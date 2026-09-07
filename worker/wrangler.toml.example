@@ -1,0 +1,6 @@
+name = "organic637-lab-api"
+main = "organic637-worker.js"
+compatibility_date = "2026-09-07"
+
+[vars]
+ALLOWED_ORIGIN = "https://lts2590871238-cpu.github.io"
