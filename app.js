@@ -459,8 +459,9 @@
       day,
       positionLabel: question.role === 'repair' ? '修复题 · 同技能新结构' : `Day ${day} · 第 ${Math.min(progress.taskIndex + 1, progress.queue.length)} 个判断`,
       onNext(result) {
-        progress.answered[question.id] = { correct: Boolean(result?.correct), partialScore: Number(result?.partialScore ?? 0), at: Date.now() };
-        progress.taskIndex += 1;
+        const currentProgress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        currentProgress.answered[question.id] = { correct: Boolean(result?.correct), partialScore: Number(result?.partialScore ?? 0), at: Date.now() };
+        currentProgress.taskIndex += 1;
         Store.save();
         dayPage(day);
       },
@@ -628,10 +629,11 @@
       day,
       positionLabel: `今日复习 · ${progress.reviewIndex + 1}/${progress.reviewQueue.length}`,
       onNext() {
-        progress.reviewIndex += 1;
-        if (progress.reviewIndex >= progress.reviewQueue.length) {
-          progress.reviewQueue = [];
-          progress.reviewIndex = 0;
+        const currentProgress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        currentProgress.reviewIndex += 1;
+        if (currentProgress.reviewIndex >= currentProgress.reviewQueue.length) {
+          currentProgress.reviewQueue = [];
+          currentProgress.reviewIndex = 0;
           Store.save();
           reviewDonePage();
         } else {

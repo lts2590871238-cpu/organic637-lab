@@ -1,3 +1,9 @@
+# Phase 3.1 hotfix
+
+- Fixed study question Continue button repeating the same question after submission.
+- Fixed the same stale day-state reference in review progression.
+- Added app.js cache-busting query in index.html.
+
 # organic637 Phase 3 build status
 
 - Phase 1 learning loop: PASS (kept from clean-v1)

@@ -1,5 +1,5 @@
-CURRENT_MILESTONE: M3_PHASE3_INTEGRATED
-DONE: M1 schema v2 migration + Day01-Day04 registry; M2 mastery/confidence/hints/first-attempt/forgetting/review queue integrated into live app; M3 ranking/route/structure-choice/electron-arrow integrated and reachable in Day02-Day04.
-NEXT: M4 full Structure Detective engine (candidate evidence matrix + IR/NMR SVG + partial evidence scoring), then M5 Synthesis Maze.
-KNOWN_ISSUES: Browser-level visual smoke test still requires deployment/user browser; Phase4/5 and Day05-Day20 content are intentionally not included in this stage.
-LAST_VALIDATION: node syntax checks + scripts/validate-phase3.mjs PASS on 2026-09-08.
+CURRENT_MILESTONE: M3_HOTFIX_COMPLETE
+DONE: Phase 2 engine integrated; Phase 3 interactions integrated for Day 1-4; fixed post-submit progression stale-state bug; fixed review progression stale-state bug.
+NEXT: Phase 4 structure detective, then Phase 5 synthesis maze.
+KNOWN_ISSUES: Day 5-20 not built yet by design at this checkpoint.
+LAST_VALIDATION: app.js syntax PASS; phase3 validator PASS before hotfix; hotfix blocks manually verified 2026-09-08.
