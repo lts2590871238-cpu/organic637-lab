@@ -1,23 +1,25 @@
-# 有机实验室 · 南京工业大学 637 · clean-v1
+# 有机实验室 · Phase 3 continuation
 
-这是一版从零重写的第一垂直切片，技术结构刻意复用已经跑通的考研英语网站模式：
+本包接在已经成功运行的 clean-v1 后面，不改登录架构，不重建 D1，不改 Cloudflare CORS。
 
-- GitHub Pages：只托管静态前端
-- `config.js`：只保存 Worker URL，不保存任何 Secret
-- Cloudflare Worker：注册、登录、云同步；以后 AI 也只放这里
-- Cloudflare D1：账号、会话和云端学习状态
-- 浏览器本地：localStorage 双份保存，网络暂时异常时不丢当前进度
+## 本轮做了什么
 
-## 前端文件
+1. 把 Codex 已写但尚未接入页面的 `learning-engine.js`、`review-engine.js`、`interactions.js` 真正接入 `index.html/app.js`。
+2. 修复 clean-v1 -> schema v2 的 Day1 迁移缺口，保留旧用户 Day1 进度、技能和 attempts。
+3. 首页加入独立的“今日复习 / 今日错题 / 能力地图”。
+4. Day1-Day4 使用统一学习流，记录 first attempt、hints、confidence、partial score、error type、response time。
+5. Phase 3 可实际运行：排序、路线分支、结构选择、电子箭头。
+6. 修复两类数据兼容：Day2 的简单 synthesis 不是 graph；Day3 的 early detective 先以 detective-lite 运行，避免学习流卡死。
+7. 修复电子箭头热点对不同 SVG viewBox 的坐标适配。
 
-- `index.html`
-- `styles.css`
-- `config.js`
-- `app.js`
-- `data/day01.js`
+## 部署
 
-没有 Vite、React、npm 构建，也不需要 GitHub Actions。GitHub Pages 直接从 `main / (root)` 发布。
+这是前端阶段更新。现有 Worker 与 D1 不需要重建。
 
-## Worker
+把本包内容覆盖上传到现有 GitHub 仓库 `organic637-lab` 根目录即可。`worker/` 只是保持后端源码快照，本轮没有要求重新粘贴 Worker。
 
-见 `worker/README.md`。第一版推荐在 Cloudflare Dashboard 手动创建 Worker，并把 `organic637-worker.js` 粘贴进去，避免把前端仓库和 Worker 构建流程混在一起。
+## 当前开放
+
+Day1-Day4。
+
+Day5-Day20 在本轮界面中不会伪装成已完成；下一阶段先做 Phase4 结构侦探，再做 Phase5 合成迷宫，然后继续扩充20天数据。
