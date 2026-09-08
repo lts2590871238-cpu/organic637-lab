@@ -12,7 +12,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
-  if (!NS.Learning || !NS.Review || !NS.Interactions) {
+  if (!NS.Learning || !NS.Review || !NS.Interactions || !NS.Detective) {
     $('#app').textContent = '学习引擎没有完整加载，请刷新页面。';
     return;
   }
@@ -230,6 +230,7 @@
     }
     state.attempts = Array.isArray(state.attempts) ? state.attempts.slice(-1200) : [];
     state.completedDays = [...new Set((state.completedDays || []).map(Number))].sort((a, b) => a - b);
+    state.detective = NS.Detective.normalizeProgress(state.detective);
     const firstUnfinished = Array.from({ length: AVAILABLE_MAX_DAY }, (_, i) => i + 1).find(day => REGISTRY[day] && !state.completedDays.includes(day));
     if (!state.currentDay || state.currentDay < 1) state.currentDay = firstUnfinished || AVAILABLE_MAX_DAY;
     if (state.currentDay > AVAILABLE_MAX_DAY) state.currentDay = AVAILABLE_MAX_DAY;
@@ -329,7 +330,7 @@
 
   function shell(inner, active = '') {
     const name = Auth.user?.username || '';
-    $('#app').innerHTML = `<div class="app"><header class="topbar"><div class="brand"><small>南京工业大学 637 · 20天冲刺</small>有机实验室</div><div class="nav-row"><button class="nav-pill ${active === 'home' ? 'active' : ''}" data-nav="#home">今日</button><button class="nav-pill ${active === 'review' ? 'active' : ''}" data-nav="#review">复习</button><button class="nav-pill ${active === 'mistakes' ? 'active' : ''}" data-nav="#mistakes">错题</button><button class="nav-pill ${active === 'abilities' ? 'active' : ''}" data-nav="#abilities">能力</button></div><div class="cloud"><span id="cloudDot" class="dot"></span><span id="cloudText">${name ? esc(name) : '未登录'}</span></div></header>${inner}</div>`;
+    $('#app').innerHTML = `<div class="app"><header class="topbar"><div class="brand"><small>南京工业大学 637 · 20天冲刺</small>有机实验室</div><div class="nav-row"><button class="nav-pill ${active === 'home' ? 'active' : ''}" data-nav="#home">今日</button><button class="nav-pill ${active === 'review' ? 'active' : ''}" data-nav="#review">复习</button><button class="nav-pill ${active === 'mistakes' ? 'active' : ''}" data-nav="#mistakes">错题</button><button class="nav-pill ${active === 'abilities' ? 'active' : ''}" data-nav="#abilities">能力</button><button class="nav-pill ${active === 'detective' ? 'active' : ''}" data-nav="#detective">侦探</button></div><div class="cloud"><span id="cloudDot" class="dot"></span><span id="cloudText">${name ? esc(name) : '未登录'}</span></div></header>${inner}</div>`;
     document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.nav; }));
     renderCloud();
   }
@@ -413,13 +414,14 @@
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
       return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可自由复练' : meta.day === state.currentDay ? '今天的主线' : available ? '按顺序解锁' : '下一阶段继续建设'}</small></button>`;
     }).join('');
-    shell(`<div class="home-grid"><section class="panel day-card"><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今日主线</div><h1>${esc(data.title)}</h1><p class="lead">${esc(data.subtitle || '')}</p><div class="progress-line"><i style="width:${percent}%"></i></div><div class="tiny">今日进度 ${percent}% · 预计 ${Number(data.estimatedMinutes || 80)} 分钟</div><div class="home-actions"><button class="home-action" id="startDay"><b>${progress.lessonIndex || progress.taskIndex ? '继续今天' : '开始今天'}</b><span>只沿这一条主线往前走</span></button><button class="home-action" id="openReview"><b>今日复习 ${due}</b><span>只捡回已经到期的记忆</span></button><button class="home-action" id="openMistakes"><b>今日错题 ${mistakes}</b><span>和遗忘复习分开处理</span></button></div><div class="btn-row"><button id="abilities" class="btn soft">看能力地图</button><button id="logout" class="btn ghost">退出账号</button></div></section><aside class="side-stat"><div class="panel"><div class="kicker">阶段 2 · 能力模型</div><div class="mini-card"><span class="tiny">已稳定技能</span><strong>${stable}</strong></div><div class="mini-card" style="margin-top:10px"><span class="tiny">训练估计</span><strong>${score.low}–${score.high}</strong><span class="tiny">/150 · ${esc(score.label)}</span></div></div><div class="panel"><div class="kicker">阶段 3 · 核心互动</div><p style="line-height:1.8;margin-bottom:0">Day 2–4 已接入结构选择、排序、路线分支与电子箭头。黄色路线允许继续，不把“非最优”直接判成错误。</p></div></aside></div><div class="section-title"><h2>20 天实验地图</h2><span class="phase-badge">本轮已开放 Day 1–4</span></div><div class="day-map">${dayTiles}</div>${summary.length ? `<div class="section-title"><h2>现在只看大能力，不堆几十条技能</h2><button class="tiny-link" id="allAbilities">展开能力地图 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}`,'home');
+    shell(`<div class="home-grid"><section class="panel day-card"><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今日主线</div><h1>${esc(data.title)}</h1><p class="lead">${esc(data.subtitle || '')}</p><div class="progress-line"><i style="width:${percent}%"></i></div><div class="tiny">今日进度 ${percent}% · 预计 ${Number(data.estimatedMinutes || 80)} 分钟</div><div class="home-actions"><button class="home-action" id="startDay"><b>${progress.lessonIndex || progress.taskIndex ? '继续今天' : '开始今天'}</b><span>只沿这一条主线往前走</span></button><button class="home-action" id="openReview"><b>今日复习 ${due}</b><span>只捡回已经到期的记忆</span></button><button class="home-action" id="openMistakes"><b>今日错题 ${mistakes}</b><span>和遗忘复习分开处理</span></button></div><div class="btn-row"><button id="abilities" class="btn soft">看能力地图</button><button id="logout" class="btn ghost">退出账号</button></div></section><aside class="side-stat"><div class="panel"><div class="kicker">阶段 2 · 能力模型</div><div class="mini-card"><span class="tiny">已稳定技能</span><strong>${stable}</strong></div><div class="mini-card" style="margin-top:10px"><span class="tiny">训练估计</span><strong>${score.low}–${score.high}</strong><span class="tiny">/150 · ${esc(score.label)}</span></div></div><div class="panel"><div class="kicker">阶段 3 · 核心互动</div><p style="line-height:1.8;margin-bottom:0">Day 2–4 已接入结构选择、排序、路线分支与电子箭头。黄色路线允许继续，不把“非最优”直接判成错误。</p></div><div class="panel"><div class="kicker">阶段 4 · 结构侦探</div><p style="line-height:1.8;margin-bottom:10px">完整结构侦探所已开放独立训练：DBE → IR → NMR → 候选排除 → 最终结构。最终选错不会把前面的正确证据清零。</p><button class="btn soft" id="openDetectiveHome">进入结构侦探所</button></div></aside></div><div class="section-title"><h2>20 天实验地图</h2><span class="phase-badge">本轮已开放 Day 1–4</span></div><div class="day-map">${dayTiles}</div>${summary.length ? `<div class="section-title"><h2>现在只看大能力，不堆几十条技能</h2><button class="tiny-link" id="allAbilities">展开能力地图 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
     $('#abilities').onclick = () => { location.hash = '#abilities'; };
     $('#allAbilities')?.addEventListener('click', () => { location.hash = '#abilities'; });
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => { location.hash = `#day/${button.dataset.day}`; }));
+    $('#openDetectiveHome')?.addEventListener('click', () => { location.hash = '#detective'; });
     $('#logout').onclick = async () => {
       await Cloud.push().catch(() => {});
       await Auth.logout();
@@ -668,6 +670,76 @@
     $('#home').onclick = () => { location.hash = '#home'; };
   }
 
+
+  function detectiveHubPage() {
+    const cases = Array.isArray(Data.DETECTIVE_CASES) ? Data.DETECTIVE_CASES : [];
+    const progress = NS.Detective.normalizeProgress(Store.state.detective);
+    Store.state.detective = progress;
+    const completed = Object.values(progress.cases || {}).filter(row => row?.completedAt).length;
+    const average = completed ? Math.round(Object.values(progress.cases).filter(row => row?.completedAt).reduce((sum, row) => sum + Number(row.score || 0), 0) / completed * 100) : 0;
+    shell(`<section class="panel detective-hub"><div class="kicker">PHASE 4 · 结构侦探所</div><h1>不是“看谱猜答案”，而是把证据一条条关上门</h1><p class="lead">每一案都按同一条链走：分子式与 DBE → IR → ¹H NMR → 候选保留/排除 → 最终结构。最终候选选错，前面算对的 DBE、IR、NMR 仍然分别进入能力模型。</p><div class="detective-hub-stats"><div><span>已完成案例</span><b>${completed}/${cases.length}</b></div><div><span>已完成案例平均推断链</span><b>${completed ? average + '%' : '—'}</b></div><div><span>当前模式</span><b>独立训练</b></div></div><div class="section-title"><h2>案例</h2><span class="phase-badge">Day 13–14 引擎预先开放测试</span></div><div class="detective-case-list">${cases.map((kase, index) => { const row = progress.cases?.[kase.id]; return `<button type="button" class="detective-case-tile ${row?.completedAt ? 'done' : ''}" data-detective-case="${esc(kase.id)}"><span>${esc(kase.stage || `案例 ${index + 1}`)}</span><b>${esc(kase.title)}</b><small>${esc(kase.subtitle || '')}</small><em>${row?.completedAt ? `已完成 · ${Math.round(Number(row.score || 0) * 100)}%` : '未开始'}</em></button>`; }).join('')}</div><div class="note">这里先独立开放 Phase 4 方便验收，不会把你的当前 Day 1–4 主线强行跳到 Day 13。等 Day 5–12 数据补齐后，这套同一引擎会直接嵌入 Day 13–14。</div><div class="btn-row"><button class="btn primary" id="detectiveHome">回到今日</button></div></section>`, 'detective');
+    document.querySelectorAll('[data-detective-case]').forEach(button => button.addEventListener('click', () => { location.hash = `#detective/${button.dataset.detectiveCase}`; }));
+    $('#detectiveHome').onclick = () => { location.hash = '#home'; };
+  }
+
+  function detectiveCasePage(caseId) {
+    const cases = Array.isArray(Data.DETECTIVE_CASES) ? Data.DETECTIVE_CASES : [];
+    const index = cases.findIndex(row => row.id === caseId);
+    const kase = cases[index];
+    if (!kase) return detectiveHubPage();
+    Store.state.detective = NS.Detective.normalizeProgress(Store.state.detective);
+    Store.state.detective.currentCaseId = kase.id;
+    Store.save(false);
+    const started = performance.now();
+    shell(`<section class="panel detective-shell"><div id="detectiveRoot"></div><div class="footer-actions"><button class="link-btn" id="detectiveExit">← 暂时离开这案</button><span class="tiny">推断过程分开计分，不用一次猜中才算会。</span></div></section>`, 'detective');
+    $('#detectiveExit').onclick = () => { location.hash = '#detective'; };
+    NS.Detective.mount($('#detectiveRoot'), kase, {
+      nextCaseId: cases[index + 1]?.id || null,
+      onComplete(summary) {
+        const elapsed = Math.max(0, Math.round(performance.now() - started));
+        summary.skillEvidence.forEach(evidence => {
+          const questionId = `${kase.id}:${evidence.questionSuffix}`;
+          const previous = Store.state.attempts.filter(row => row.questionId === questionId).length;
+          const pseudoQuestion = {
+            id: questionId,
+            day: String(kase.stage || '').includes('14') ? 14 : 13,
+            type: 'detective-step',
+            role: 'transfer',
+            primarySkill: evidence.skillId,
+            skillIds: [evidence.skillId]
+          };
+          NS.Learning.recordAttempt(Store.state, pseudoQuestion, {
+            mode: 'detective',
+            correct: evidence.correct,
+            firstAttempt: previous === 0,
+            attemptNumber: previous + 1,
+            hintsUsed: evidence.hintsUsed || 0,
+            confidence: summary.confidence,
+            responseTimeMs: Math.round(elapsed / Math.max(1, summary.skillEvidence.length)),
+            isTransfer: true,
+            answerPayload: summary.answers,
+            partialScore: evidence.partialScore,
+            errorType: evidence.errorType
+          });
+        });
+        Store.state.detective.cases[kase.id] = {
+          completedAt: Date.now(),
+          score: summary.score,
+          dbeCorrect: summary.dbeCorrect,
+          irCorrect: summary.irCorrect,
+          nmrCorrect: summary.nmrCorrect,
+          eliminationScore: summary.eliminationScore,
+          finalCorrect: summary.finalCorrect,
+          hintsUsed: summary.hintsUsed,
+          confidence: summary.confidence
+        };
+        Store.save();
+      },
+      onBack() { location.hash = '#detective'; },
+      onNext(nextId) { location.hash = `#detective/${nextId}`; }
+    });
+  }
+
   function notReadyPage(day) {
     shell(`<section class="panel"><div class="kicker">DAY ${day}</div><h1>这一阶段还没有开放</h1><p class="lead">当前交付只把 Phase 2 能力模型与 Phase 3 核心互动完整接到 Day 1–4。结构侦探与合成迷宫会在下一阶段继续接入，不在这里放占位假功能。</p><div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`);
     $('#home').onclick = () => { location.hash = '#home'; };
@@ -680,6 +752,9 @@
     if (hash === '#review') return reviewPage();
     if (hash === '#mistakes') return mistakesPage();
     if (hash === '#abilities') return abilitiesPage();
+    if (hash === '#detective') return detectiveHubPage();
+    const detectiveMatch = hash.match(/^#detective\/(.+)$/);
+    if (detectiveMatch) return detectiveCasePage(decodeURIComponent(detectiveMatch[1]));
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
     location.hash = '#home';
