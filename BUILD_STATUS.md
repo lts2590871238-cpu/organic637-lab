@@ -1,4 +1,4 @@
-# BUILD STATUS — beginner closure v12
+# BUILD STATUS — beginner closure v13
 
 - Phase 1 learning loop: PASS
 - Phase 2 ability/mastery/review: PASS
@@ -10,6 +10,7 @@
 - Question-level guided reasoning v11: PASS
 - Prerequisite leakage audit: PASS (COUNT 0)
 - V12 unified layout / 5-stage journey: PASS
+- V13 reading-first / mobile comfort layout: PASS
 - Daily duration rule 70–90 min: PASS
 - 3D: NOT INCLUDED YET BY DESIGN
 

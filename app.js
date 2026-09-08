@@ -823,7 +823,7 @@
     if (!cards.length) return '';
     return `<section class="first-use-terms"><div class="first-use-head"><span>第一次见到这些词</span><b>先把词翻译成人话，再读下面正文</b><small>这里没有“默认你会”。每个词都回答：它是什么、为什么有用、哪里不能乱套。</small></div><div class="term-card-grid">${cards.map((card, index) => {
       const visual = card.diagram && NS.Visuals?.render ? NS.Visuals.render(card.diagram) : '';
-      return `<article class="term-card ${index < 2 ? 'important' : ''}"><div class="term-title"><span>${index + 1}</span><h3>${esc(card.term)}</h3></div>${visual ? `<div class="term-visual">${visual}</div>` : ''}<div class="term-explain"><p><b>先说人话：</b>${esc(card.plain || '')}</p><p><b>为什么要懂它：</b>${esc(card.why || '')}</p>${card.limit ? `<p class="term-limit"><b>别把它套过头：</b>${esc(card.limit)}</p>` : ''}</div></article>`;
+      return `<article class="term-card ${index < 2 ? 'important' : ''}"><div class="term-title"><span>${index + 1}</span><h3>${esc(card.term)}</h3></div><div class="term-explain"><p><b>先说人话：</b>${esc(card.plain || '')}</p><p><b>为什么要懂它：</b>${esc(card.why || '')}</p></div>${visual ? `<div class="term-visual"><div class="term-visual-label">把刚才这句话变成一张图</div>${visual}</div>` : ''}${card.limit ? `<p class="term-limit"><b>别把它套过头：</b>${esc(card.limit)}</p>` : ''}</article>`;
     }).join('')}</div></section>`;
   }
 
@@ -894,7 +894,7 @@
     if (level === 'compact') {
       return `<div class="question-term-help compact"><b>词义扶手</b><div class="question-term-chip-list">${cards.map(c => `<span title="${esc(c.plain)}">${esc(c.term)}</span>`).join('')}</div><small>忘了词义没关系，先把名词翻译成人话再做。</small></div>`;
     }
-    return `<section class="question-term-help full"><div class="first-use-head"><span>这题会用到这些词</span><b>不要求你“应该已经会”</b><small>先读懂词义，再开始判断。</small></div>${cards.map(c => `<article class="question-term-mini full"><b>${esc(c.term)}</b>${c.diagram && NS.Visuals?.render ? `<div class="mini-term-visual">${NS.Visuals.render(c.diagram)}</div>` : ''}<p><strong>人话：</strong>${esc(c.plain)}</p><p><strong>为什么：</strong>${esc(c.why)}</p></article>`).join('')}</section>`;
+    return `<section class="question-term-help full"><div class="first-use-head"><span>这题会用到这些词</span><b>不要求你“应该已经会”</b><small>先读懂词义，再开始判断。</small></div>${cards.map(c => `<article class="question-term-mini full"><b>${esc(c.term)}</b><p><strong>人话：</strong>${esc(c.plain)}</p><p><strong>为什么：</strong>${esc(c.why)}</p>${c.diagram && NS.Visuals?.render ? `<div class="mini-term-visual"><div class="term-visual-label">把刚才这句话变成一张图</div>${NS.Visuals.render(c.diagram)}</div>` : ''}</article>`).join('')}</section>`;
   }
 
   function goPreviousStudyPage(day) {
@@ -903,7 +903,7 @@
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     if (progress.lessonIndex < data.lessons.length) {
       if (progress.lessonIndex <= 0) {
-        location.hash = '#portal';
+        location.hash = '#welcome';
         return;
       }
       progress.lessonIndex -= 1;
@@ -922,7 +922,7 @@
       Store.save();
       dayPage(day);
     } else {
-      location.hash = '#portal';
+      location.hash = '#welcome';
     }
   }
 
@@ -1095,7 +1095,7 @@
 
   function lessonPage(day, item) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
-    const prevLabel = progress.lessonIndex > 0 ? '← 上一页' : '← 回入口';
+    const prevLabel = progress.lessonIndex > 0 ? '← 上一页' : '← 回欢迎页';
     shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevLesson').onclick = () => goPreviousStudyPage(day);
@@ -1216,7 +1216,7 @@
       return { id, label: SKILL_META.get(id)?.label || id, effective, band: NS.Learning.masteryBand(skill, effective) };
     });
     const nextAvailable = day < AVAILABLE_MAX_DAY && Boolean(REGISTRY[day + 1]);
-    shell(`<section class="panel finish"><div class="big">🌱</div><div class="kicker">DAY ${day} 收口</div><h1>今天这一条主线已经走完</h1><p class="lead">正确不等于永久掌握。系统已经把提示、置信度、首次作答和后续复习时间写进能力模型。</p><div class="skills">${rows.map(row => `<div class="skill-row"><span>${esc(row.label)}<small style="display:block;color:var(--muted);margin-top:3px">${esc(row.band)}</small></span><b>${row.effective}%</b></div>`).join('')}</div><div class="good">今天的错题与遗忘曲线复习已经分开记录。明天到期的内容会进入“今日复习”，不是随机插进主线。</div>${data.memorySheet?.length ? `<div class="memory-sheet"><div class="section-title"><h2>今天真正要带走的表达</h2></div>${data.memorySheet.map(x => `<div class="memory-line">${esc(x)}</div>`).join('')}</div>` : ''}<div class="btn-row" style="justify-content:center"><button id="home" class="btn primary">回到欢迎页首页</button>${nextAvailable ? `<button id="nextDay" class="btn soft">看看 Day ${day + 1}</button>` : ''}<button id="redo" class="btn ghost">自由复练这一天</button></div></section>`);
+    shell(`<section class="panel finish"><div class="big">🌱</div><div class="kicker">DAY ${day} 收口</div><h1>今天这一条主线已经走完</h1><p class="lead">正确不等于永久掌握。系统已经把提示、置信度、首次作答和后续复习时间写进能力模型。</p><div class="skills">${rows.map(row => `<div class="skill-row"><span>${esc(row.label)}<small style="display:block;color:var(--muted);margin-top:3px">${esc(row.band)}</small></span><b>${row.effective}%</b></div>`).join('')}</div><div class="good">今天的错题与遗忘曲线复习已经分开记录。明天到期的内容会进入“今日复习”，不是随机插进主线。</div>${data.memorySheet?.length ? `<div class="memory-sheet"><div class="section-title"><h2>今天真正要带走的表达</h2></div>${data.memorySheet.map(x => `<div class="memory-line">${esc(x)}</div>`).join('')}</div>` : ''}<div class="btn-row" style="justify-content:center"><button id="home" class="btn primary">回到欢迎页</button>${nextAvailable ? `<button id="nextDay" class="btn soft">看看 Day ${day + 1}</button>` : ''}<button id="redo" class="btn ghost">自由复练这一天</button></div></section>`);
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#nextDay')?.addEventListener('click', () => { location.hash = `#day/${day + 1}`; });
     $('#redo').onclick = () => {
