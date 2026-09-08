@@ -11,7 +11,7 @@
     estimatedMinutes: 90,
     objectives: [
       '识别端炔酸性来自 sp 碳较高的 s 成分',
-      '用强碱生成炔负离子并只对合适的卤代烃做 SN2 增碳',
+      '用强碱生成炔负离子，并学会用“一边成 C–C、一边让 X 离开”的方式增碳；Day4 再给这种取代正式命名',
       '区分炔烃两种水合与两种选择性还原',
       '识别共轭二烯并完成基础 Diels–Alder 判断',
       '开始用光谱硬证据淘汰候选，并做一步微型逆推'
@@ -83,13 +83,13 @@
         primarySkill: 'alkyne.acetylide_alkylation',
         skillIds: ['alkyne.acetylide_alkylation', 'substitution.sn2', 'synthesis.carbon_count'],
         difficulty: 2,
-        prompt: '乙炔钠 HC≡C⁻ Na⁺ 要通过 SN2 顺利增添两个碳，优先选择哪种卤代烃？',
-        examTags: ['C–C 键形成', 'SN2', '合成'],
-        hints: ['炔负离子既是强亲核体也是强碱。', 'SN2 更喜欢甲基或一级卤代烃。'],
+        prompt: '乙炔钠 HC≡C⁻ Na⁺ 要顺利增添两个碳，优先选择哪种卤代烃？',
+        examTags: ['C–C 键形成', '一步取代', '合成'],
+        hints: ['炔负离子既是强亲核体也是强碱。', '这种一步接入更喜欢甲基或一级卤代烃，因为进攻碳周围不拥挤。'],
         explanationLayers: {
           short: '选择溴乙烷。',
           why: '一级溴代烃位阻小，炔负离子可背面进攻形成新的 C–C 键。',
-          full: 'HC≡C⁻ + CH₃CH₂Br → HC≡CCH₂CH₃。叔丁基溴位阻过大且易 E2；乙烯基溴的 sp² 碳不走普通 SN2。'
+          full: 'HC≡C⁻ + CH₃CH₂Br → HC≡CCH₂CH₃。叔丁基溴周围太拥挤，强碱更容易去拿旁边的 H；乙烯基溴的双键碳也不适合这种背面一步接入。Day4–5 会正式命名这些竞争路线。'
         },
         options: [{ id: 'a', label: 'CH₃CH₂Br' }, { id: 'b', label: '(CH₃)₃CBr' }, { id: 'c', label: 'CH₂=CHBr' }],
         answer: 'a'
@@ -221,7 +221,7 @@
         hints: ['1-丁炔末端 H 可先被强碱移走。', '目标比起点多两个碳，应让炔负离子进攻一级二碳卤代物。'],
         explanationLayers: {
           short: '先 NaNH₂，再加入 CH₃CH₂Br。',
-          why: '端炔转为炔负离子后，对一级溴乙烷做 SN2，新增两个碳。',
+          why: '端炔转为炔负离子后，负电碳进攻一级溴乙烷的带 Br 碳，一边成 C–C 键、一边让 Br 带着旧键电子离开，于是新增两个碳。',
           full: 'HC≡CCH₂CH₃ 经 NaNH₂ 生成 ⁻C≡CCH₂CH₃；其与 CH₃CH₂Br 形成 CH₃CH₂C≡CCH₂CH₃。若用叔丁基溴，强碱性炔负离子主要引发 E2，路线卡住。'
         },
         graph: {
@@ -234,7 +234,7 @@
           ],
           edges: [
             { id: 'e1', from: 'butyne1', to: 'acetylide', choice: 'NaNH₂/NH₃(l)', reagent: 'NaNH₂', status: 'green', reason: '生成所需炔负离子。' },
-            { id: 'e2', from: 'acetylide', to: 'hexyne3', choice: 'CH₃CH₂Br', reagent: 'CH₃CH₂Br', status: 'green', reason: '一级卤代烃顺利 SN2，增加两个碳。' },
+            { id: 'e2', from: 'acetylide', to: 'hexyne3', choice: 'CH₃CH₂Br', reagent: 'CH₃CH₂Br', status: 'green', reason: '一级卤代烃的反应中心较不拥挤，炔负离子容易从背后接近并新建 C–C 键，增加两个碳。' },
             { id: 'e3', from: 'acetylide', to: 'elimination', choice: '(CH₃)₃CBr', reagent: '(CH₃)₃CBr', status: 'red', reason: '三级底物位阻大，主要发生 E2，不能得到目标炔。' }
           ],
           referenceRoutes: [['e1', 'e2']]
@@ -258,8 +258,8 @@
           id: 'd03-repair-alkylation-01', day: 3, type: 'choice', role: 'repair',
           primarySkill: 'alkyne.acetylide_alkylation', skillIds: ['alkyne.acetylide_alkylation', 'substitution.sn2'], difficulty: 2,
           prompt: '丙炔负离子要甲基化，最合适的底物是什么？', examTags: ['修复', '增碳'],
-          hints: ['甲基卤代物是最不拥挤的 SN2 底物。'],
-          explanationLayers: { short: '选择 CH₃I。', why: '炔负离子可对甲基碘做快速 SN2。', full: 'CH₃C≡C⁻ + CH₃I 形成 2-丁炔；三级卤代物会偏消除。' },
+          hints: ['甲基卤代物的反应中心最不拥挤，最适合这种一步接入。'],
+          explanationLayers: { short: '选择 CH₃I。', why: '炔负离子可快速进攻甲基碘的碳，同时让 I⁻ 离开。', full: 'CH₃C≡C⁻ + CH₃I 形成 2-丁炔；若换成周围非常拥挤的三级卤代物，强碱更容易夺取邻近 H 并形成双键。Day5 再正式学习这条竞争路线。' },
           options: [{ id: 'a', label: 'CH₃I' }, { id: 'b', label: '(CH₃)₃CCl' }], answer: 'a'
         }
       ],

@@ -5,7 +5,7 @@
   window.Organic637Data.DETECTIVE_CASES = [
     {
       id: 'det-terminal-alkyne',
-      stage: 'Day 13 · 硬证据',
+      stage: 'Day 14 · 完整证据链复练',
       title: '谁是真正的端炔？',
       subtitle: '先用 DBE、IR 和化学检验把明显不合格的候选淘汰掉。',
       formula: 'C4H6',
@@ -71,7 +71,7 @@
     },
     {
       id: 'det-acetone-symmetry',
-      stage: 'Day 13 · IR + 对称性',
+      stage: 'Day 14 · IR + NMR 对称性',
       title: '一个 6H 单峰为什么这么有力？',
       subtitle: '这次不是“看见羰基就结束”，而是用对称性继续淘汰。',
       formula: 'C3H6O',

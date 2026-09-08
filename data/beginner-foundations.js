@@ -105,7 +105,7 @@
       {
         id: 'd01-zero-08-wonder', eyebrow: 'Day 1 · 进入有机世界的第一张地图',
         title: '你已经不是在背反应，而是在追踪“电子想去哪里”',
-        body: '到这里你已经有了一套可以反复使用的语言：结构式是连接地图，官能团是反应把手，键是一对共享电子，断键要追踪电子归属，成键要找到电子来源与电子缺口，条件会改变电子运动路径。后面的 SN1/SN2、羰基、芳香取代、烯醇负离子，看起来名字完全不同，但底层都能回到这几句话。',
+        body: '到这里你已经有了一套可以反复使用的语言：结构式是连接地图，官能团是反应把手，键是一对共享电子，断键要追踪电子归属，成键要找到电子来源与电子缺口，条件会改变电子运动路径。后面的取代反应、羰基反应、芳香取代、烯醇负离子，看起来名字完全不同，但底层都能回到这几句话。',
         note: '如果这一页真的看懂，后面很多“新反应”会开始像同一种语言的不同句子。',
         formulas: ['找电子源 → 找电子缺口 → 看哪个键断 → 看哪个键成 → 检查产物是否稳定'],
         analogy: { title: '像终于学会看地图图例', body: '第一次看地图时每个符号都陌生；一旦知道“蓝线是河、红线是路、圆点是站”，城市突然变得有秩序。有机化学也是这样。', boundary: '后续还会加入立体、轨道、动力学和热力学等更细规则。' },
@@ -124,7 +124,7 @@
     ],
     3: [
       { id:'d03-zero-01-hybridization', eyebrow:'Day 3 · 为什么端炔 H 特别', title:'先别背 pKa：看负电荷离原子核有多近', body:'端炔失去 H 后，负电荷落在 sp 碳上。sp 轨道 s 成分高，电子平均更靠近原子核；负电荷被吸得更紧，因此比落在 sp² 或 sp³ 碳上更稳定。酸性强弱本质上是在比较“失去 H 后的共轭碱谁更稳”。', formulas:['sp：50% s；sp²：33% s；sp³：25% s','端炔 pKa≈25；烯烃≈44；烷烃≈50'], analogy:{title:'像负电荷被更短的安全绳拉回中心',body:'离带正电的原子核越近，负电荷越容易被稳定。',boundary:'真实轨道是概率分布，不是绳子长度。'}, sequence:[{title:'先去掉 H',text:'不要先比较原酸，先画共轭碱。',formula:'RC≡CH → RC≡C⁻'},{title:'看负电荷落在哪类轨道',text:'端炔是 sp 碳。',formula:'sp C⁻'},{title:'比较稳定性',text:'共轭碱越稳，原来的 H 越容易失去。',formula:'稳定共轭碱 ⇔ 较强酸'}] },
-      { id:'d03-zero-02-carbon-nucleophile', eyebrow:'Day 3 · 第一次真正“接长碳链”', title:'碳也可以当亲核体：炔负离子手里有一对可用电子', body:'很多初学者会以为“亲核体都是 O⁻、N、卤离子”。其实带负电的碳同样可以提供电子对。炔负离子的碳拿着一对电子去进攻一级卤代烃中带 X 的碳，同时 C–X 键断裂，于是旧的两个碳骨架被一根新的 C–C 键接在一起。', formulas:['RC≡C⁻ + R′–CH₂–Br → RC≡C–CH₂R′ + Br⁻'], analogy:{title:'像两段乐高通过一个新卡扣拼成更长的一段',body:'炔负离子提供“卡扣的一对电子”，卤代烃提供可被进攻的碳，同时 Br 离开。',boundary:'位阻太大时 SN2 不顺，会竞争 E2。'}, sequence:[{title:'标出负电碳',text:'它是电子来源。',formula:'RC≡C:⁻'},{title:'标出带 Br 的碳',text:'C–Br 极化，碳是可被进攻的位置。',formula:'R′–CH₂δ+–Brδ−'},{title:'成 C–C 键',text:'负电碳的电子对与 CH₂ 碳形成新 σ 键。',formula:'RC≡C–CH₂R′'},{title:'Br 离开',text:'原 C–Br 键电子留给 Br。',formula:'Br⁻'}] },
+      { id:'d03-zero-02-carbon-nucleophile', eyebrow:'Day 3 · 第一次真正“接长碳链”', title:'碳也可以当亲核体：炔负离子手里有一对可用电子', body:'很多初学者会以为“亲核体都是 O⁻、N、卤离子”。其实带负电的碳同样可以提供电子对。炔负离子的碳拿着一对电子去进攻一级卤代烃中带 X 的碳，同时 C–X 键断裂，于是旧的两个碳骨架被一根新的 C–C 键接在一起。', formulas:['RC≡C⁻ + R′–CH₂–Br → RC≡C–CH₂R′ + Br⁻'], analogy:{title:'像两段乐高通过一个新卡扣拼成更长的一段',body:'炔负离子提供“卡扣的一对电子”，卤代烃提供可被进攻的碳，同时 Br 离开。',boundary:'周围太拥挤时，这种一步接入会变难，旁边“抽走H并形成双键”的路线也会来竞争；它们的正式名字到 Day4–5 再学。'}, sequence:[{title:'标出负电碳',text:'它是电子来源。',formula:'RC≡C:⁻'},{title:'标出带 Br 的碳',text:'C–Br 极化，碳是可被进攻的位置。',formula:'R′–CH₂δ+–Brδ−'},{title:'成 C–C 键',text:'负电碳的电子对与 CH₂ 碳形成新 σ 键。',formula:'RC≡C–CH₂R′'},{title:'Br 离开',text:'原 C–Br 键电子留给 Br。',formula:'Br⁻'}] },
       { id:'d03-zero-03-diene', eyebrow:'Day 3 · 共轭到底奇妙在哪', title:'两个双键隔一个单键，电子就不再各管各的', body:'CH₂=CH–CH=CH₂ 中，四个 p 轨道连续排列，π 电子可以在更长的区域离域。Diels–Alder 正是利用这套连续 π 系统，一次性重新分配电子，形成两根新 σ 键和一根新 π 键。', formulas:['CH₂=CH–CH=CH₂：共轭二烯','4π + 2π → 六元环'], analogy:{title:'像四个人手拉手组成一条能整体移动的队伍',body:'共轭让电子不再局限于单独一个双键，而能作为连续体系参与反应。',boundary:'真正描述需用分子轨道，不是电子在链上自由奔跑。'}, sequence:[{title:'确认连续 p 轨道',text:'双键—单键—双键。',formula:'C=C–C=C'},{title:'把 4 个碳当整体',text:'二烯提供 4 个参与碳。',formula:'C1=C2–C3=C4'},{title:'与 2 个碳一次闭环',text:'亲双烯体贡献另外 2 个碳。',formula:'4 + 2 → 6 元环'}] }
     ],
     4: [
@@ -212,7 +212,7 @@
     'd02-zero-01-condition-language': { prompt:'“HBr”与“HBr/ROOR”可以直接当同一条反应规则吗？', options:['可以','不可以'], answer:1, feedback:'ROOR 会把机理切换到自由基路径，区域选择也随之改变。' },
     'd02-zero-02-radical': { prompt:'自由基符号 “·” 表示什么？', options:['一个未配对电子','一个负电荷','一对孤对电子'], answer:0, feedback:'自由基最核心特征是一个未配对电子。' },
     'd03-zero-01-hybridization': { prompt:'比较端炔、烯烃、烷烃的 C–H，哪一类 H 通常最酸？', options:['端炔','烯烃','烷烃'], answer:0, feedback:'端炔去质子化后负电落在 sp 碳上，共轭碱相对更稳定。' },
-    'd03-zero-02-carbon-nucleophile': { prompt:'炔负离子与一级溴代烃反应时，新生成的关键键是什么？', options:['C–O','C–C','O–H'], answer:1, feedback:'这是非常重要的增碳工具：通过 SN2 新建 C–C 键。' },
+    'd03-zero-02-carbon-nucleophile': { prompt:'炔负离子与一级溴代烃反应时，新生成的关键键是什么？', options:['C–O','C–C','O–H'], answer:1, feedback:'这是非常重要的增碳工具：电子丰富的炔负离子碳进攻一级卤代烃的碳，一边成新 C–C 键、一边让 Br 带着旧键电子离开。Day4 会给这种一步取代正式命名。' },
     'd04-zero-01-roles': { prompt:'SN2 中，谁负责提供形成新键的电子对？', options:['亲核体','离去基','亲电碳'], answer:0, feedback:'亲核体是电子对提供者，亲电碳是接收位置。' },
     'd04-zero-02-sn2-why-back': { prompt:'SN2 为什么倾向背面进攻？', options:['为了最好地重叠 σ* 并避开离去基一侧','因为背面温度更低','没有原因，只是口诀'], answer:0, feedback:'背面几何来自轨道重叠和位阻，而不是人为规定。' },
     'd05-zero-01-base-vs-nu': { prompt:'强碱去拿 β-H 并形成 C=C，这更像哪类过程？', options:['取代','消除'], answer:1, feedback:'夺 β-H、同时离去基离开并形成双键，就是消除思路。' },
