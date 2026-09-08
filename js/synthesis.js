@@ -7,6 +7,7 @@
   function normalizeProgress(progress) {
     const out = progress && typeof progress === 'object' ? progress : {};
     out.cases = out.cases && typeof out.cases === 'object' ? out.cases : {};
+    out.inProgress = out.inProgress && typeof out.inProgress === 'object' ? out.inProgress : {};
     out.currentCaseId = out.currentCaseId || null;
     return out;
   }
@@ -91,26 +92,42 @@
     const graph = kase.graph || {};
     const nodes = new Map((graph.nodes || []).map(node => [String(node.id), node]));
     const edges = graph.edges || [];
+    const saved = settings.initialState && typeof settings.initialState === 'object' ? settings.initialState : {};
     const state = {
-      stage: 'analysis',
-      difference: null,
-      carbon: null,
-      analysisSubmitted: false,
-      mode: null,
-      currentNode: String(graph.start),
-      selectedEdges: [],
-      nodeStack: [],
-      message: '',
-      hintsUsed: 0,
-      confidence: 'unsure',
+      stage: saved.stage || 'analysis',
+      difference: saved.difference ?? null,
+      carbon: saved.carbon ?? null,
+      analysisSubmitted: Boolean(saved.analysisSubmitted),
+      mode: ['forward','backward'].includes(saved.mode) ? saved.mode : null,
+      currentNode: String(saved.currentNode || graph.start),
+      selectedEdges: Array.isArray(saved.selectedEdges) ? saved.selectedEdges.map(String) : [],
+      nodeStack: Array.isArray(saved.nodeStack) ? saved.nodeStack.map(String) : [],
+      message: saved.message || '',
+      hintsUsed: Math.max(0, Number(saved.hintsUsed) || 0),
+      confidence: ['sure','unsure','guess'].includes(saved.confidence) ? saved.confidence : 'unsure',
       completed: false
     };
+    const emitProgress = () => settings.onProgress?.({
+      stage: state.stage,
+      difference: state.difference,
+      carbon: state.carbon,
+      analysisSubmitted: state.analysisSubmitted,
+      mode: state.mode,
+      currentNode: state.currentNode,
+      selectedEdges: state.selectedEdges.slice(),
+      nodeStack: state.nodeStack.slice(),
+      message: state.message,
+      hintsUsed: state.hintsUsed,
+      confidence: state.confidence
+    });
 
     function shell(content, step = 1) {
-      root.innerHTML = `<div class="synthesis-progress"><div><b>合成迷宫</b><span>${esc(kase.stage || '')}</span></div><div class="synthesis-step-dots">${[1,2,3,4].map(n => `<i class="${n <= step ? 'on' : ''}"></i>`).join('')}</div></div><div class="synthesis-case-head"><div><div class="stage-kicker">${esc(kase.title)}</div><h2>${esc(kase.subtitle || '')}</h2></div></div><div class="synthesis-bridge"><div><span>起点</span><b>${esc(kase.start?.label || '')}</b><strong>${esc(kase.start?.structure || '')}</strong></div><div class="bridge-arrow">⇄</div><div><span>目标</span><b>${esc(kase.target?.label || '')}</b><strong>${esc(kase.target?.structure || '')}</strong></div></div>${content}`;
+      root.innerHTML = `<div class="synthesis-progress"><div><b>路线训练</b><span>${esc(kase.stage || '')}</span></div><div class="synthesis-step-dots">${[1,2,3,4].map(n => `<i class="${n <= step ? 'on' : ''}"></i>`).join('')}</div></div><div class="synthesis-case-head"><div><div class="stage-kicker">${esc(kase.title)}</div><h2>${esc(kase.subtitle || '')}</h2></div></div><div class="synthesis-bridge"><div><span>起点</span><b>${esc(kase.start?.label || '')}</b><strong>${esc(kase.start?.structure || '')}</strong></div><div class="bridge-arrow">⇄</div><div><span>目标</span><b>${esc(kase.target?.label || '')}</b><strong>${esc(kase.target?.structure || '')}</strong></div></div>${content}`;
     }
 
     function renderAnalysis() {
+      state.stage = 'analysis';
+      emitProgress();
       const a = kase.analysis || {};
       shell(`<section class="synthesis-stage"><div class="stage-kicker">第 1 步 · 先别急着选试剂</div><h3>先比较起点和终点</h3><p class="stage-copy">合成题最容易一上来就“搜记忆”。这里先强制做两件更稳的事：看官能团差异，审计碳数。</p><div class="analysis-question"><b>${esc(a.differencePrompt || '关键结构差异是什么？')}</b><div class="detective-choice-grid">${(a.differenceOptions || []).map((row, i) => `<button type="button" class="detective-choice" data-diff="${esc(row.id)}"><span>${String.fromCharCode(65+i)}</span>${esc(row.label)}</button>`).join('')}</div></div><div class="analysis-question"><b>${esc(a.carbonPrompt || '碳数如何变化？')}</b><div class="detective-choice-grid">${(a.carbonOptions || []).map((row, i) => `<button type="button" class="detective-choice" data-carbon="${esc(row.id)}"><span>${String.fromCharCode(65+i)}</span>${esc(row.label)}</button>`).join('')}</div></div><div id="analysisFeedback"></div><div class="btn-row"><button type="button" class="btn primary" id="submitAnalysis" disabled>先把这两件事定下来</button></div></section>`, 1);
       const submit = root.querySelector('#submitAnalysis');
@@ -128,12 +145,14 @@
         state.analysisSubmitted = true;
         const diffOK = String(state.difference) === String(a.differenceAnswer);
         const carbonOK = String(state.carbon) === String(a.carbonAnswer);
-        root.querySelector('#analysisFeedback').innerHTML = `<div class="feedback"><strong>${diffOK && carbonOK ? '起点和终点看清了。' : '先把桥头重新对齐。'}</strong><p>${esc(a.teaching || '')}</p><div class="formula-learning-card"><span>先把这条结构变化读出来</span><b>${esc(kase.start?.structure || '')} → ${esc(kase.target?.structure || '')}</b></div><div class="btn-row"><button type="button" class="btn primary" id="analysisNext">进入迷宫</button></div></div>`;
+        root.querySelector('#analysisFeedback').innerHTML = `<div class="feedback"><strong>${diffOK && carbonOK ? '起点和终点看清了。' : '先把桥头重新对齐。'}</strong><p>${esc(a.teaching || '')}</p><div class="formula-learning-card"><span>先把这条结构变化读出来</span><b>${esc(kase.start?.structure || '')} → ${esc(kase.target?.structure || '')}</b></div><div class="btn-row"><button type="button" class="btn primary" id="analysisNext">进入路线训练</button></div></div>`;
         root.querySelector('#analysisNext').onclick = renderMode;
       });
     }
 
     function renderMode() {
+      state.stage = 'mode';
+      emitProgress();
       shell(`<section class="synthesis-stage"><div class="stage-kicker">第 2 步 · 选择你的思考方向</div><h3>从起点往前走，还是从目标往后拆？</h3><div class="mode-grid"><button type="button" class="mode-card" data-mode="forward"><span>正向</span><b>我从起点往前想</b><small>已知起始物，逐步选择试剂与中间体。</small></button><button type="button" class="mode-card" data-mode="backward"><span>逆向</span><b>我从目标往后拆</b><small>先猜最后一步，再寻找合理前体。</small></button></div><div class="note">两种方式最后都会用同一条化学路线做正向验证。逆向只是帮助你找到路，不会替代最后的正向检查。</div></section>`, 2);
       root.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
         state.mode = button.dataset.mode;
@@ -174,6 +193,8 @@
     }
 
     function renderMaze() {
+      state.stage = 'maze';
+      emitProgress();
       const node = nodes.get(state.currentNode);
       const choices = choicesAtCurrent();
       const reached = goalReached();
@@ -202,6 +223,8 @@
     }
 
     function renderConfidence() {
+      state.stage = 'confidence';
+      emitProgress();
       const path = forwardPath();
       shell(`<section class="synthesis-stage"><div class="stage-kicker">第 4 步 · 提交前最后自检</div><h3>你对这条路线有多确定？</h3><div class="route-equation"><span>你的正向路线</span><b>${esc(routeEquation(kase, path))}</b></div><div class="confidence-buttons synthesis-confidence"><button type="button" data-confidence="sure">我确定</button><button type="button" data-confidence="unsure" class="active">有点犹豫</button><button type="button" data-confidence="guess">我在猜</button></div><div class="btn-row"><button type="button" class="btn ghost" id="backMaze">回去再看看</button><button type="button" class="btn primary" id="finalRoute">评价这条路线</button></div></section>`, 4);
       root.querySelectorAll('[data-confidence]').forEach(button => button.addEventListener('click', () => {
@@ -241,7 +264,7 @@
       };
       settings.onComplete?.(summary);
       const status = result.preferred ? '主路线' : result.correct ? '可行替代路线' : result.reachedTarget ? '到达目标但含风险步骤' : '没有真正到达目标';
-      shell(`<section class="synthesis-stage synthesis-result"><div class="stage-kicker">路线评价</div><div class="synthesis-result-head"><div class="result-score-ring"><b>${Math.round(summary.score * 100)}</b><span>综合%</span></div><div><h3>${esc(status)}</h3><p>${result.preferred ? '这条路线既成立，也符合当前题目的优先路线。' : result.correct ? '不是参考主路线，但化学上成立；系统不会因为“不一样”把它判错。' : '分数保留了你已经做对的结构分析和可行步骤，不会整题清零。'}</p></div></div><div class="route-score-grid"><div><span>化学可行</span><b>${Math.round(result.chemicalValidity * 100)}%</b><small>权重 50%</small></div><div><span>效率</span><b>${Math.round(result.efficiency * 100)}%</b><small>权重 20%</small></div><div><span>选择性</span><b>${Math.round(result.selectivity * 100)}%</b><small>权重 15%</small></div><div><span>兼容性</span><b>${Math.round(result.compatibility * 100)}%</b><small>权重 15%</small></div></div><div class="panel-inset"><h3>你的路线</h3><div class="route-equation"><b>${esc(routeEquation(kase, path))}</b></div></div><div class="panel-inset preferred-route"><h3>优先参考路线</h3><div class="route-equation"><b>${esc(routeEquation(kase, preferred))}</b></div><p>${esc(kase.analysis?.teaching || '')}</p></div><div class="btn-row"><button type="button" class="btn ghost" id="synthesisBack">回到迷宫列表</button><button type="button" class="btn soft" id="synthesisRetry">换个方向再走一次</button>${settings.nextCaseId ? '<button type="button" class="btn primary" id="synthesisNext">下一座迷宫</button>' : ''}</div></section>`, 4);
+      shell(`<section class="synthesis-stage synthesis-result"><div class="stage-kicker">路线评价</div><div class="synthesis-result-head"><div class="result-score-ring"><b>${Math.round(summary.score * 100)}</b><span>综合%</span></div><div><h3>${esc(status)}</h3><p>${result.preferred ? '这条路线既成立，也符合当前题目的优先路线。' : result.correct ? '不是参考主路线，但化学上成立；系统不会因为“不一样”把它判错。' : '分数保留了你已经做对的结构分析和可行步骤，不会整题清零。'}</p></div></div><div class="route-score-grid"><div><span>化学可行</span><b>${Math.round(result.chemicalValidity * 100)}%</b><small>权重 50%</small></div><div><span>效率</span><b>${Math.round(result.efficiency * 100)}%</b><small>权重 20%</small></div><div><span>选择性</span><b>${Math.round(result.selectivity * 100)}%</b><small>权重 15%</small></div><div><span>兼容性</span><b>${Math.round(result.compatibility * 100)}%</b><small>权重 15%</small></div></div><div class="panel-inset"><h3>你的路线</h3><div class="route-equation"><b>${esc(routeEquation(kase, path))}</b></div></div><div class="panel-inset preferred-route"><h3>优先参考路线</h3><div class="route-equation"><b>${esc(routeEquation(kase, preferred))}</b></div><p>${esc(kase.analysis?.teaching || '')}</p></div><div class="btn-row"><button type="button" class="btn ghost" id="synthesisBack">${esc(settings.backLabel || '回到路线列表')}</button><button type="button" class="btn soft" id="synthesisRetry">换个方向再走一次</button>${settings.nextCaseId ? '<button type="button" class="btn primary" id="synthesisNext">下一组路线</button>' : ''}</div></section>`, 4);
       root.querySelector('#synthesisBack').onclick = () => settings.onBack?.();
       root.querySelector('#synthesisRetry').onclick = () => {
         state.completed = false;
@@ -255,7 +278,10 @@
       root.querySelector('#synthesisNext')?.addEventListener('click', () => settings.onNext?.(settings.nextCaseId));
     }
 
-    renderAnalysis();
+    if (state.stage === 'mode') renderMode();
+    else if (state.stage === 'maze' && state.mode) renderMaze();
+    else if (state.stage === 'confidence' && state.mode) renderConfidence();
+    else renderAnalysis();
     return { state };
   }
 

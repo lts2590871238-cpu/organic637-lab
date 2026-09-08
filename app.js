@@ -8,7 +8,7 @@
   const APP_KEY = 'organic637_clean_v1_state';
   const AUTH_KEY = 'organic637_clean_v1_auth';
   const BACKUP_SUFFIX = ':backup';
-  const AVAILABLE_MAX_DAY = 4;
+  const AVAILABLE_MAX_DAY = 20;
   const $ = (selector, root = document) => root.querySelector(selector);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
@@ -340,7 +340,7 @@
 
   function shell(inner, active = '') {
     const name = Auth.user?.username || '';
-    $('#app').innerHTML = `<div class="app"><header class="topbar"><div class="brand"><small>南京工业大学 637 · 20天冲刺</small>有机实验室</div><div class="nav-row"><button class="nav-pill ${active === 'home' ? 'active' : ''}" data-nav="#home">今日</button><button class="nav-pill ${active === 'review' ? 'active' : ''}" data-nav="#review">复习</button><button class="nav-pill ${active === 'mistakes' ? 'active' : ''}" data-nav="#mistakes">错题</button><button class="nav-pill ${active === 'abilities' ? 'active' : ''}" data-nav="#abilities">能力</button><button class="nav-pill ${active === 'detective' ? 'active' : ''}" data-nav="#detective">侦探</button><button class="nav-pill ${active === 'synthesis' ? 'active' : ''}" data-nav="#synthesis">迷宫</button></div><div class="cloud"><span id="cloudDot" class="dot"></span><span id="cloudText">${name ? esc(name) : '未登录'}</span></div></header>${inner}</div>`;
+    $('#app').innerHTML = `<div class="app"><header class="topbar"><div class="brand"><small>南京工业大学 637 · 20天冲刺</small>有机实验室</div><div class="nav-row"><button class="nav-pill ${active === 'portal' ? 'active' : ''}" data-nav="#portal">入口</button><button class="nav-pill ${active === 'home' ? 'active' : ''}" data-nav="#home">首页</button><button class="nav-pill ${active === 'study' ? 'active' : ''}" data-nav="#day/${Store.state?.currentDay || 1}">今日学习</button><button class="nav-pill ${active === 'review' ? 'active' : ''}" data-nav="#review">今日复习</button><button class="nav-pill ${active === 'mistakes' ? 'active' : ''}" data-nav="#mistakes">错题回看</button><button class="nav-pill ${active === 'abilities' ? 'active' : ''}" data-nav="#abilities">能力地图</button></div><div class="cloud"><span id="cloudDot" class="dot"></span><span id="cloudText">${name ? esc(name) : '未登录'}</span></div></header>${inner}</div>`;
     document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.nav; }));
     renderCloud();
   }
@@ -353,8 +353,22 @@
     text.textContent = !Auth.user ? '未登录' : Cloud.status === 'synced' ? `${Auth.user.username} · 已同步` : Cloud.status === 'syncing' ? `${Auth.user.username} · 同步中` : `${Auth.user.username} · 本地保存`;
   }
 
+  const DECOR = {
+    random: { src: 'assets/mascots/random-home.jpg', name: '随机位置插图', caption: '放在入口与首页，作为轻松的小陪伴。' },
+    boss: { src: 'assets/mascots/boss-exercise.jpg', name: '练习 / Boss 插图', caption: '每一道练习和 Day19–20 Boss 都会出现。' },
+    review: { src: 'assets/mascots/review-page.jpg', name: '复习页插图', caption: '复习不是重学一遍，而是把快忘的内容捡回来。' },
+    study: { src: 'assets/mascots/study-page.jpg', name: '学习页插图', caption: '学习页陪你一步一步把今天主线走完。' },
+    welcome: { src: 'assets/mascots/welcome-page.jpg', name: '欢迎页插图', caption: '欢迎回来，今天也不用一下学很多。' }
+  };
+
+  function mascotFigure(key, extra = '') {
+    const item = DECOR[key];
+    if (!item) return '';
+    return `<figure class="mascot-card ${extra}"><img src="${item.src}" alt="${esc(item.name)}"><figcaption><b>${esc(item.name)}</b><span>${esc(item.caption)}</span></figcaption></figure>`;
+  }
+
   function loginPage(mode = 'login', message = '') {
-    $('#app').innerHTML = `<div class="app login-wrap"><section class="panel login-card"><div class="kicker">南京工业大学 637 · 20天冲刺</div><h1 class="hero">有机实验室</h1><p class="lead">今天只学一小串，学会以后再往前走。</p><div class="field"><label>名字 / 账号</label><input id="user" autocomplete="username" placeholder="例如：111"></div><div class="field"><label>密码</label><input id="pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" placeholder="至少 6 位"></div>${message ? `<div class="error">${esc(message)}</div>` : ''}<div class="btn-row"><button id="submitLogin" class="btn primary">${mode === 'login' ? '登录' : '创建账号'}</button><button id="switchLogin" class="btn soft">${mode === 'login' ? '第一次来？创建账号' : '已经有账号？直接登录'}</button></div><p class="tiny" style="margin-top:18px">学习状态先保存在本机，再异步同步到云端；断网时也不会阻止做题。</p></section></div>`;
+    $('#app').innerHTML = `<div class="app login-wrap"><section class="panel login-card login-layout"><div><div class="kicker">南京工业大学 637 · 20天冲刺</div><h1 class="hero">有机实验室</h1><p class="lead">玩中学，学中练。今天只学一小串，学会以后再往前走；中途可以随时退出，下次会从你停下来的地方继续。</p><div class="field"><label>名字 / 账号</label><input id="user" autocomplete="username" placeholder="例如：111"></div><div class="field"><label>密码</label><input id="pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" placeholder="至少 6 位"></div>${message ? `<div class="error">${esc(message)}</div>` : ''}<div class="btn-row"><button id="submitLogin" class="btn primary">${mode === 'login' ? '登录' : '创建账号'}</button><button id="switchLogin" class="btn soft">${mode === 'login' ? '第一次来？创建账号' : '已经有账号？直接登录'}</button></div><p class="tiny" style="margin-top:18px">学习状态会先保存在本机，再异步同步到云端；断网也不会丢进度。</p></div>${mascotFigure('random', 'welcome-main-mascot')}</section></div>`;
     $('#switchLogin').onclick = () => loginPage(mode === 'login' ? 'register' : 'login');
     $('#submitLogin').onclick = async () => {
       const user = $('#user').value.trim().toLowerCase();
@@ -364,13 +378,28 @@
         if (mode === 'login') await Auth.login(user, password);
         else await Auth.register(user, password);
         await Cloud.bootstrap(mode === 'register');
-        location.hash = '#home';
+        location.hash = mode === 'register' ? '#welcome' : '#portal';
         route();
       } catch (error) {
         loginPage(mode, error.message || '请求失败');
       }
     };
     $('#pass').addEventListener('keydown', event => { if (event.key === 'Enter') $('#submitLogin').click(); });
+  }
+
+  function welcomePage() {
+    shell(`<section class="panel welcome-panel"><div class="welcome-copy"><div class="kicker">欢迎回来</div><h1>先别急着刷题，先把今天的路线看清楚。</h1><p class="lead">这 20 天不是“背答案”，而是用结构式、类比、机理和反复回看，把真题里最常见的判断慢慢练成直觉。学到一半也可以退出，回来会接着做。</p><div class="welcome-points"><div>· 每天主线约 60–90 分钟，先教再练</div><div>· 错题和遗忘复习分开，不混着刷</div><div>· 能力地图只给你有用结论，不堆后台细节</div></div><div class="btn-row"><button class="btn primary" id="openPortal">20天有机化学大作战！</button><button class="btn ghost" id="jumpHome">直接看今日首页</button></div></div><div class="welcome-side">${mascotFigure('welcome', 'hero-figure')}</div></section>`, 'portal');
+    $('#openPortal').onclick = () => { location.hash = '#portal'; };
+    $('#jumpHome').onclick = () => { location.hash = '#home'; };
+  }
+
+  function portalPage() {
+    const day = Store.state.currentDay || 1;
+    const due = NS.Review.dueCount(Store.state);
+    const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+    const studyText = progress.lessonIndex || progress.taskIndex ? '继续今天' : '开始今天';
+    shell(`<section class="panel portal-panel"><div class="section-title"><h2>今天从哪里进入？</h2><span class="phase-badge">三角入口</span></div><p class="lead">中途离开不会丢。下次回来，今日学习会从当前 lesson / 题目继续；复习也会从待复习队列继续。</p><div class="triangle-layout"><button class="triangle-card left" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><b>今日学习</b><small>${studyText} · Day ${String(day).padStart(2,'0')}</small></button><button class="triangle-card right" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><b>今日复习</b><small>${due ? `已有 ${due} 条到期内容` : '今天暂无到期内容'}</small></button><button class="triangle-card bottom" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><b>首页总览</b><small>看今日概览、错题、能力和 20 天地图</small></button></div><div class="portal-tip">结构推断、路线设计、结构选择、电子箭头这些内容都已经揉进每天学习里，不需要额外找页面。</div></section>`, 'portal');
+    document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
   }
 
   const domainNames = {
@@ -422,17 +451,16 @@
       const done = state.completedDays.includes(meta.day);
       const unlocked = available && (meta.day <= state.currentDay || done);
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
-      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可自由复练' : meta.day === state.currentDay ? '今天的主线' : available ? '按顺序解锁' : '下一阶段继续建设'}</small></button>`;
+      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重新练' : meta.day === state.currentDay ? '今天的主线' : available ? '按顺序解锁' : '尚未解锁'}</small></button>`;
     }).join('');
-    shell(`<div class="home-grid"><section class="panel day-card"><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今日主线</div><h1>${esc(data.title)}</h1><p class="lead">${esc(data.subtitle || '')}</p><div class="progress-line"><i style="width:${percent}%"></i></div><div class="tiny">今日进度 ${percent}% · 预计 ${Number(data.estimatedMinutes || 80)} 分钟</div><div class="home-actions"><button class="home-action" id="startDay"><b>${progress.lessonIndex || progress.taskIndex ? '继续今天' : '开始今天'}</b><span>只沿这一条主线往前走</span></button><button class="home-action" id="openReview"><b>今日复习 ${due}</b><span>只捡回已经到期的记忆</span></button><button class="home-action" id="openMistakes"><b>今日错题 ${mistakes}</b><span>和遗忘复习分开处理</span></button></div><div class="btn-row"><button id="abilities" class="btn soft">看能力地图</button><button id="logout" class="btn ghost">退出账号</button></div></section><aside class="side-stat"><div class="panel"><div class="kicker">阶段 2 · 能力模型</div><div class="mini-card"><span class="tiny">已稳定技能</span><strong>${stable}</strong></div><div class="mini-card" style="margin-top:10px"><span class="tiny">训练估计 · 早期只看趋势</span><strong>${score.low}–${score.high}</strong><span class="tiny">/150 · ${esc(score.label)}</span></div></div><div class="panel"><div class="kicker">阶段 3 · 核心互动</div><p style="line-height:1.8;margin-bottom:0">Day 2–4 已接入结构选择、排序、路线分支与电子箭头。黄色路线允许继续，不把“非最优”直接判成错误。</p></div><div class="panel"><div class="kicker">阶段 4 · 结构侦探</div><p style="line-height:1.8;margin-bottom:10px">完整结构侦探所已开放独立训练：DBE → IR → NMR → 候选排除 → 最终结构。最终选错不会把前面的正确证据清零。</p><button class="btn soft" id="openDetectiveHome">进入结构侦探所</button></div><div class="panel"><div class="kicker">阶段 5 · 合成迷宫</div><p style="line-height:1.8;margin-bottom:10px">正向/逆向都能走；先比较起点与终点，再看碳数、最后一步、兼容性和路线效率。非主路线只要化学上成立就保留。</p><button class="btn soft" id="openSynthesisHome">进入合成迷宫</button></div></aside></div><div class="section-title"><h2>20 天实验地图</h2><span class="phase-badge">本轮已开放 Day 1–4</span></div><div class="day-map">${dayTiles}</div>${summary.length ? `<div class="section-title"><h2>现在只看大能力，不堆几十条技能</h2><button class="tiny-link" id="allAbilities">展开能力地图 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}`,'home');
+    shell(`<div class="home-hero-grid"><section class="panel day-card"><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今日主线</div><h1>${esc(data.title)}</h1><p class="lead">${esc(data.subtitle || '')}</p><div class="progress-line"><i style="width:${percent}%"></i></div><div class="tiny">今日进度 ${percent}% · 预计 ${Number(data.estimatedMinutes || 80)} 分钟 · 可随时退出并从这里继续</div><div class="quick-grid"><button class="quick-card" id="startDay"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>顺着今天这条主线，从 lesson 到练习一直往前</small></button><button class="quick-card" id="openReview"><b>今日复习 ${due}</b><small>只捡回到期记忆，不打断主线</small></button><button class="quick-card" id="openMistakes"><b>今日错题 ${mistakes}</b><small>集中看今天真正做偏的地方</small></button><button class="quick-card" id="abilities"><b>能力地图</b><small>看哪些点开始稳了，哪些还要补</small></button></div><div class="btn-row"><button id="backPortal" class="btn soft">回到三角入口</button><button id="logout" class="btn ghost">退出账号</button></div></section><aside class="home-right-rail"><section class="panel mascot-rail">${mascotFigure('random')}<div class="status-note">首页不再单独拆很多玩法标签，这些能力已经揉进每日主线。错题回看会更直接告诉你卡在哪，今日学习会把图、结构式和类比逐步撤掉。</div></section><section class="panel concise-stats"><div class="mini-card"><span class="tiny">已稳定技能</span><strong>${stable}</strong></div><div class="mini-card" style="margin-top:10px"><span class="tiny">训练估计</span><strong>${score.low}–${score.high}</strong><span class="tiny">/150 · ${esc(score.label)}</span></div></section></aside></div><div class="section-title"><h2>20 天实验地图</h2><span class="phase-badge">Day 1–20 已接入</span></div><div class="day-map">${dayTiles}</div>${summary.length ? `<div class="section-title"><h2>大能力概览</h2><button class="tiny-link" id="allAbilities">展开能力地图 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
     $('#abilities').onclick = () => { location.hash = '#abilities'; };
+    $('#backPortal').onclick = () => { location.hash = '#portal'; };
     $('#allAbilities')?.addEventListener('click', () => { location.hash = '#abilities'; });
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => { location.hash = `#day/${button.dataset.day}`; }));
-    $('#openDetectiveHome')?.addEventListener('click', () => { location.hash = '#detective'; });
-    $('#openSynthesisHome')?.addEventListener('click', () => { location.hash = '#synthesis'; });
     $('#logout').onclick = async () => {
       await Cloud.push().catch(() => {});
       await Auth.logout();
@@ -454,23 +482,45 @@
       return homePage();
     }
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
-    if (progress.finished) return dayFinishPage(day);
+    if (progress.finished) {
+      if (day === 19 && Store.state.examResults?.[19]) return examResultsPage();
+      if (day === 20) return finalSummaryPage();
+      return dayFinishPage(day);
+    }
     if (!progress.startedAt) progress.startedAt = Date.now();
     if (progress.lessonIndex < data.lessons.length) return lessonPage(day, data.lessons[progress.lessonIndex]);
     progress.phase = 'questions';
+
+    if (day === 20 && !progress.day20Prepared) {
+      const plan = NS.Learning.buildDay20Plan(Store.state, data);
+      Store.state.day20Plan = plan;
+      progress.queue = plan.questionIds.slice();
+      progress.taskIndex = 0;
+      progress.day20Prepared = true;
+      Store.save();
+    }
+
     if (!Array.isArray(progress.queue) || !progress.queue.length) progress.queue = data.questions.map(q => q.id);
     const id = progress.queue[progress.taskIndex];
-    if (!id) return completeDay(day);
+    if (!id) {
+      if (day === 19 && data.mode === 'exam') return completeExamDay();
+      return completeDay(day);
+    }
     const question = QMAP.get(id);
     if (!question) {
       progress.taskIndex += 1;
       Store.save();
       return dayPage(day);
     }
+
+    if (day === 19 && data.mode === 'exam') return examQuestionPage(question, progress);
+    if (question.type === 'detective-case') return embeddedDetectiveTask(question, day);
+    if (question.type === 'synthesis-case') return embeddedSynthesisTask(question, day);
+
     return studyQuestionPage(question, {
-      mode: question.role === 'repair' ? 'repair' : 'learn',
+      mode: question.role === 'repair' ? 'repair' : question.role === 'boss' ? 'boss' : 'learn',
       day,
-      positionLabel: question.role === 'repair' ? '修复题 · 同技能新结构' : `Day ${day} · 第 ${Math.min(progress.taskIndex + 1, progress.queue.length)} 个判断`,
+      positionLabel: question.role === 'repair' ? '修复题 · 同技能新结构' : question.role === 'boss' ? `Day ${day} · 最终 Boss` : `Day ${day} · 第 ${Math.min(progress.taskIndex + 1, progress.queue.length)} 个判断`,
       onNext(result) {
         const currentProgress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
         currentProgress.answered[question.id] = { correct: Boolean(result?.correct), partialScore: Number(result?.partialScore ?? 0), at: Date.now() };
@@ -479,11 +529,203 @@
         dayPage(day);
       },
       onSubmitted(result) {
-        progress.answered[question.id] = { correct: result.correct, partialScore: result.partialScore, at: Date.now() };
-        if (!result.correct && question.role !== 'repair') queueRepair(day, question.primarySkill);
+        const currentProgress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        currentProgress.answered[question.id] = { correct: result.correct, partialScore: result.partialScore, at: Date.now() };
+        if (!result.correct && question.role !== 'repair' && day !== 20) queueRepair(day, question.primarySkill);
         Store.save();
       }
     });
+  }
+
+  function embeddedDetectiveTask(question, day) {
+    const cases = Array.isArray(Data.DETECTIVE_CASES) ? Data.DETECTIVE_CASES : [];
+    const kase = cases.find(row => row.id === question.caseId);
+    if (!kase) {
+      const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+      progress.taskIndex += 1;
+      Store.save();
+      return dayPage(day);
+    }
+    const started = performance.now();
+    let completed = false;
+    shell(`<section class="panel detective-shell"><div class="question-head"><div class="step-label">Day ${day} · 结构证据串讲</div><span class="role-chip">证据链任务</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>这不是一道“三选一”。DBE、IR/NMR、候选排除和最终结构会分别留下能力证据。</p></div><div id="detectiveRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出，稍后继续</button><span class="tiny">完成后才会进入今天下一项；退出后仍会记住当前位置。</span></div></section>`, 'study');
+    $('#embeddedExit').onclick = () => { location.hash = '#portal'; };
+    Store.state.detective = NS.Detective.normalizeProgress(Store.state.detective);
+    NS.Detective.mount($('#detectiveRoot'), kase, {
+      nextCaseId: null,
+      backLabel: '完成这案，继续今日主线',
+      initialState: Store.state.detective.inProgress?.[kase.id] || null,
+      onProgress(snapshot) {
+        Store.state.detective.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
+      onComplete(summary) {
+        completed = true;
+        const elapsed = Math.max(0, Math.round(performance.now() - started));
+        summary.skillEvidence.forEach(evidence => {
+          const questionId = `${kase.id}:${evidence.questionSuffix}`;
+          const previous = Store.state.attempts.filter(row => row.questionId === questionId).length;
+          const pseudoQuestion = { id: questionId, day, type: 'detective-step', role: 'transfer', primarySkill: evidence.skillId, skillIds: [evidence.skillId] };
+          NS.Learning.recordAttempt(Store.state, pseudoQuestion, {
+            mode: 'detective', correct: evidence.correct, firstAttempt: previous === 0, attemptNumber: previous + 1,
+            hintsUsed: evidence.hintsUsed || 0, confidence: summary.confidence,
+            responseTimeMs: Math.round(elapsed / Math.max(1, summary.skillEvidence.length)), isTransfer: true,
+            answerPayload: summary.answers, partialScore: evidence.partialScore, errorType: evidence.errorType
+          });
+        });
+        Store.state.detective.cases[kase.id] = { completedAt: Date.now(), score: summary.score, dbeCorrect: summary.dbeCorrect, irCorrect: summary.irCorrect, nmrCorrect: summary.nmrCorrect, eliminationScore: summary.eliminationScore, finalCorrect: summary.finalCorrect, hintsUsed: summary.hintsUsed, confidence: summary.confidence };
+        delete Store.state.detective.inProgress[kase.id];
+        const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        progress.answered[question.id] = { correct: summary.score >= .75, partialScore: summary.score, at: Date.now() };
+        Store.save();
+      },
+      onBack() {
+        if (!completed) return;
+        const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        progress.taskIndex += 1;
+        Store.save();
+        dayPage(day);
+      },
+      onNext() {}
+    });
+  }
+
+  function embeddedSynthesisTask(question, day) {
+    const cases = Array.isArray(Data.SYNTHESIS_CASES) ? Data.SYNTHESIS_CASES : [];
+    const kase = cases.find(row => row.id === question.caseId);
+    if (!kase) {
+      const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+      progress.taskIndex += 1;
+      Store.save();
+      return dayPage(day);
+    }
+    const started = performance.now();
+    let completed = false;
+    shell(`<section class="panel synthesis-shell"><div class="question-head"><div class="step-label">Day ${day} · 路线综合训练</div><span class="role-chip">正向 / 逆向</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>先做目标差异与碳数账本，再走路线。非标准但可行的路线不会被简单判错。</p></div><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出，稍后继续</button><span class="tiny">完成路线评价后继续今天主线；退出后仍会记住当前位置。</span></div></section>`, 'study');
+    $('#embeddedExit').onclick = () => { location.hash = '#portal'; };
+    Store.state.synthesis = NS.Synthesis.normalizeProgress(Store.state.synthesis);
+    NS.Synthesis.mount($('#synthesisRoot'), kase, {
+      nextCaseId: null,
+      backLabel: '完成这组路线训练，继续今日主线',
+      initialState: Store.state.synthesis.inProgress?.[kase.id] || null,
+      onProgress(snapshot) {
+        Store.state.synthesis.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
+      onComplete(summary) {
+        completed = true;
+        const elapsed = Math.max(0, Math.round(performance.now() - started));
+        summary.skillEvidence.forEach(evidence => {
+          const questionId = `${kase.id}:${evidence.questionSuffix}`;
+          const previous = Store.state.attempts.filter(row => row.questionId === questionId).length;
+          const pseudoQuestion = { id: questionId, day, type: 'synthesis-step', role: 'transfer', primarySkill: evidence.skillId, skillIds: [evidence.skillId] };
+          NS.Learning.recordAttempt(Store.state, pseudoQuestion, {
+            mode: 'synthesis', correct: evidence.correct, firstAttempt: previous === 0, attemptNumber: previous + 1,
+            hintsUsed: summary.hintsUsed || 0, confidence: summary.confidence,
+            responseTimeMs: Math.round(elapsed / Math.max(1, summary.skillEvidence.length)), isTransfer: true,
+            answerPayload: { mode: summary.mode, route: summary.route }, partialScore: evidence.partialScore, errorType: evidence.errorType
+          });
+        });
+        Store.state.synthesis.cases[kase.id] = { completedAt: Date.now(), score: summary.score, mode: summary.mode, differenceCorrect: summary.differenceCorrect, carbonCorrect: summary.carbonCorrect, route: summary.route, routeScore: summary.routeResult.score, hintsUsed: summary.hintsUsed, confidence: summary.confidence };
+        delete Store.state.synthesis.inProgress[kase.id];
+        const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        progress.answered[question.id] = { correct: summary.score >= .75, partialScore: summary.score, at: Date.now() };
+        Store.save();
+      },
+      onBack() {
+        if (!completed) return;
+        const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+        progress.taskIndex += 1;
+        Store.save();
+        dayPage(day);
+      },
+      onNext() {}
+    });
+  }
+
+  function examQuestionPage(question, progress) {
+    const data = REGISTRY[19];
+    const position = Math.min(progress.taskIndex + 1, progress.queue.length);
+    const started = performance.now();
+    progress.examDraft = progress.examDraft || { responses: [], startedAt: Date.now() };
+    shell(`<section class="panel question-shell exam-shell exercise-with-mascot"><div class="exercise-mascot-mini boss-mode"><img src="${DECOR.boss.src}" alt="${esc(DECOR.boss.name)}"><span>Boss 卷：先自己做完，再统一看解析</span></div><div class="question-head"><div class="step-label">Boss 卷 · ${position}/${progress.queue.length}</div><span class="role-chip">${Number(question.points || 0)} 分</span></div><div class="exam-warning">考试模式：无提示、提交即锁定、整卷结束统一看解析。</div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂存并回首页</button><span class="tiny">置信度会记录，但不影响卷面分。</span></div></section>`, 'study');
+    $('#home').onclick = () => { location.hash = '#portal'; };
+    const previous = Store.state.attempts.filter(row => row.questionId === question.id && row.mode === 'exam').length;
+    NS.Interactions.mount($('#interactionRoot'), question, {
+      examMode: true,
+      onSubmit(submission, feedback) {
+        const responseTimeMs = Math.max(0, Math.round(performance.now() - started));
+        NS.Learning.recordAttempt(Store.state, question, {
+          day: 19, mode: 'exam', correct: submission.correct, firstAttempt: previous === 0, attemptNumber: previous + 1,
+          hintsUsed: 0, confidence: submission.confidence, responseTimeMs, isTransfer: true,
+          answerPayload: submission.payload, partialScore: submission.partialScore, errorType: submission.errorType, reasoningState: submission.reasoningState
+        });
+        const current = NS.Learning.ensureDayState(Store.state, 19, REGISTRY);
+        current.examDraft = current.examDraft || { responses: [], startedAt: Date.now() };
+        if (!current.examDraft.responses.some(row => row.questionId === question.id)) {
+          current.examDraft.responses.push({ questionId: question.id, correct: submission.correct, partialScore: Number(submission.partialScore || 0), confidence: submission.confidence, points: Number(question.points || 0), primarySkill: question.primarySkill, responseTimeMs });
+        }
+        current.answered[question.id] = { correct: submission.correct, partialScore: submission.partialScore, at: Date.now() };
+        current.taskIndex += 1;
+        Store.save();
+        feedback.insertAdjacentHTML('beforeend', `<div class="btn-row"><button id="nextExam" class="btn primary">${current.taskIndex >= data.questions.length ? '交卷并看结果' : '下一题'}</button></div>`);
+        feedback.querySelector('#nextExam').onclick = () => dayPage(19);
+      }
+    });
+  }
+
+  function completeExamDay() {
+    const data = REGISTRY[19];
+    const progress = NS.Learning.ensureDayState(Store.state, 19, REGISTRY);
+    const responses = progress.examDraft?.responses || [];
+    const total = data.questions.reduce((sum, q) => sum + Number(q.points || 0), 0) || 150;
+    const earned = responses.reduce((sum, row) => sum + Number(row.points || 0) * Number(row.partialScore || 0), 0);
+    const scaled = Math.round(earned / total * 150);
+    const domains = {};
+    responses.forEach(row => {
+      const meta = SKILL_META.get(row.primarySkill);
+      const domain = meta?.domain || 'exam';
+      const q = QMAP.get(row.questionId);
+      const pts = Number(q?.points || row.points || 0);
+      const bucket = domains[domain] ||= { earned: 0, total: 0 };
+      bucket.earned += pts * Number(row.partialScore || 0);
+      bucket.total += pts;
+    });
+    const highConfidenceWrong = responses.filter(row => !row.correct && row.confidence === 'sure').map(row => row.questionId);
+    const weak = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
+    Store.state.examResults[19] = { completedAt: Date.now(), rawEarned: earned, rawTotal: total, score150: scaled, domains, highConfidenceWrong, topWeakSkills: weak, responseCount: responses.length };
+    progress.finished = true;
+    progress.completedAt = Date.now();
+    if (!Store.state.completedDays.includes(19)) Store.state.completedDays.push(19);
+    Store.state.completedDays.sort((a, b) => a - b);
+    Store.state.currentDay = 20;
+    Store.save();
+    examResultsPage();
+  }
+
+  function examResultsPage() {
+    const result = Store.state.examResults?.[19];
+    if (!result) return homePage();
+    const domainRows = Object.entries(result.domains || {}).map(([domain, row]) => ({ domain, percent: row.total ? Math.round(row.earned / row.total * 100) : 0 }));
+    const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
+    shell(`<section class="panel finish exam-result-page"><div class="big">🧪</div><div class="kicker">DAY 19 · Boss 卷结果</div><h1>${result.score150} / 150</h1><p class="lead">这是一套网站内部混合未见卷，不冒充某一年完整真题。它的作用是给 Day20 暴露真实漏洞。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label, i) => `<div class="skill-row"><span>${i + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：这些会被 Day20 提高修复权重。</div>` : '<div class="good">这次没有高置信错误；仍会按低 mastery 和迁移证据选择 Top3。</div>'}<div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn ghost" id="home">回首页</button></div></section>`);
+    $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#home').onclick = () => { location.hash = '#portal'; };
+  }
+
+  function finalSummaryPage() {
+    const score = NS.Learning.estimateScore(Store.state, SKILLS);
+    const boss = Store.state.examResults?.[19];
+    const weak = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 5);
+    const stable = Object.values(Store.state.skills || {}).filter(skill => NS.Learning.masteryBand(skill, NS.Learning.getEffectiveMastery(skill)) === '稳定').length;
+    const day20Attempts = (Store.state.attempts || []).filter(a => a.day === 20);
+    const independent = day20Attempts.filter(a => a.correct && a.hintsUsed === 0 && a.firstAttempt);
+    const transferRate = day20Attempts.length ? Math.round(independent.length / day20Attempts.length * 100) : 0;
+    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。真正接近 120/150 目标线，需要未见题与换结构迁移都保持在较高水平。</p><div class="score-box"><div><span class="tiny">Day19 Boss</span><strong>${boss ? boss.score150 : '—'} / 150</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${boss && boss.score150 >= 120 && transferRate >= 75 ? 'good' : 'note'}">${boss && boss.score150 >= 120 && transferRate >= 75 ? '当前训练证据已经接近 120/150 目标线：继续按复习队列保持。' : '当前还不建议把“学完20天”直接等同于120分。按复习队列继续补低 mastery 和高置信错误，直到未见题与迁移都更稳。'}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button><button class="btn ghost" id="review">继续到期复习</button></div></section>`);
+    $('#home').onclick = () => { location.hash = '#abilities'; };
+    $('#review').onclick = () => { location.hash = '#review'; };
   }
 
   function questionAidLevel(question) {
@@ -498,8 +740,23 @@
   function renderLessonSupport(item) {
     const extra = SCAFFOLDS.lessons?.[item.id] || {};
     const formulas = [...new Set([...(item.formulas || []), ...(extra.equations || [])].filter(Boolean))];
-    if (!formulas.length && !extra.concept && !extra.definition) return '';
-    return `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(extra.concept || '把这一小步先用化学式看清楚')}</b></div>${extra.definition ? `<p>${esc(extra.definition)}</p>` : ''}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${extra.watch ? `<div class="support-watch"><b>容易混：</b>${esc(extra.watch)}</div>` : ''}</div>`;
+    const concept = extra.concept || item.concept || '';
+    const definition = extra.definition || item.definition || '';
+    const watch = extra.watch || item.watch || '';
+    const analogy = item.analogy || extra.analogy;
+    let visual = item.visual || extra.visual;
+    let lookQuestions = item.lookQuestions || extra.lookQuestions || [];
+    const arrowFormula = formulas.find(formula => /→|⇄|⇒/.test(formula));
+    if (!visual && arrowFormula) {
+      const parts = String(arrowFormula).split(/→|⇄|⇒/);
+      if (parts.length >= 2) visual = { left: parts[0].trim(), arrow: arrowFormula.includes('⇄') ? '⇄' : '→', right: parts.slice(1).join(' → ').trim(), caption: '把这一行当成“找不同”：先看左边有什么，再看右边哪里变了。' };
+    }
+    if (!lookQuestions.length && visual) lookQuestions = ['反应前后，最明显变化的是哪根键或哪个官能团？', '碳骨架有没有变化？如果没变，真正变化的只是哪个位置？'];
+    if (!formulas.length && !concept && !definition && !analogy && !visual && !lookQuestions.length) return '';
+    const analogyHtml = analogy ? `<div class="analogy-card"><div class="analogy-icon">🧠</div><div><b>${esc(analogy.title || '先用一个生活直觉')}</b><p>${esc(analogy.body || '')}</p>${analogy.boundary ? `<small><b>比喻到这里为止：</b>${esc(analogy.boundary)}</small>` : ''}</div></div>` : '';
+    const visualHtml = visual ? `<div class="concept-visual"><div class="visual-box"><span>先看这里</span><b>${esc(visual.left || '')}</b></div><div class="visual-arrow"><span>${esc(visual.arrow || '→')}</span></div><div class="visual-box"><span>变化以后</span><b>${esc(visual.right || '')}</b></div>${visual.caption ? `<p>${esc(visual.caption)}</p>` : ''}</div>` : '';
+    const lookHtml = lookQuestions.length ? `<div class="look-say"><b>👀 看图说一句</b><p>先别背名词，试着自己说出下面这些变化：</p><ol>${lookQuestions.map(x => `<li>${esc(x)}</li>`).join('')}</ol><small>不用写长答案。能准确指出“谁变了、哪里变了”就已经在建立做题语言。</small></div>` : '';
+    return `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(concept || '把这一小步先用化学式看清楚')}</b></div>${definition ? `<p>${esc(definition)}</p>` : ''}${analogyHtml}${visualHtml}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${lookHtml}${watch ? `<div class="support-watch"><b>容易混：</b>${esc(watch)}</div>` : ''}</div>`;
   }
 
   function questionAidData(question) {
@@ -529,8 +786,8 @@
   }
 
   function lessonPage(day, item) {
-    shell(`<section class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1><div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="footer-actions"><button class="link-btn" id="home">← 回首页</button><button class="btn primary" id="nextLesson">继续这一小串</button></div></section>`);
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel lesson-card lesson-with-mascot"><div class="lesson-mascot-mini"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><span>今天这一步慢慢来</span></div><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1><div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="footer-actions"><button class="link-btn" id="home">← 暂时退出，稍后继续</button><button class="btn primary" id="nextLesson">继续这一小串</button></div></section>`, 'study');
+    $('#home').onclick = () => { location.hash = '#portal'; };
     $('#nextLesson').onclick = () => {
       const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
       progress.lessonIndex += 1;
@@ -541,9 +798,11 @@
 
   function studyQuestionPage(question, context) {
     const started = performance.now();
-    const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习' }[context.mode] || context.mode;
-    shell(`<section class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionSupport(question)}<div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 先回首页</button><span class="tiny">学习模式可以试错；化学式扶手会随着掌握度逐渐撤掉。</span></div></section>`);
-    $('#home').onclick = () => { location.hash = '#home'; };
+    const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习', boss: '最终 Boss', exam: '考试' }[context.mode] || context.mode;
+    const pageDecor = context.mode === 'review' ? DECOR.review : DECOR.boss;
+    const pageDecorText = context.mode === 'review' ? '把快忘的这一条捡回来' : question.day >= 19 || context.mode === 'boss' ? 'Boss 时间：一题一题来' : '先看清变化，再下判断';
+    shell(`<section class="panel question-shell exercise-with-mascot"><div class="exercise-mascot-mini ${question.day >= 19 || context.mode === 'boss' ? 'boss-mode' : ''}"><img src="${pageDecor.src}" alt="${esc(pageDecor.name)}"><span>${pageDecorText}</span></div><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionSupport(question)}<div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂时退出，稍后继续</button><span class="tiny">学习模式可以试错；化学式扶手会随着掌握度逐渐撤掉，回来会接着当前这题。</span></div></section>`, context.mode === 'review' ? 'review' : 'study');
+    $('#home').onclick = () => { location.hash = '#portal'; };
     bindAidReveal(document);
     const previous = Store.state.attempts.filter(row => row.questionId === question.id).length;
     NS.Interactions.mount($('#interactionRoot'), question, {
@@ -572,6 +831,8 @@
         feedback.innerHTML = resultFeedback(question, submission, context);
         const next = feedback.querySelector('#nextAfterFeedback');
         if (next) next.onclick = () => context.onNext?.(submission, attempt);
+        const retry = feedback.querySelector('#retrySameQuestion');
+        if (retry) retry.onclick = () => studyQuestionPage(question, context);
         bindExplanationButtons(feedback);
       }
     });
@@ -595,7 +856,7 @@
       sub = '这是一次高置信错误，系统会提高后续修复优先级。';
     }
     const repairText = !result.correct && context.mode !== 'review' && context.mode !== 'repair' ? '<div class="status-note">下一步会插入同技能的新结构修复题；不会让你重复背原题答案。</div>' : '';
-    return `<div class="feedback"><div class="result-title">${esc(title)}</div>${sub ? `<div class="result-sub">${esc(sub)}</div>` : ''}${repairText}<div class="layered-explanation"><div class="explain-layer open"><b>一句话</b><br>${esc(layers.short || '')}</div><div class="explain-layer why"><b>为什么</b><br>${esc(layers.why || '')}</div><div class="explain-layer full"><b>完整解释 / 机理</b><br>${esc(layers.full || '')}</div><div class="explain-actions"><button class="btn ghost" data-open-layer="why">为什么？</button><button class="btn ghost" data-open-layer="full">看完整解释</button></div></div><div class="btn-row"><button id="nextAfterFeedback" class="btn ${result.correct ? 'primary' : 'soft'}">${context.mode === 'review' ? '下一条复习' : result.correct ? '继续' : '看懂以后继续修复'}</button></div></div>`;
+    return `<div class="feedback"><div class="result-title">${esc(title)}</div>${sub ? `<div class="result-sub">${esc(sub)}</div>` : ''}${repairText}<div class="layered-explanation"><div class="explain-layer open"><b>一句话</b><br>${esc(layers.short || '')}</div><div class="explain-layer why"><b>为什么</b><br>${esc(layers.why || '')}</div><div class="explain-layer full"><b>完整解释 / 机理</b><br>${esc(layers.full || '')}</div><div class="explain-actions"><button class="btn ghost" data-open-layer="why">为什么？</button><button class="btn ghost" data-open-layer="full">看完整解释</button></div></div><div class="btn-row"><button id="nextAfterFeedback" class="btn ${result.correct ? 'primary' : 'soft'}">${context.mode === 'review' ? '下一条复习' : result.correct ? '继续' : '看懂以后继续修复'}</button><button id="retrySameQuestion" class="btn ghost">再做一次这题</button></div></div>`;
   }
 
   function bindExplanationButtons(root) {
@@ -626,6 +887,7 @@
     Store.state.completedDays.sort((a, b) => a - b);
     if (Store.state.currentDay === day && day < AVAILABLE_MAX_DAY && REGISTRY[day + 1]) Store.state.currentDay = day + 1;
     Store.save();
+    if (day === 20) return finalSummaryPage();
     dayFinishPage(day);
   }
 
@@ -638,8 +900,8 @@
       return { id, label: SKILL_META.get(id)?.label || id, effective, band: NS.Learning.masteryBand(skill, effective) };
     });
     const nextAvailable = day < AVAILABLE_MAX_DAY && Boolean(REGISTRY[day + 1]);
-    shell(`<section class="panel finish"><div class="big">🌱</div><div class="kicker">DAY ${day} 收口</div><h1>今天这一条主线已经走完</h1><p class="lead">正确不等于永久掌握。系统已经把提示、置信度、首次作答和后续复习时间写进能力模型。</p><div class="skills">${rows.map(row => `<div class="skill-row"><span>${esc(row.label)}<small style="display:block;color:var(--muted);margin-top:3px">${esc(row.band)}</small></span><b>${row.effective}%</b></div>`).join('')}</div><div class="good">今天的错题与遗忘曲线复习已经分开记录。明天到期的内容会进入“今日复习”，不是随机插进主线。</div><div class="btn-row" style="justify-content:center"><button id="home" class="btn primary">回到今日首页</button>${nextAvailable ? `<button id="nextDay" class="btn soft">看看 Day ${day + 1}</button>` : ''}<button id="redo" class="btn ghost">自由复练这一天</button></div></section>`);
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel finish"><div class="big">🌱</div><div class="kicker">DAY ${day} 收口</div><h1>今天这一条主线已经走完</h1><p class="lead">正确不等于永久掌握。系统已经把提示、置信度、首次作答和后续复习时间写进能力模型。</p><div class="skills">${rows.map(row => `<div class="skill-row"><span>${esc(row.label)}<small style="display:block;color:var(--muted);margin-top:3px">${esc(row.band)}</small></span><b>${row.effective}%</b></div>`).join('')}</div><div class="good">今天的错题与遗忘曲线复习已经分开记录。明天到期的内容会进入“今日复习”，不是随机插进主线。</div>${data.memorySheet?.length ? `<div class="memory-sheet"><div class="section-title"><h2>今天真正要带走的表达</h2></div>${data.memorySheet.map(x => `<div class="memory-line">${esc(x)}</div>`).join('')}</div>` : ''}<div class="btn-row" style="justify-content:center"><button id="home" class="btn primary">回到今日首页</button>${nextAvailable ? `<button id="nextDay" class="btn soft">看看 Day ${day + 1}</button>` : ''}<button id="redo" class="btn ghost">自由复练这一天</button></div></section>`);
+    $('#home').onclick = () => { location.hash = '#portal'; };
     $('#nextDay')?.addEventListener('click', () => { location.hash = `#day/${day + 1}`; });
     $('#redo').onclick = () => {
       const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
@@ -656,8 +918,8 @@
     const state = Store.state;
     const due = NS.Review.dueCount(state);
     if (!due) {
-      shell(`<section class="panel"><div class="kicker">今日复习</div><h1>今天没有到期记忆</h1><div class="empty-state">不需要为了“刷数量”硬塞复习题。继续今天主线就可以。</div><div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`, 'review');
-      $('#home').onclick = () => { location.hash = '#home'; };
+      shell(`<section class="panel"><div class="review-mascot-row">${mascotFigure('review')}<div class="review-panel-copy"><div class="kicker">今日复习</div><h1>今天没有到期记忆</h1><div class="empty-state">不需要为了“刷数量”硬塞复习题。继续今天主线就可以。</div><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
+      $('#home').onclick = () => { location.hash = '#portal'; };
       return;
     }
     const day = Store.state.currentDay;
@@ -701,14 +963,14 @@
   }
 
   function reviewDonePage() {
-    shell(`<section class="panel finish"><div class="big">🧠</div><div class="kicker">今日复习</div><h1>到期记忆已经捡回来了</h1><p class="lead">复习只处理遗忘曲线到期内容。今天新做错的题仍留在“今日错题”里单独看。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回到今日主线</button></div></section>`, 'review');
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel finish"><div class="review-mascot-row">${mascotFigure('review')}<div class="review-panel-copy"><div class="big">🧠</div><div class="kicker">今日复习</div><h1>到期记忆已经捡回来了</h1><p class="lead">复习只处理遗忘曲线到期内容。今天新做错的题仍留在“今日错题”里单独看。</p><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
+    $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
   function mistakesPage() {
     const groups = NS.Review.todayMistakeGroups(Store.state, SKILLS);
-    shell(`<section class="panel"><div class="kicker">今日错题</div><h1>只看今天真正偏掉的地方</h1><p class="lead">这里不混入遗忘曲线复习。高置信错误会优先显示。</p>${groups.length ? `<div class="mistake-list">${groups.map(group => `<article class="mistake-card ${group.highConfidence ? 'high' : ''}"><b>${esc(group.skillLabel)} · ${group.count} 次${group.highConfidence ? ' · 高置信错误' : ''}</b><p>${esc(NS.Review.errorMessage(group))}</p><p class="tiny">记录题目：${group.questionIds.map(esc).join('、')}</p></article>`).join('')}</div>` : '<div class="empty-state">今天还没有错误记录。猜对的题不会被当作“完全掌握”，但也不会混进错题列表。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`, 'mistakes');
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel"><div class="mistake-mascot-row">${mascotFigure('random')}<div class="mistake-panel-copy"><div class="kicker">今日错题</div><h1>只看今天真正偏掉的地方</h1><p class="lead">这里不混入遗忘曲线复习。高置信错误会优先显示。</p>${groups.length ? `<div class="mistake-list">${groups.map(group => `<article class="mistake-card ${group.highConfidence ? 'high' : ''}"><b>${esc(group.skillLabel)} · ${group.count} 次${group.highConfidence ? ' · 高置信错误' : ''}</b><p>${esc(NS.Review.errorMessage(group))}</p><p class="tiny">记录题目：${group.questionIds.map(esc).join('、')}</p></article>`).join('')}</div>` : '<div class="empty-state">今天还没有错误记录。猜对的题不会被当作“完全掌握”，但也不会混进错题列表。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'mistakes');
+    $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
   function abilitiesPage() {
@@ -720,8 +982,8 @@
       return { meta, skill, effective, band: NS.Learning.masteryBand(skill, effective) };
     }).filter(Boolean).sort((a, b) => a.effective - b.effective);
     const score = NS.Learning.estimateScore(Store.state, SKILLS);
-    shell(`<section class="panel"><div class="kicker">能力地图</div><h1>后台看细，前台只给你有用的结论</h1><p class="lead">同一天连续做对不会把技能刷成“稳定”。跨日无提示正确和迁移题证据才会真正抬高稳定度。120/150 是课程设计目标线，不是网站对个人成绩的保证；只有完整20天和Boss卷之后，估计才更有解释意义。</p><div class="score-box"><div><span class="tiny">训练估计</span><strong>${score.low}–${score.high} / 150</strong></div><div><span class="tiny">目标线</span><strong>${score.target} / 150</strong></div></div>${summary.length ? `<div class="section-title"><h2>能力域</h2></div><div class="ability-grid">${summary.map(row => abilityDomainCard(row)).join('')}</div>` : ''}<div class="section-title"><h2>已有学习证据的技能</h2><span class="tiny">弱项排在前面</span></div>${attempted.length ? `<div class="skill-detail-list">${attempted.map(row => `<div class="skill-detail"><span><b>${esc(row.meta.label)}</b></span><b>${row.effective}%</b><small>${esc(row.band)} · 尝试 ${row.skill.attempts} 次 · 首次正确 ${row.skill.firstAttemptCorrect}/${row.skill.firstAttemptAttempts} · 独立正确 ${row.skill.independentCorrect}${row.skill.crossDayVerified ? ' · 已跨日验证' : ' · 待跨日验证'}${row.skill.nextReviewAt ? ` · 下次复习 ${esc(row.skill.nextReviewAt)}` : ''}</small></div>`).join('')}</div>` : '<div class="empty-state">先完成几道题，能力地图才会开始有证据。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`, 'abilities');
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel"><div class="ability-mascot-row">${mascotFigure('random')}<div class="ability-panel-copy"><div class="kicker">能力地图</div><h1>后台看细，前台只给你有用的结论</h1><p class="lead">同一天连续做对不会把技能刷成“稳定”。跨日无提示正确和迁移题证据才会真正抬高稳定度。120/150 是课程设计目标线，不是网站对个人成绩的保证；只有完整20天和Boss卷之后，估计才更有解释意义。</p><div class="score-box"><div><span class="tiny">训练估计</span><strong>${score.low}–${score.high} / 150</strong></div><div><span class="tiny">目标线</span><strong>${score.target} / 150</strong></div></div>${summary.length ? `<div class="section-title"><h2>能力域</h2></div><div class="ability-grid">${summary.map(row => abilityDomainCard(row)).join('')}</div>` : ''}<div class="section-title"><h2>已有学习证据的技能</h2><span class="tiny">弱项排在前面</span></div>${attempted.length ? `<div class="skill-detail-list">${attempted.map(row => `<div class="skill-detail"><span><b>${esc(row.meta.label)}</b></span><b>${row.effective}%</b><small>${esc(row.band)} · 尝试 ${row.skill.attempts} 次 · 首次正确 ${row.skill.firstAttemptCorrect}/${row.skill.firstAttemptAttempts} · 独立正确 ${row.skill.independentCorrect}${row.skill.crossDayVerified ? ' · 已跨日验证' : ' · 待跨日验证'}${row.skill.nextReviewAt ? ` · 下次复习 ${esc(row.skill.nextReviewAt)}` : ''}</small></div>`).join('')}</div>` : '<div class="empty-state">先完成几道题，能力地图才会开始有证据。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'abilities');
+    $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
 
@@ -731,7 +993,7 @@
     Store.state.detective = progress;
     const completed = Object.values(progress.cases || {}).filter(row => row?.completedAt).length;
     const average = completed ? Math.round(Object.values(progress.cases).filter(row => row?.completedAt).reduce((sum, row) => sum + Number(row.score || 0), 0) / completed * 100) : 0;
-    shell(`<section class="panel detective-hub"><div class="kicker">PHASE 4 · 结构侦探所</div><h1>不是“看谱猜答案”，而是把证据一条条关上门</h1><p class="lead">每一案都按同一条链走：分子式与 DBE → IR → ¹H NMR → 候选保留/排除 → 最终结构。最终候选选错，前面算对的 DBE、IR、NMR 仍然分别进入能力模型。</p><div class="detective-hub-stats"><div><span>已完成案例</span><b>${completed}/${cases.length}</b></div><div><span>已完成案例平均推断链</span><b>${completed ? average + '%' : '—'}</b></div><div><span>当前模式</span><b>独立训练</b></div></div><div class="section-title"><h2>案例</h2><span class="phase-badge">Day 13–14 引擎预先开放测试</span></div><div class="detective-case-list">${cases.map((kase, index) => { const row = progress.cases?.[kase.id]; return `<button type="button" class="detective-case-tile ${row?.completedAt ? 'done' : ''}" data-detective-case="${esc(kase.id)}"><span>${esc(kase.stage || `案例 ${index + 1}`)}</span><b>${esc(kase.title)}</b><small>${esc(kase.subtitle || '')}</small><em>${row?.completedAt ? `已完成 · ${Math.round(Number(row.score || 0) * 100)}%` : '未开始'}</em></button>`; }).join('')}</div><div class="note">这里先独立开放 Phase 4 方便验收，不会把你的当前 Day 1–4 主线强行跳到 Day 13。等 Day 5–12 数据补齐后，这套同一引擎会直接嵌入 Day 13–14。</div><div class="btn-row"><button class="btn primary" id="detectiveHome">回到今日</button></div></section>`, 'detective');
+    shell(`<section class="panel detective-hub"><div class="kicker">专项训练 · 结构证据</div><h1>不是“看谱猜答案”，而是把证据一条条关上门</h1><p class="lead">每一案都按同一条链走：分子式与 DBE → IR → ¹H NMR → 候选保留/排除 → 最终结构。最终候选选错，前面算对的 DBE、IR、NMR 仍然分别进入能力模型。</p><div class="detective-hub-stats"><div><span>已完成案例</span><b>${completed}/${cases.length}</b></div><div><span>已完成案例平均推断链</span><b>${completed ? average + '%' : '—'}</b></div><div><span>当前模式</span><b>独立训练</b></div></div><div class="section-title"><h2>案例</h2><span class="phase-badge">Day 13–14 主线同款引擎</span></div><div class="detective-case-list">${cases.map((kase, index) => { const row = progress.cases?.[kase.id]; return `<button type="button" class="detective-case-tile ${row?.completedAt ? 'done' : ''}" data-detective-case="${esc(kase.id)}"><span>${esc(kase.stage || `案例 ${index + 1}`)}</span><b>${esc(kase.title)}</b><small>${esc(kase.subtitle || '')}</small><em>${row?.completedAt ? `已完成 · ${Math.round(Number(row.score || 0) * 100)}%` : '未开始'}</em></button>`; }).join('')}</div><div class="note">这里是自由复练入口；正式 20 天主线在 Day 13–14 也会调用同一套证据链引擎。自由练习不会改变当前主线解锁顺序。</div><div class="btn-row"><button class="btn primary" id="detectiveHome">回到今日</button></div></section>`, 'detective');
     document.querySelectorAll('[data-detective-case]').forEach(button => button.addEventListener('click', () => { location.hash = `#detective/${button.dataset.detectiveCase}`; }));
     $('#detectiveHome').onclick = () => { location.hash = '#home'; };
   }
@@ -749,6 +1011,12 @@
     $('#detectiveExit').onclick = () => { location.hash = '#detective'; };
     NS.Detective.mount($('#detectiveRoot'), kase, {
       nextCaseId: cases[index + 1]?.id || null,
+      initialState: Store.state.detective.inProgress?.[kase.id] || null,
+      onProgress(snapshot) {
+        Store.state.detective.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
       onComplete(summary) {
         const elapsed = Math.max(0, Math.round(performance.now() - started));
         summary.skillEvidence.forEach(evidence => {
@@ -787,6 +1055,7 @@
           hintsUsed: summary.hintsUsed,
           confidence: summary.confidence
         };
+        delete Store.state.detective.inProgress[kase.id];
         Store.save();
       },
       onBack() { location.hash = '#detective'; },
@@ -801,7 +1070,7 @@
     const completedRows = Object.values(progress.cases || {}).filter(row => row?.completedAt);
     const completed = completedRows.length;
     const average = completed ? Math.round(completedRows.reduce((sum, row) => sum + Number(row.score || 0), 0) / completed * 100) : 0;
-    shell(`<section class="panel synthesis-hub"><div class="kicker">PHASE 5 · 合成迷宫</div><h1>先看差异，再搭桥；不是背“标准路线”</h1><p class="lead">每一座迷宫都先做两件基础审计：目标比起点多了什么、碳数变没变。然后你可以正向走，也可以从目标逆向拆。黄色路线只要化学上成立就会保留，不会因为不是参考答案被打成错。</p><div class="synthesis-hub-stats"><div><span>已完成迷宫</span><b>${completed}/${cases.length}</b></div><div><span>平均路线表现</span><b>${completed ? average + '%' : '—'}</b></div><div><span>判分维度</span><b>4 项</b><small>可行 / 效率 / 选择性 / 兼容</small></div></div><div class="section-title"><h2>迷宫列表</h2><span class="phase-badge">Day 17–18 引擎提前开放测试</span></div><div class="synthesis-case-list">${cases.map((kase, index) => { const row = progress.cases?.[kase.id]; return `<button type="button" class="synthesis-case-tile ${row?.completedAt ? 'done' : ''}" data-synthesis-case="${esc(kase.id)}"><span>${esc(kase.stage || `迷宫 ${index + 1}`)}</span><b>${esc(kase.title)}</b><small>${esc(kase.subtitle || '')}</small><div class="case-mini-equation">${esc(kase.start?.structure || '')}<i>→</i>${esc(kase.target?.structure || '')}</div><em>${row?.completedAt ? `已完成 · ${Math.round(Number(row.score || 0) * 100)}%` : '未开始'}</em></button>`; }).join('')}</div><div class="note">这版先独立开放 Phase 5 做验收，不会把当前主线突然跳到 Day 17。等 Day 5–16 数据补齐后，同一套引擎直接嵌入 Day 17–18。</div><div class="btn-row"><button class="btn primary" id="synthesisHome">回到今日</button></div></section>`, 'synthesis');
+    shell(`<section class="panel synthesis-hub"><div class="kicker">专项训练 · 路线设计</div><h1>先看差异，再搭桥；不是背“标准路线”</h1><p class="lead">每一组路线练习都先做两件基础审计：目标比起点多了什么、碳数变没变。然后你可以正向走，也可以从目标逆向拆。黄色路线只要化学上成立就会保留，不会因为不是参考答案被打成错。</p><div class="synthesis-hub-stats"><div><span>已完成路线训练</span><b>${completed}/${cases.length}</b></div><div><span>平均路线表现</span><b>${completed ? average + '%' : '—'}</b></div><div><span>判分维度</span><b>4 项</b><small>可行 / 效率 / 选择性 / 兼容</small></div></div><div class="section-title"><h2>路线列表</h2><span class="phase-badge">Day 17–18 主线同款引擎</span></div><div class="synthesis-case-list">${cases.map((kase, index) => { const row = progress.cases?.[kase.id]; return `<button type="button" class="synthesis-case-tile ${row?.completedAt ? 'done' : ''}" data-synthesis-case="${esc(kase.id)}"><span>${esc(kase.stage || `训练 ${index + 1}`)}</span><b>${esc(kase.title)}</b><small>${esc(kase.subtitle || '')}</small><div class="case-mini-equation">${esc(kase.start?.structure || '')}<i>→</i>${esc(kase.target?.structure || '')}</div><em>${row?.completedAt ? `已完成 · ${Math.round(Number(row.score || 0) * 100)}%` : '未开始'}</em></button>`; }).join('')}</div><div class="note">这里是自由复练入口；正式 20 天主线在 Day 17–18 会调用同一套正向/逆向路线训练。自由练习不会改变当前主线解锁顺序。</div><div class="btn-row"><button class="btn primary" id="synthesisHome">回到今日</button></div></section>`, 'synthesis');
     document.querySelectorAll('[data-synthesis-case]').forEach(button => button.addEventListener('click', () => { location.hash = `#synthesis/${button.dataset.synthesisCase}`; }));
     $('#synthesisHome').onclick = () => { location.hash = '#home'; };
   }
@@ -815,10 +1084,16 @@
     Store.state.synthesis.currentCaseId = kase.id;
     Store.save(false);
     const started = performance.now();
-    shell(`<section class="panel synthesis-shell"><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="synthesisExit">← 暂时离开这座迷宫</button><span class="tiny">路线不是只看最终答案；起点终点分析和每一步化学逻辑都会留下证据。</span></div></section>`, 'synthesis');
+    shell(`<section class="panel synthesis-shell"><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="synthesisExit">← 暂时离开这组路线训练</button><span class="tiny">路线不是只看最终答案；起点终点分析和每一步化学逻辑都会留下证据。</span></div></section>`, 'synthesis');
     $('#synthesisExit').onclick = () => { location.hash = '#synthesis'; };
     NS.Synthesis.mount($('#synthesisRoot'), kase, {
       nextCaseId: cases[index + 1]?.id || null,
+      initialState: Store.state.synthesis.inProgress?.[kase.id] || null,
+      onProgress(snapshot) {
+        Store.state.synthesis.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
       onComplete(summary) {
         const elapsed = Math.max(0, Math.round(performance.now() - started));
         summary.skillEvidence.forEach(evidence => {
@@ -857,6 +1132,7 @@
           hintsUsed: summary.hintsUsed,
           confidence: summary.confidence
         };
+        delete Store.state.synthesis.inProgress[kase.id];
         Store.save();
       },
       onBack() { location.hash = '#synthesis'; },
@@ -865,13 +1141,15 @@
   }
 
   function notReadyPage(day) {
-    shell(`<section class="panel"><div class="kicker">DAY ${day}</div><h1>这一阶段还没有开放</h1><p class="lead">当前顺序主线仍只开放 Day 1–4；Phase 4 结构侦探和 Phase 5 合成迷宫已经作为独立入口可完整训练。Day 5–12 / 15–20 还没有伪装成完成状态。</p><div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`);
-    $('#home').onclick = () => { location.hash = '#home'; };
+    shell(`<section class="panel"><div class="kicker">DAY ${day}</div><h1>这一天的数据没有正确加载</h1><p class="lead">20 天内容已经完整写入。如果你看到这里，通常是 GitHub Pages 仍在缓存旧文件，或某个 dayXX.js 没有上传完整。请先刷新页面并核对仓库文件。</p><div class="btn-row"><button class="btn primary" id="home">回到今日</button></div></section>`);
+    $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
   function route() {
     if (!Auth.user) return loginPage('login');
-    const hash = location.hash || '#home';
+    const hash = location.hash || '#welcome';
+    if (hash === '#welcome') return welcomePage();
+    if (hash === '#portal') return portalPage();
     if (hash === '#home') return homePage();
     if (hash === '#review') return reviewPage();
     if (hash === '#mistakes') return mistakesPage();
@@ -884,7 +1162,7 @@
     if (synthesisMatch) return synthesisCasePage(decodeURIComponent(synthesisMatch[1]));
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
-    location.hash = '#home';
+    location.hash = '#welcome';
   }
 
   async function boot() {
@@ -895,6 +1173,7 @@
     const restored = await Auth.restore();
     if (restored) {
       await Cloud.bootstrap(false);
+      if (!location.hash) location.hash = '#portal';
       route();
     } else {
       loginPage('login');

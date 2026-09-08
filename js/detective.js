@@ -7,6 +7,7 @@
   function normalizeProgress(progress) {
     const out = progress && typeof progress === 'object' ? progress : {};
     out.cases = out.cases && typeof out.cases === 'object' ? out.cases : {};
+    out.inProgress = out.inProgress && typeof out.inProgress === 'object' ? out.inProgress : {};
     out.currentCaseId = out.currentCaseId || null;
     return out;
   }
@@ -70,25 +71,37 @@
   }
 
   function mount(root, kase, settings = {}) {
+    const saved = settings.initialState && typeof settings.initialState === 'object' ? settings.initialState : {};
     const state = {
-      stage: 0,
-      dbeValue: '',
-      irSelected: null,
-      nmrSelected: null,
-      decisions: {},
-      finalSelected: null,
-      confidence: 'unsure',
-      hintsUsed: 0,
-      hintsByStage: {},
+      stage: Math.max(0, Math.min(4, Number(saved.stage) || 0)),
+      dbeValue: saved.dbeValue || '',
+      irSelected: saved.irSelected ?? null,
+      nmrSelected: saved.nmrSelected ?? null,
+      decisions: saved.decisions && typeof saved.decisions === 'object' ? { ...saved.decisions } : {},
+      finalSelected: saved.finalSelected ?? null,
+      confidence: ['sure','unsure','guess'].includes(saved.confidence) ? saved.confidence : 'unsure',
+      hintsUsed: Math.max(0, Number(saved.hintsUsed) || 0),
+      hintsByStage: saved.hintsByStage && typeof saved.hintsByStage === 'object' ? { ...saved.hintsByStage } : {},
       submitted: false
     };
+    const emitProgress = () => settings.onProgress?.({
+      stage: state.stage,
+      dbeValue: state.dbeValue,
+      irSelected: state.irSelected,
+      nmrSelected: state.nmrSelected,
+      decisions: { ...state.decisions },
+      finalSelected: state.finalSelected,
+      confidence: state.confidence,
+      hintsUsed: state.hintsUsed,
+      hintsByStage: { ...state.hintsByStage }
+    });
 
     const stages = ['DBE', 'IR', 'NMR', '候选排除', '最终结构'];
     const currentHintKey = () => ['dbe', 'ir', 'nmr', 'candidates', 'candidates'][state.stage] || 'candidates';
     const progressPct = () => Math.round((state.stage / (stages.length - 1)) * 100);
 
     function header() {
-      return `<div class="detective-progress"><div class="detective-progress-top"><span>${esc(kase.stage || '结构侦探')}</span><b>${state.stage + 1}/${stages.length} · ${esc(stages[state.stage])}</b></div><div class="progress-line"><i style="width:${progressPct()}%"></i></div></div><div class="detective-case-head"><div><h2>${esc(kase.title)}</h2><p>${esc(kase.subtitle || '')}</p></div><div class="case-formula"><span>分子式</span><b>${esc(kase.formula)}</b></div></div>`;
+      return `<div class="detective-progress"><div class="detective-progress-top"><span>${esc(kase.stage || '结构推断')}</span><b>${state.stage + 1}/${stages.length} · ${esc(stages[state.stage])}</b></div><div class="progress-line"><i style="width:${progressPct()}%"></i></div></div><div class="detective-case-head"><div><h2>${esc(kase.title)}</h2><p>${esc(kase.subtitle || '')}</p></div><div class="case-formula"><span>分子式</span><b>${esc(kase.formula)}</b></div></div>`;
     }
 
     function hintButton() {
@@ -202,12 +215,13 @@
     function renderResult(summary) {
       const rows = matrixRows(kase);
       const correct = (kase.candidates || []).find(c => String(c.id) === String(kase.correctCandidate));
-      root.innerHTML = `${header()}<section class="detective-result"><div class="result-score-ring"><b>${Math.round(summary.score * 100)}</b><span>推断链得分</span></div><div><div class="stage-kicker">结果不是只有“猜中/没猜中”</div><h3>${summary.finalCorrect ? '最终结构找对了。' : '最终结构没收住，但前面正确的证据不会被抹掉。'}</h3><div class="subscore-grid"><div><span>DBE</span><b>${summary.dbeCorrect ? '✓' : '×'}</b></div><div><span>IR</span><b>${summary.irCorrect ? '✓' : '×'}</b></div><div><span>NMR</span><b>${summary.nmrCorrect ? '✓' : '×'}</b></div><div><span>候选排除</span><b>${Math.round(summary.eliminationScore * 100)}%</b></div><div><span>最终结构</span><b>${summary.finalCorrect ? '✓' : '×'}</b></div></div></div></section><section class="panel-inset"><div class="stage-kicker">证据表 · 现在揭晓每个候选为什么留/为什么死</div><div class="constraint-table-wrap"><table class="constraint-table"><thead><tr><th>证据</th>${(kase.candidates || []).map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><th>${esc(row.label)}</th>${(kase.candidates || []).map(c => `<td>${statusMark(c.constraints?.[row.id])}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="candidate-reasons">${(kase.candidates || []).map(c => `<article class="candidate-reason ${String(c.id) === String(kase.correctCandidate) ? 'winner' : ''}"><b>${esc(c.label)}${String(c.id) === String(kase.correctCandidate) ? ' · 最终保留' : ' · 被排除'}</b><p>${esc(c.eliminationReason || '')}</p></article>`).join('')}</div></section><section class="panel-inset"><div class="stage-kicker">收口</div><h3>正确结构：${esc(correct?.label || kase.correctCandidate)}</h3><p class="stage-copy">${esc(kase.explanation || '')}</p><div class="btn-row"><button class="btn primary" id="detectiveBack">回结构侦探所</button>${settings.nextCaseId ? '<button class="btn soft" id="detectiveNext">下一案</button>' : ''}</div></section>`;
+      root.innerHTML = `${header()}<section class="detective-result"><div class="result-score-ring"><b>${Math.round(summary.score * 100)}</b><span>推断链得分</span></div><div><div class="stage-kicker">结果不是只有“猜中/没猜中”</div><h3>${summary.finalCorrect ? '最终结构找对了。' : '最终结构没收住，但前面正确的证据不会被抹掉。'}</h3><div class="subscore-grid"><div><span>DBE</span><b>${summary.dbeCorrect ? '✓' : '×'}</b></div><div><span>IR</span><b>${summary.irCorrect ? '✓' : '×'}</b></div><div><span>NMR</span><b>${summary.nmrCorrect ? '✓' : '×'}</b></div><div><span>候选排除</span><b>${Math.round(summary.eliminationScore * 100)}%</b></div><div><span>最终结构</span><b>${summary.finalCorrect ? '✓' : '×'}</b></div></div></div></section><section class="panel-inset"><div class="stage-kicker">证据表 · 现在揭晓每个候选为什么留/为什么死</div><div class="constraint-table-wrap"><table class="constraint-table"><thead><tr><th>证据</th>${(kase.candidates || []).map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr><th>${esc(row.label)}</th>${(kase.candidates || []).map(c => `<td>${statusMark(c.constraints?.[row.id])}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="candidate-reasons">${(kase.candidates || []).map(c => `<article class="candidate-reason ${String(c.id) === String(kase.correctCandidate) ? 'winner' : ''}"><b>${esc(c.label)}${String(c.id) === String(kase.correctCandidate) ? ' · 最终保留' : ' · 被排除'}</b><p>${esc(c.eliminationReason || '')}</p></article>`).join('')}</div></section><section class="panel-inset"><div class="stage-kicker">收口</div><h3>正确结构：${esc(correct?.label || kase.correctCandidate)}</h3><p class="stage-copy">${esc(kase.explanation || '')}</p><div class="btn-row"><button class="btn primary" id="detectiveBack">${esc(settings.backLabel || '回专项训练')}</button>${settings.nextCaseId ? '<button class="btn soft" id="detectiveNext">下一案</button>' : ''}</div></section>`;
       root.querySelector('#detectiveBack').onclick = () => settings.onBack?.();
       root.querySelector('#detectiveNext')?.addEventListener('click', () => settings.onNext?.(settings.nextCaseId));
     }
 
     function render() {
+      emitProgress();
       if (state.stage === 0) renderDBE();
       else if (state.stage === 1) renderSpectrumStage('ir');
       else if (state.stage === 2) renderSpectrumStage('nmr');

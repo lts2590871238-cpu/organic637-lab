@@ -154,7 +154,7 @@
     const evidence = (kase.evidence || []).map(row => `<li>${esc(row.text || row.label || row.id)}</li>`).join('');
     const ir = (kase.irPeaks || []).map(row => `${esc(row.wavenumber)} cm⁻¹${row.label ? ` · ${esc(row.label)}` : ''}`).join('；');
     const candidates = (kase.candidates || []).map((candidate, index) => `<button type="button" class="option detective-candidate" data-option="${esc(candidate.id)}" aria-pressed="false"><span class="option-letter">${String.fromCharCode(65 + index)}</span><span><span class="option-formula">${esc(candidate.formula || candidate.label || candidate.id)}</span><span>先保留这个候选</span></span></button>`).join('');
-    return `<div class="detective-lite"><div class="evidence-box"><b>当前证据</b>${kase.formula ? `<p>分子式：${esc(kase.formula)}${kase.dbe != null ? ` · DBE=${esc(kase.dbe)}` : ''}</p>` : ''}${evidence ? `<ul>${evidence}</ul>` : ''}${ir ? `<p class="tiny">IR：${ir}</p>` : ''}</div><p class="interaction-instruction">这是结构侦探的早期小练习：先选目前最能满足全部硬证据的候选。完整证据矩阵在 Phase 4 再展开。</p><div class="options structure-options">${candidates}</div></div>`;
+    return `<div class="detective-lite"><div class="evidence-box"><b>当前证据</b>${kase.formula ? `<p>分子式：${esc(kase.formula)}${kase.dbe != null ? ` · DBE=${esc(kase.dbe)}` : ''}</p>` : ''}${evidence ? `<ul>${evidence}</ul>` : ''}${ir ? `<p class="tiny">IR：${ir}</p>` : ''}</div><p class="interaction-instruction">这是一次早期结构证据练习：先选目前最能满足全部硬证据的候选。后面的主线会逐步加入完整证据矩阵。</p><div class="options structure-options">${candidates}</div></div>`;
   }
 
   function renderSimpleSynthesis(question) {
