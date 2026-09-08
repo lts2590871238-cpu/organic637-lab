@@ -397,7 +397,8 @@
   function welcomePage() {
     const day = Store.state.currentDay || 1;
     const name = Auth.user?.username || '';
-    shell(`<section class="welcome-stage"><img class="welcome-stage-bg" src="${DECOR.welcome.src}" alt="${esc(DECOR.welcome.name)}"><div class="welcome-stage-shade"></div><div class="welcome-center-card"><div class="welcome-badge">Day ${day} · ${name ? esc(name) : '今天'}</div><h1>20天有机化学大作战！</h1><p class="course-slogan">学懂有机，会做真题。</p><p>不急着全会。今天只把眼前这一小串真正看懂，再往前走。</p><button class="btn welcome-start" id="openPortal">开始今天 ✿</button><button class="welcome-skip" id="jumpHome">先看今日总览</button></div><div class="welcome-doodles"><span>✿</span><span>★</span><span>☁</span><span>♡</span></div></section>`);
+    const act = journeyAct(day);
+    shell(`<section class="welcome-stage"><img class="welcome-stage-bg" src="${DECOR.welcome.src}" alt="${esc(DECOR.welcome.name)}"><div class="welcome-stage-shade"></div><div class="welcome-center-card"><div class="welcome-badge">Day ${day} · ${name ? esc(name) : '今天'}${act ? ` · 第 ${act.id} 段` : ''}</div><h1>20天有机化学大作战！</h1><p class="course-slogan">学懂有机，会做真题。</p><p>${act ? esc(act.title) + '。' : ''} 不急着全会。今天只把眼前这一小串真正看懂，再接到明天。</p><button class="btn welcome-start" id="openPortal">开始今天 ✿</button><button class="welcome-skip" id="jumpHome">先看今日总览</button></div><div class="welcome-doodles"><span>✿</span><span>★</span><span>☁</span><span>♡</span></div></section>`);
     $('#openPortal').onclick = () => { location.hash = '#portal'; };
     $('#jumpHome').onclick = () => { location.hash = '#home'; };
   }
@@ -407,7 +408,8 @@
     const due = NS.Review.dueCount(Store.state);
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     const studyText = progress.lessonIndex || progress.taskIndex ? '从上次的位置继续' : '从今天第一步开始';
-    shell(`<section class="portal-stage"><div class="portal-head"><span>🌷 Day ${day}</span><h1>今天想从哪里开始？</h1><p>学累了随时退出，回来会接着原来的位置。</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>今日学习</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>返回首页</b><small>看今天进度、错题和20天地图</small></div></button></div></section>`);
+    const act = journeyAct(day);
+    shell(`<section class="portal-stage"><div class="portal-head"><span>🌷 Day ${day}${act ? ` · 第 ${act.id} 段` : ''}</span><h1>今天想从哪里开始？</h1><p>${act ? esc(act.title) + '。' : ''} 学累了随时退出，回来会接着原来的位置。</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>今日学习</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>返回首页</b><small>看今天进度、错题和20天地图</small></div></button></div></section>`);
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
   }
 
@@ -436,6 +438,47 @@
     return [...buckets.values()].map(row => ({ ...row, average: Math.round(row.values.reduce((sum, value) => sum + value, 0) / row.values.length) }));
   }
 
+  function journeyMeta(day) {
+    return Data.COURSE_JOURNEY?.dayMeta?.[day] || REGISTRY[day]?.journey || null;
+  }
+
+  function journeyAct(day) {
+    return (Data.COURSE_JOURNEY?.acts || []).find(act => act.days.includes(Number(day))) || null;
+  }
+
+  function renderJourneyStrip(day) {
+    const meta = journeyMeta(day);
+    const act = journeyAct(day);
+    if (!meta || !act) return '';
+    const prev = REGISTRY[day - 1];
+    const next = REGISTRY[day + 1];
+    return `<section class="journey-strip"><div class="journey-act"><span>第 ${act.id} 段 · Day ${day}/20</span><b>${esc(act.title)}</b><small>${esc(act.subtitle)}</small></div><div class="journey-flow"><div><span>从哪里来</span><b>${esc(meta.from)}</b>${prev ? `<small>上一天：${esc(prev.title)}</small>` : '<small>从零基础开始</small>'}</div><div class="current"><span>今天长出的能力</span><b>${esc(meta.ability)}</b><small>${esc(meta.today)}</small></div><div><span>接到哪里去</span><b>${esc(meta.to)}</b>${next ? `<small>下一天：${esc(next.title)}</small>` : '<small>进入后续保持与真题训练</small>'}</div></div></section>`;
+  }
+
+  function renderLearningContext(day) {
+    const meta = journeyMeta(day);
+    const act = journeyAct(day);
+    if (!meta || !act) return '';
+    return `<section class="learning-context"><span>第 ${act.id} 段 · Day ${day}/20 · ${esc(act.title)}</span><b>${esc(meta.ability)}</b><small>${esc(meta.from)} → <strong>今天</strong> → ${esc(meta.to)}</small></section>`;
+  }
+
+  function renderTimeRhythm(day) {
+    const minutes = Number(journeyMeta(day)?.minutes || REGISTRY[day]?.estimatedMinutes || 85);
+    let blocks = [
+      ['捡回旧知识',10],['看懂新动作',20],['带着做',20],['独立/对比',20],['迁移与收口',Math.max(10, minutes-70)]
+    ];
+    if (day === 1) blocks = [['看懂结构语言',15],['电子与键',20],['第一组反应电影',20],['带练/对比',20],['独立收口',10]];
+    if (day === 19) blocks = [['热身读题',5],['Boss 卷',75],['统一检查',10]];
+    if (day === 20) blocks = [['Top3诊断',15],['退回一层重建',20],['新结构修复',20],['迁移 Boss',20],['总结',10]];
+    return `<section class="time-rhythm"><div class="time-rhythm-head"><b>今天约 ${minutes} 分钟</b><span>不是一直刷题，理解和练习交替进行</span></div><div class="time-rhythm-bar">${blocks.map(([label,min])=>`<div style="--w:${min}"><span>${esc(label)}</span><b>${min}m</b></div>`).join('')}</div></section>`;
+  }
+
+  function renderCourseActsMap(state) {
+    const acts = Data.COURSE_JOURNEY?.acts || [];
+    if (!acts.length) return '';
+    return `<div class="course-acts">${acts.map(act => `<section class="course-act ${act.days.includes(state.currentDay) ? 'current' : ''}"><header><span>第 ${act.id} 段</span><div><b>${esc(act.title)}</b><small>${esc(act.subtitle)}</small></div></header><div class="course-act-days">${act.days.map(day => { const meta=(MANIFEST.days||[]).find(x=>x.day===day)||{}; const done=state.completedDays.includes(day); const unlocked=day<=state.currentDay||done; const cls=done?'done':day===state.currentDay?'current':unlocked?'':'locked'; return `<button class="act-day ${cls}" ${unlocked?`data-day="${day}"`:'disabled'}><span>Day ${day}</span><b>${esc(meta.shortTitle || REGISTRY[day]?.title || '')}</b><small>${done?'已完成 · 可重练':day===state.currentDay?'今天':unlocked?'可进入':'按顺序解锁'}</small></button>`; }).join('')}</div></section>`).join('')}</div>`;
+  }
+
   function currentDayData() {
     normalizeState();
     return REGISTRY[Store.state.currentDay] || REGISTRY[1];
@@ -462,7 +505,7 @@
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
       return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重练' : meta.day === state.currentDay ? '今天' : available ? '按顺序解锁' : ''}</small></button>`;
     }).join('');
-    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div><div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div><div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先学再练，沿着今天这一条主线走</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天地图</h2><span>想重练已经完成的 Day，直接点它。</span></div><div class="day-map compact-map">${dayTiles}</div>${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
+    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
@@ -740,6 +783,28 @@
     return 'hidden';
   }
 
+  function renderLessonGrounding(item, day) {
+    const g = item.grounding || Data.DAY_GROUNDING?.[day];
+    if (!g) return '';
+    return `<section class="learning-compass"><div><span>你已经会</span><b>${esc(g.known || '')}</b></div><div class="on"><span>这一页只加一块</span><b>${esc(g.newThing || '')}</b></div><div><span>做题时要变成</span><b>${esc(g.action || '')}</b></div><small>真题出口：${esc(g.exam || '')}</small></section>`;
+  }
+
+  function renderLessonHeroVisual(item) {
+    if (!item.heroDiagram || !NS.Visuals?.render) return '';
+    const visual = NS.Visuals.render(item.heroDiagram);
+    if (!visual) return '';
+    return `<section class="lesson-hero-chem"><div class="lesson-hero-label"><span>先看图，不急着背名词</span><b>把结构、电子和键的变化先看成一段动作</b></div><div class="lesson-hero-svg">${visual}</div></section>`;
+  }
+
+  function renderQuestionTranslation(question) {
+    const t = question.translation;
+    if (!t) return '';
+    const level = questionAidLevel(question);
+    const steps = Array.isArray(t.steps) ? t.steps : [];
+    if (level === 'hidden') return `<details class="question-translation compact"><summary>忘了怎么拆题？点开“题干翻译机”</summary><p>${esc(t.source || '')}</p>${steps.length ? `<ol>${steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : ''}</details>`;
+    return `<section class="question-translation ${level}"><div class="translation-head"><span>题干翻译机</span><b>先把题目翻译成你已经学过的动作</b><small>${esc(t.source || '')}</small></div>${steps.length ? `<ol>${steps.map((x,i)=>`<li><span>${i+1}</span><p>${esc(x)}</p></li>`).join('')}</ol>` : ''}${t.trap ? `<div class="translation-trap"><b>先防一个坑：</b>${esc(t.trap)}</div>` : ''}</section>`;
+  }
+
   function renderLessonExamBridge(item, day) {
     const bridge = item.examBridge || Data.DAY_EXAM_BRIDGES?.[day];
     if (!bridge) return '';
@@ -785,6 +850,38 @@
     if (!pre) return '';
     const steps = Array.isArray(pre.steps) ? pre.steps : [];
     return `<section class="question-preflight"><div class="preflight-head"><span>做题前先拆题</span><b>这题不是突然冒出来的</b><small>核心能力：${esc(pre.skill || '')}</small></div>${steps.length ? `<ol>${steps.map(step => `<li>${esc(step)}</li>`).join('')}</ol>` : ''}${pre.why ? `<p>${esc(pre.why)}</p>` : ''}</section>`;
+  }
+
+  function renderQuestionGuidedFrames(question) {
+    const frames = Array.isArray(question.guidedFrames) ? question.guidedFrames : [];
+    if (!frames.length || question.role === 'exam' || question.role === 'boss') return '';
+    const level = questionAidLevel(question);
+    const inner = `<div class="guided-question-steps">${frames.map((frame,index)=>`<article class="guided-question-step" data-guided-step="${index}"><div class="guided-question-index">${index+1}</div><div><b>${esc(frame.title || `第 ${index+1} 步`)}</b>${frame.text?`<p>${esc(frame.text)}</p>`:''}${frame.diagram&&NS.Visuals?.render?`<div class="guided-question-visual">${NS.Visuals.render(frame.diagram)}</div>`:''}${frame.formula?`<div class="story-formula">${esc(frame.formula)}</div>`:''}</div></article>`).join('')}</div>`;
+    if (level === 'hidden' || question.role === 'transfer') return `<details class="guided-question collapsed"><summary>如果一眼不知道从哪开始，点开“带我拆一遍”</summary>${inner}</details>`;
+    return `<section class="guided-question" data-guided-question="${esc(question.id)}"><div class="guided-question-head"><span>先别急着选答案</span><b>像教练在旁边一样，只看一步、做一步</b><small>这些不是答案，是你以后面对陌生真题也能复用的起手式。</small></div>${inner}<div class="guided-question-controls"><button type="button" class="btn ghost" data-guided-prev>上一步</button><span class="tiny" data-guided-count></span><button type="button" class="btn soft" data-guided-next>下一步</button></div></section>`;
+  }
+
+  function bindQuestionGuidedFrames(question, day) {
+    const box = document.querySelector(`[data-guided-question="${CSS.escape(question.id)}"]`);
+    if (!box) return;
+    const steps=[...box.querySelectorAll('[data-guided-step]')]; if(!steps.length)return;
+    const progress=NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+    progress.questionFrames=progress.questionFrames||{};
+    let current=Math.max(0,Math.min(steps.length-1,Number(progress.questionFrames[question.id]||0)));
+    const prev=box.querySelector('[data-guided-prev]');
+    const next=box.querySelector('[data-guided-next]');
+    const count=box.querySelector('[data-guided-count]');
+    const draw=()=>{
+      steps.forEach((step,index)=>{step.hidden=index!==current;});
+      if(prev)prev.disabled=current<=0;
+      if(next){next.disabled=current>=steps.length-1;next.textContent=current>=steps.length-1?'这段拆完了 ✓':'下一步';}
+      if(count)count.textContent=`${current+1} / ${steps.length}`;
+      progress.questionFrames[question.id]=current;
+      Store.save(false);
+    };
+    prev?.addEventListener('click',()=>{if(current>0){current-=1;draw();}});
+    next?.addEventListener('click',()=>{if(current<steps.length-1){current+=1;draw();}});
+    draw();
   }
 
   function renderQuestionTermSupport(question) {
@@ -852,7 +949,7 @@
     const analogyHtml = analogy ? `<div class="analogy-card deep-analogy"><div class="analogy-icon">🧠</div><div><b>${esc(analogy.title || '先用一个生活直觉')}</b><p>${esc(analogy.body || '')}</p>${analogy.boundary ? `<small><b>比喻到这里为止：</b>${esc(analogy.boundary)}</small>` : ''}</div></div>` : '';
     const visualHtml = visual ? `<div class="concept-visual"><div class="visual-box"><span>先看这里</span><b>${esc(visual.left || '')}</b></div><div class="visual-arrow"><span>${esc(visual.arrow || '→')}</span></div><div class="visual-box"><span>变化以后</span><b>${esc(visual.right || '')}</b></div>${visual.caption ? `<p>${esc(visual.caption)}</p>` : ''}</div>` : '';
     const sequenceHtml = sequence.length ? `<section class="chem-storyboard" data-storyboard="${esc(item.id)}"><div class="story-head"><span>一步一步看</span><b>先不要跳到结论，跟着电子和键走</b></div><div class="story-steps">${sequence.map((step, index) => `<article class="story-step" data-story-step="${index}"><div class="story-index">${index + 1}</div><div class="story-step-body"><b>${esc(step.title || `第 ${index + 1} 步`)}</b>${step.text ? `<p>${esc(step.text)}</p>` : ''}${step.diagram && NS.Visuals?.render ? `<div class="story-diagram">${NS.Visuals.render(step.diagram)}</div>` : ''}${step.formula ? `<div class="story-formula">${esc(step.formula)}</div>` : ''}</div></article>`).join('')}</div><div class="story-controls"><button type="button" class="btn ghost" data-story-prev>上一步</button><span class="tiny" data-story-count></span><button type="button" class="btn soft" data-story-next>看下一步</button></div></section>` : '';
-    const whyHtml = whyChain.length ? `<div class="why-chain"><b>把“为什么”问到底</b>${whyChain.map((row, index) => `<div class="why-row"><span>${index + 1}</span><p>${esc(row)}</p></div>`).join('')}</div>` : '';
+    const whyHtml = whyChain.length ? `<section class="why-chain" data-why-chain="${esc(item.id)}"><div class="why-chain-head"><span>为什么不能停在一句口诀</span><b>把“为什么”一层一层问到底</b><small>每点一次只多揭开一层；如果下一层你自己能说出来，说明真的在变成你的知识。</small></div><div class="why-chain-steps">${whyChain.map((row, index) => `<div class="why-row" data-why-step="${index}"><span>${index + 1}</span><p>${esc(row)}</p></div>`).join('')}</div><div class="why-chain-controls"><button type="button" class="btn ghost" data-why-prev>上一个为什么</button><span class="tiny" data-why-count></span><button type="button" class="btn soft" data-why-next>继续问：为什么？</button></div></section>` : '';
     const lookHtml = lookQuestions.length ? `<div class="look-say"><b>👀 看图说一句</b><p>先别背名词，试着自己说出下面这些变化：</p><ol>${lookQuestions.map(x => `<li>${esc(x)}</li>`).join('')}</ol><small>不用写长答案。能准确指出“谁变了、哪里变了”就已经在建立做题语言。</small></div>` : '';
     const checkHtml = microCheck ? `<div class="micro-check" data-micro-check="${esc(item.id)}"><div class="micro-check-head"><span>小停顿</span><b>${esc(microCheck.prompt || '')}</b></div><div class="micro-check-options">${(microCheck.options || []).map((option, index) => `<button type="button" data-micro-option="${index}">${esc(option)}</button>`).join('')}</div><div class="micro-check-feedback" data-micro-feedback hidden></div></div>` : '';
     const wonderHtml = wonder ? `<div class="wonder-card"><b>✨ 原来如此</b><p>${esc(wonder)}</p></div>` : '';
@@ -863,6 +960,8 @@
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     progress.lessonFrames = progress.lessonFrames || {};
     progress.lessonChecks = progress.lessonChecks || {};
+    progress.lessonWhyDepth = progress.lessonWhyDepth || {};
+    const whyChain = item.whyChain || SCAFFOLDS.lessons?.[item.id]?.whyChain || [];
     const sequence = item.sequence || SCAFFOLDS.lessons?.[item.id]?.sequence || [];
     const micro = item.microCheck || SCAFFOLDS.lessons?.[item.id]?.microCheck || null;
     const nextLesson = $('#nextLesson');
@@ -871,7 +970,8 @@
     const updateGate = () => {
       const frameDone = !sequence.length || Number(progress.lessonFrames[item.id] || 0) >= sequence.length - 1;
       const checkDone = !micro || Boolean(progress.lessonChecks[item.id]);
-      const ready = frameDone && checkDone;
+      const whyDone = !whyChain.length || Number(progress.lessonWhyDepth[item.id] || 0) >= whyChain.length - 1;
+      const ready = frameDone && checkDone && whyDone;
       if (nextLesson) nextLesson.disabled = !ready;
       if (gate) {
         if (ready) {
@@ -881,6 +981,7 @@
           const missing = [];
           if (!frameDone) missing.push('把“一步一步看”翻到最后一帧');
           if (!checkDone) missing.push('做完这一页的小停顿');
+          if (!whyDone) missing.push('把“为什么”追问到最后一层');
           gate.className = 'lesson-gate waiting';
           gate.innerHTML = `<b>先别急着翻页</b><span>${missing.join('，')}。忘了前面的内容，随时可以点“上一步”或“上一页”。</span>`;
         }
@@ -909,6 +1010,28 @@
       };
       prev?.addEventListener('click', () => { if (current > 0) { current -= 1; draw(); } });
       next?.addEventListener('click', () => { if (current < steps.length - 1) { current += 1; draw(); } });
+      draw();
+    });
+
+    document.querySelectorAll('[data-why-chain]').forEach(box => {
+      if (box.dataset.whyChain !== item.id) return;
+      const steps = [...box.querySelectorAll('[data-why-step]')];
+      if (!steps.length) return;
+      let current = Math.max(0, Math.min(steps.length - 1, Number(progress.lessonWhyDepth[item.id] || 0)));
+      const prev = box.querySelector('[data-why-prev]');
+      const next = box.querySelector('[data-why-next]');
+      const count = box.querySelector('[data-why-count]');
+      const draw = () => {
+        steps.forEach((step,index)=>{ step.hidden = index > current; step.classList.toggle('current', index === current); });
+        if (prev) prev.disabled = current <= 0;
+        if (next) { next.disabled = current >= steps.length - 1; next.textContent = current >= steps.length - 1 ? '为什么追到底了 ✓' : '继续问：为什么？'; }
+        if (count) count.textContent = `${current + 1} / ${steps.length}`;
+        progress.lessonWhyDepth[item.id] = current;
+        Store.save();
+        updateGate();
+      };
+      prev?.addEventListener('click',()=>{ if(current>0){current-=1;draw();} });
+      next?.addEventListener('click',()=>{ if(current<steps.length-1){current+=1;draw();} });
       draw();
     });
 
@@ -973,7 +1096,7 @@
   function lessonPage(day, item) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     const prevLabel = progress.lessonIndex > 0 ? '← 上一页' : '← 回入口';
-    shell(`<section class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderFirstUseTerms(item)}${renderLessonExamBridge(item, day)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></section>`,'study');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevLesson').onclick = () => goPreviousStudyPage(day);
     bindLessonExtras(day, item);
@@ -990,10 +1113,11 @@
     const started = performance.now();
     const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习', boss: '最终 Boss', exam: '考试' }[context.mode] || context.mode;
     const decorKey = context.mode === 'review' ? 'review' : 'boss';
-    shell(`<section class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></section>`, context.mode === 'review' ? 'review' : 'study');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(context.day || question.day)}<div class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionTranslation(question)}${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}${renderQuestionGuidedFrames(question)}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></div></section>`, context.mode === 'review' ? 'review' : 'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevStudy').onclick = () => { if (context.mode === 'review') { const d = context.day || Store.state.currentDay; const p = NS.Learning.ensureDayState(Store.state, d, REGISTRY); if (p.reviewIndex > 0) { p.reviewIndex -= 1; Store.save(); reviewPage(); } else { location.hash = '#welcome'; } } else { goPreviousStudyPage(context.day || question.day); } };
     bindAidReveal(document);
+    bindQuestionGuidedFrames(question, context.day || question.day);
     const previous = Store.state.attempts.filter(row => row.questionId === question.id).length;
     NS.Interactions.mount($('#interactionRoot'), question, {
       examMode: false,

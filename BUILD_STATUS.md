@@ -1,18 +1,16 @@
-# BUILD STATUS — beginner-deep-v1.2.0
+# BUILD STATUS — beginner closure v12
 
-- GitHub Pages static frontend: PASS
-- Existing Cloudflare Worker/D1 compatibility: PASS, no schema changes
 - Phase 1 learning loop: PASS
-- Phase 2 ability model: PASS
+- Phase 2 ability/mastery/review: PASS
 - Phase 3 core interactions: PASS
-- Phase 4 structure inference: PASS
-- Phase 5 synthesis routes: PASS
-- Day 01–Day 20 content: COMPLETE
-- Beginner foundational bridge: COMPLETE
-- 152 teaching nodes / 254 main tasks / 48 repairs / 42 adaptive tasks
-- 44 progressive storyboard lessons
-- 44 immediate micro-checks
-- 134 analogy-supported lessons
-- 3D: NOT INCLUDED BY DESIGN
-- Day 19: 150/150 Boss paper
-- Day 20: adaptive Top-3 repair + transfer
+- Phase 4 structure inference engine: PASS
+- Phase 5 synthesis route engine: PASS
+- Day01–Day20 content: COMPLETE
+- Beginner closure v10: PASS
+- Question-level guided reasoning v11: PASS
+- Prerequisite leakage audit: PASS (COUNT 0)
+- V12 unified layout / 5-stage journey: PASS
+- Daily duration rule 70–90 min: PASS
+- 3D: NOT INCLUDED YET BY DESIGN
+
+Current mainline slogan: 学懂有机，会做真题。
