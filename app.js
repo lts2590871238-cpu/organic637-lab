@@ -241,6 +241,16 @@
     state.completedDays = [...new Set((state.completedDays || []).map(Number))].sort((a, b) => a - b);
     state.detective = NS.Detective.normalizeProgress(state.detective);
     state.synthesis = NS.Synthesis.normalizeProgress(state.synthesis);
+    if (Number(state.beginnerDeepVersion || 0) < 1) {
+      for (let day = 1; day <= AVAILABLE_MAX_DAY; day += 1) {
+        const progress = state.days?.[day];
+        if (!progress || progress.finished) continue;
+        progress.lessonIndex = 0;
+        progress.lessonFrames = {};
+        progress.lessonChecks = {};
+      }
+      state.beginnerDeepVersion = 1;
+    }
     const firstUnfinished = Array.from({ length: AVAILABLE_MAX_DAY }, (_, i) => i + 1).find(day => REGISTRY[day] && !state.completedDays.includes(day));
     if (!state.currentDay || state.currentDay < 1) state.currentDay = firstUnfinished || AVAILABLE_MAX_DAY;
     if (state.currentDay > AVAILABLE_MAX_DAY) state.currentDay = AVAILABLE_MAX_DAY;
@@ -739,17 +749,82 @@
     const analogy = item.analogy || extra.analogy;
     let visual = item.visual || extra.visual;
     let lookQuestions = item.lookQuestions || extra.lookQuestions || [];
+    const sequence = item.sequence || extra.sequence || [];
+    const whyChain = item.whyChain || extra.whyChain || [];
+    const microCheck = item.microCheck || extra.microCheck || null;
+    const wonder = item.wonder || extra.wonder || '';
     const arrowFormula = formulas.find(formula => /→|⇄|⇒/.test(formula));
     if (!visual && arrowFormula) {
       const parts = String(arrowFormula).split(/→|⇄|⇒/);
       if (parts.length >= 2) visual = { left: parts[0].trim(), arrow: arrowFormula.includes('⇄') ? '⇄' : '→', right: parts.slice(1).join(' → ').trim(), caption: '把这一行当成“找不同”：先看左边有什么，再看右边哪里变了。' };
     }
     if (!lookQuestions.length && visual) lookQuestions = ['反应前后，最明显变化的是哪根键或哪个官能团？', '碳骨架有没有变化？如果没变，真正变化的只是哪个位置？'];
-    if (!formulas.length && !concept && !definition && !analogy && !visual && !lookQuestions.length) return '';
-    const analogyHtml = analogy ? `<div class="analogy-card"><div class="analogy-icon">🧠</div><div><b>${esc(analogy.title || '先用一个生活直觉')}</b><p>${esc(analogy.body || '')}</p>${analogy.boundary ? `<small><b>比喻到这里为止：</b>${esc(analogy.boundary)}</small>` : ''}</div></div>` : '';
+    if (!formulas.length && !concept && !definition && !analogy && !visual && !lookQuestions.length && !sequence.length && !whyChain.length && !microCheck && !wonder) return '';
+    const analogyHtml = analogy ? `<div class="analogy-card deep-analogy"><div class="analogy-icon">🧠</div><div><b>${esc(analogy.title || '先用一个生活直觉')}</b><p>${esc(analogy.body || '')}</p>${analogy.boundary ? `<small><b>比喻到这里为止：</b>${esc(analogy.boundary)}</small>` : ''}</div></div>` : '';
     const visualHtml = visual ? `<div class="concept-visual"><div class="visual-box"><span>先看这里</span><b>${esc(visual.left || '')}</b></div><div class="visual-arrow"><span>${esc(visual.arrow || '→')}</span></div><div class="visual-box"><span>变化以后</span><b>${esc(visual.right || '')}</b></div>${visual.caption ? `<p>${esc(visual.caption)}</p>` : ''}</div>` : '';
+    const sequenceHtml = sequence.length ? `<section class="chem-storyboard" data-storyboard="${esc(item.id)}"><div class="story-head"><span>一步一步看</span><b>先不要跳到结论，跟着电子和键走</b></div><div class="story-steps">${sequence.map((step, index) => `<article class="story-step" data-story-step="${index}"><div class="story-index">${index + 1}</div><div><b>${esc(step.title || `第 ${index + 1} 步`)}</b>${step.text ? `<p>${esc(step.text)}</p>` : ''}${step.formula ? `<div class="story-formula">${esc(step.formula)}</div>` : ''}</div></article>`).join('')}</div><div class="story-controls"><button type="button" class="btn ghost" data-story-prev>上一步</button><span class="tiny" data-story-count></span><button type="button" class="btn soft" data-story-next>看下一步</button></div></section>` : '';
+    const whyHtml = whyChain.length ? `<div class="why-chain"><b>为什么会这样连？</b>${whyChain.map((row, index) => `<div class="why-row"><span>${index + 1}</span><p>${esc(row)}</p></div>`).join('')}</div>` : '';
     const lookHtml = lookQuestions.length ? `<div class="look-say"><b>👀 看图说一句</b><p>先别背名词，试着自己说出下面这些变化：</p><ol>${lookQuestions.map(x => `<li>${esc(x)}</li>`).join('')}</ol><small>不用写长答案。能准确指出“谁变了、哪里变了”就已经在建立做题语言。</small></div>` : '';
-    return `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(concept || '把这一小步先用化学式看清楚')}</b></div>${definition ? `<p>${esc(definition)}</p>` : ''}${analogyHtml}${visualHtml}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${lookHtml}${watch ? `<div class="support-watch"><b>容易混：</b>${esc(watch)}</div>` : ''}</div>`;
+    const checkHtml = microCheck ? `<div class="micro-check" data-micro-check="${esc(item.id)}"><div class="micro-check-head"><span>小停顿</span><b>${esc(microCheck.prompt || '')}</b></div><div class="micro-check-options">${(microCheck.options || []).map((option, index) => `<button type="button" data-micro-option="${index}">${esc(option)}</button>`).join('')}</div><div class="micro-check-feedback" data-micro-feedback hidden></div></div>` : '';
+    const wonderHtml = wonder ? `<div class="wonder-card"><b>✨ 原来如此</b><p>${esc(wonder)}</p></div>` : '';
+    return `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(concept || '把这一小步先用化学式看清楚')}</b></div>${definition ? `<p>${esc(definition)}</p>` : ''}${analogyHtml}${sequenceHtml}${whyHtml}${visualHtml}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${lookHtml}${checkHtml}${wonderHtml}${watch ? `<div class="support-watch"><b>容易混：</b>${esc(watch)}</div>` : ''}</div>`;
+  }
+
+  function bindLessonExtras(day, item) {
+    const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+    progress.lessonFrames = progress.lessonFrames || {};
+    progress.lessonChecks = progress.lessonChecks || {};
+    document.querySelectorAll('[data-storyboard]').forEach(board => {
+      if (board.dataset.storyboard !== item.id) return;
+      const steps = [...board.querySelectorAll('[data-story-step]')];
+      if (!steps.length) return;
+      let current = Math.max(0, Math.min(steps.length - 1, Number(progress.lessonFrames[item.id] || 0)));
+      const prev = board.querySelector('[data-story-prev]');
+      const next = board.querySelector('[data-story-next]');
+      const count = board.querySelector('[data-story-count]');
+      const draw = () => {
+        steps.forEach((step, index) => { step.hidden = index !== current; });
+        if (prev) prev.disabled = current <= 0;
+        if (next) {
+          next.disabled = current >= steps.length - 1;
+          next.textContent = current >= steps.length - 1 ? '这一段看完了' : '看下一步';
+        }
+        if (count) count.textContent = `${current + 1} / ${steps.length}`;
+        progress.lessonFrames[item.id] = current;
+        Store.save();
+      };
+      prev?.addEventListener('click', () => { if (current > 0) { current -= 1; draw(); } });
+      next?.addEventListener('click', () => { if (current < steps.length - 1) { current += 1; draw(); } });
+      draw();
+    });
+    document.querySelectorAll('[data-micro-check]').forEach(box => {
+      if (box.dataset.microCheck !== item.id) return;
+      const feedback = box.querySelector('[data-micro-feedback]');
+      const saved = progress.lessonChecks[item.id];
+      const answer = Number((item.microCheck || SCAFFOLDS.lessons?.[item.id]?.microCheck || {}).answer);
+      const explanation = (item.microCheck || SCAFFOLDS.lessons?.[item.id]?.microCheck || {}).feedback || '';
+      const apply = selected => {
+        box.querySelectorAll('[data-micro-option]').forEach(button => {
+          const idx = Number(button.dataset.microOption);
+          button.classList.toggle('selected', idx === selected);
+          button.classList.toggle('correct', idx === answer && selected !== null);
+          button.classList.toggle('wrong', idx === selected && idx !== answer);
+        });
+        if (selected !== null && feedback) {
+          const correct = selected === answer;
+          feedback.hidden = false;
+          feedback.className = `micro-check-feedback ${correct ? 'good' : 'error'}`;
+          feedback.textContent = `${correct ? '对，这一步通了。' : '这一步还差一点。'} ${explanation}`;
+        }
+      };
+      if (saved && Number.isInteger(saved.selected)) apply(saved.selected);
+      box.querySelectorAll('[data-micro-option]').forEach(button => button.addEventListener('click', () => {
+        const selected = Number(button.dataset.microOption);
+        progress.lessonChecks[item.id] = { selected, correct: selected === answer, at: Date.now() };
+        Store.save();
+        apply(selected);
+      }));
+    });
   }
 
   function questionAidData(question) {
@@ -781,6 +856,7 @@
   function lessonPage(day, item) {
     shell(`<section class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1><div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="footer-actions"><button class="link-btn" id="home">← 暂时退出</button><button class="btn primary" id="nextLesson">继续这一小串</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>今天只看这一小步。看懂再继续 ♡</p></aside></section>`,'study');
     $('#home').onclick = () => { location.hash = '#portal'; };
+    bindLessonExtras(day, item);
     $('#nextLesson').onclick = () => {
       const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
       progress.lessonIndex += 1;

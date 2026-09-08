@@ -1,4 +1,4 @@
 window.ORGANIC637_CONFIG = {
   API_URL: "https://organic637-lab-api.lts2590871238.workers.dev",
-  APP_VERSION: "full20-cozy-v1.1.0"
+  APP_VERSION: "beginner-deep-v1.2.0"
 };
