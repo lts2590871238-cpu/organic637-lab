@@ -339,10 +339,7 @@
   }
 
   function shell(inner, active = '') {
-    const name = Auth.user?.username || '';
-    $('#app').innerHTML = `<div class="app"><header class="topbar"><div class="brand"><small>南京工业大学 637 · 20天冲刺</small>有机实验室</div><div class="nav-row"><button class="nav-pill ${active === 'portal' ? 'active' : ''}" data-nav="#portal">入口</button><button class="nav-pill ${active === 'home' ? 'active' : ''}" data-nav="#home">首页</button><button class="nav-pill ${active === 'study' ? 'active' : ''}" data-nav="#day/${Store.state?.currentDay || 1}">今日学习</button><button class="nav-pill ${active === 'review' ? 'active' : ''}" data-nav="#review">今日复习</button><button class="nav-pill ${active === 'mistakes' ? 'active' : ''}" data-nav="#mistakes">错题回看</button><button class="nav-pill ${active === 'abilities' ? 'active' : ''}" data-nav="#abilities">能力地图</button></div><div class="cloud"><span id="cloudDot" class="dot"></span><span id="cloudText">${name ? esc(name) : '未登录'}</span></div></header>${inner}</div>`;
-    document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.nav; }));
-    renderCloud();
+    $('#app').innerHTML = `<div class="app cozy-app">${inner}</div>`;
   }
 
   function renderCloud() {
@@ -361,14 +358,14 @@
     welcome: { src: 'assets/mascots/welcome-page.jpg', name: '欢迎页插图', caption: '欢迎回来，今天也不用一下学很多。' }
   };
 
-  function mascotFigure(key, extra = '') {
+  function decorImage(key, extra = '') {
     const item = DECOR[key];
     if (!item) return '';
-    return `<figure class="mascot-card ${extra}"><img src="${item.src}" alt="${esc(item.name)}"><figcaption><b>${esc(item.name)}</b><span>${esc(item.caption)}</span></figcaption></figure>`;
+    return `<div class="decor-image ${extra}"><img src="${item.src}" alt="${esc(item.name)}"></div>`;
   }
 
   function loginPage(mode = 'login', message = '') {
-    $('#app').innerHTML = `<div class="app login-wrap"><section class="panel login-card login-layout"><div><div class="kicker">南京工业大学 637 · 20天冲刺</div><h1 class="hero">有机实验室</h1><p class="lead">玩中学，学中练。今天只学一小串，学会以后再往前走；中途可以随时退出，下次会从你停下来的地方继续。</p><div class="field"><label>名字 / 账号</label><input id="user" autocomplete="username" placeholder="例如：111"></div><div class="field"><label>密码</label><input id="pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" placeholder="至少 6 位"></div>${message ? `<div class="error">${esc(message)}</div>` : ''}<div class="btn-row"><button id="submitLogin" class="btn primary">${mode === 'login' ? '登录' : '创建账号'}</button><button id="switchLogin" class="btn soft">${mode === 'login' ? '第一次来？创建账号' : '已经有账号？直接登录'}</button></div><p class="tiny" style="margin-top:18px">学习状态会先保存在本机，再异步同步到云端；断网也不会丢进度。</p></div>${mascotFigure('random', 'welcome-main-mascot')}</section></div>`;
+    $('#app').innerHTML = `<div class="app login-wrap"><section class="panel login-card login-layout"><div class="login-copy"><div class="kicker">南京工业大学 637 · 20天冲刺</div><h1 class="hero">有机实验室</h1><p class="lead">今天只学一小串。先看懂，再动手；中途退出也会记住你做到哪里。</p><div class="field"><label>名字 / 账号</label><input id="user" autocomplete="username" placeholder="例如：111"></div><div class="field"><label>密码</label><input id="pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" placeholder="至少 6 位"></div>${message ? `<div class="error">${esc(message)}</div>` : ''}<div class="btn-row"><button id="submitLogin" class="btn primary">${mode === 'login' ? '登录' : '创建账号'}</button><button id="switchLogin" class="btn soft">${mode === 'login' ? '第一次来？创建账号' : '已经有账号？直接登录'}</button></div><p class="tiny" style="margin-top:18px">进度先保存在本机，再同步到云端。</p></div>${decorImage('random', 'login-decor')}</section></div>`;
     $('#switchLogin').onclick = () => loginPage(mode === 'login' ? 'register' : 'login');
     $('#submitLogin').onclick = async () => {
       const user = $('#user').value.trim().toLowerCase();
@@ -378,7 +375,7 @@
         if (mode === 'login') await Auth.login(user, password);
         else await Auth.register(user, password);
         await Cloud.bootstrap(mode === 'register');
-        location.hash = mode === 'register' ? '#welcome' : '#portal';
+        location.hash = '#welcome';
         route();
       } catch (error) {
         loginPage(mode, error.message || '请求失败');
@@ -388,17 +385,19 @@
   }
 
   function welcomePage() {
-    shell(`<section class="panel welcome-panel"><div class="welcome-copy"><div class="kicker">欢迎回来</div><h1>先别急着刷题，先把今天的路线看清楚。</h1><p class="lead">这 20 天不是“背答案”，而是用结构式、类比、机理和反复回看，把真题里最常见的判断慢慢练成直觉。学到一半也可以退出，回来会接着做。</p><div class="welcome-points"><div>· 每天主线约 60–90 分钟，先教再练</div><div>· 错题和遗忘复习分开，不混着刷</div><div>· 能力地图只给你有用结论，不堆后台细节</div></div><div class="btn-row"><button class="btn primary" id="openPortal">20天有机化学大作战！</button><button class="btn ghost" id="jumpHome">直接看今日首页</button></div></div><div class="welcome-side">${mascotFigure('welcome', 'hero-figure')}</div></section>`, 'portal');
-    $('#openPortal').onclick = () => { location.hash = '#portal'; };
-    $('#jumpHome').onclick = () => { location.hash = '#home'; };
+    const day = Store.state.currentDay || 1;
+    const name = Auth.user?.username || '';
+    shell(`<section class="welcome-stage"><img class="welcome-stage-bg" src="${DECOR.welcome.src}" alt="${esc(DECOR.welcome.name)}"><div class="welcome-stage-shade"></div><div class="welcome-center-card"><div class="welcome-badge">Day ${day} · ${name ? esc(name) : '今天'}</div><h1>20天有机化学大作战！</h1><p>不急着全会。今天只把眼前这一小串真正看懂，再往前走。</p><button class="btn welcome-start" id="openPortal">开始今天 ✿</button><button class="welcome-skip" id="jumpHome">先看今日总览</button></div><div class="welcome-doodles"><span>✿</span><span>★</span><span>☁</span><span>♡</span></div></section>`);
+    $('#openPortal').onclick = () => { sessionStorage.setItem('organic637_welcome_seen_cozy', '1'); location.hash = '#portal'; };
+    $('#jumpHome').onclick = () => { sessionStorage.setItem('organic637_welcome_seen_cozy', '1'); location.hash = '#home'; };
   }
 
   function portalPage() {
     const day = Store.state.currentDay || 1;
     const due = NS.Review.dueCount(Store.state);
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
-    const studyText = progress.lessonIndex || progress.taskIndex ? '继续今天' : '开始今天';
-    shell(`<section class="panel portal-panel"><div class="section-title"><h2>今天从哪里进入？</h2><span class="phase-badge">三角入口</span></div><p class="lead">中途离开不会丢。下次回来，今日学习会从当前 lesson / 题目继续；复习也会从待复习队列继续。</p><div class="triangle-layout"><button class="triangle-card left" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><b>今日学习</b><small>${studyText} · Day ${String(day).padStart(2,'0')}</small></button><button class="triangle-card right" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><b>今日复习</b><small>${due ? `已有 ${due} 条到期内容` : '今天暂无到期内容'}</small></button><button class="triangle-card bottom" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><b>首页总览</b><small>看今日概览、错题、能力和 20 天地图</small></button></div><div class="portal-tip">结构推断、路线设计、结构选择、电子箭头这些内容都已经揉进每天学习里，不需要额外找页面。</div></section>`, 'portal');
+    const studyText = progress.lessonIndex || progress.taskIndex ? '从上次的位置继续' : '从今天第一步开始';
+    shell(`<section class="portal-stage"><div class="portal-head"><span>🌷 Day ${day}</span><h1>今天想从哪里开始？</h1><p>学累了随时退出，回来会接着原来的位置。</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>今日学习</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>返回首页</b><small>看今天进度、错题和20天地图</small></div></button></div></section>`);
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
   }
 
@@ -451,23 +450,17 @@
       const done = state.completedDays.includes(meta.day);
       const unlocked = available && (meta.day <= state.currentDay || done);
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
-      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重新练' : meta.day === state.currentDay ? '今天的主线' : available ? '按顺序解锁' : '尚未解锁'}</small></button>`;
+      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重练' : meta.day === state.currentDay ? '今天' : available ? '按顺序解锁' : ''}</small></button>`;
     }).join('');
-    shell(`<div class="home-hero-grid"><section class="panel day-card"><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今日主线</div><h1>${esc(data.title)}</h1><p class="lead">${esc(data.subtitle || '')}</p><div class="progress-line"><i style="width:${percent}%"></i></div><div class="tiny">今日进度 ${percent}% · 预计 ${Number(data.estimatedMinutes || 80)} 分钟 · 可随时退出并从这里继续</div><div class="quick-grid"><button class="quick-card" id="startDay"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>顺着今天这条主线，从 lesson 到练习一直往前</small></button><button class="quick-card" id="openReview"><b>今日复习 ${due}</b><small>只捡回到期记忆，不打断主线</small></button><button class="quick-card" id="openMistakes"><b>今日错题 ${mistakes}</b><small>集中看今天真正做偏的地方</small></button><button class="quick-card" id="abilities"><b>能力地图</b><small>看哪些点开始稳了，哪些还要补</small></button></div><div class="btn-row"><button id="backPortal" class="btn soft">回到三角入口</button><button id="logout" class="btn ghost">退出账号</button></div></section><aside class="home-right-rail"><section class="panel mascot-rail">${mascotFigure('random')}<div class="status-note">首页不再单独拆很多玩法标签，这些能力已经揉进每日主线。错题回看会更直接告诉你卡在哪，今日学习会把图、结构式和类比逐步撤掉。</div></section><section class="panel concise-stats"><div class="mini-card"><span class="tiny">已稳定技能</span><strong>${stable}</strong></div><div class="mini-card" style="margin-top:10px"><span class="tiny">训练估计</span><strong>${score.low}–${score.high}</strong><span class="tiny">/150 · ${esc(score.label)}</span></div></section></aside></div><div class="section-title"><h2>20 天实验地图</h2><span class="phase-badge">Day 1–20 已接入</span></div><div class="day-map">${dayTiles}</div>${summary.length ? `<div class="section-title"><h2>大能力概览</h2><button class="tiny-link" id="allAbilities">展开能力地图 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}`,'home');
+    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div><div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div><div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先学再练，沿着今天这一条主线走</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到入口</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天地图</h2><span>想重练已经完成的 Day，直接点它。</span></div><div class="day-map compact-map">${dayTiles}</div>${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
     $('#abilities').onclick = () => { location.hash = '#abilities'; };
     $('#backPortal').onclick = () => { location.hash = '#portal'; };
+    $('#logout').onclick = async () => { await Cloud.push().catch(() => {}); await Auth.logout(); Store.setScope('guest'); sessionStorage.removeItem('organic637_welcome_seen_cozy'); location.hash = ''; loginPage('login'); };
     $('#allAbilities')?.addEventListener('click', () => { location.hash = '#abilities'; });
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => { location.hash = `#day/${button.dataset.day}`; }));
-    $('#logout').onclick = async () => {
-      await Cloud.push().catch(() => {});
-      await Auth.logout();
-      Store.setScope('guest');
-      location.hash = '';
-      loginPage('login');
-    };
   }
 
   function abilityDomainCard(row) {
@@ -548,7 +541,7 @@
     }
     const started = performance.now();
     let completed = false;
-    shell(`<section class="panel detective-shell"><div class="question-head"><div class="step-label">Day ${day} · 结构证据串讲</div><span class="role-chip">证据链任务</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>这不是一道“三选一”。DBE、IR/NMR、候选排除和最终结构会分别留下能力证据。</p></div><div id="detectiveRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出，稍后继续</button><span class="tiny">完成后才会进入今天下一项；退出后仍会记住当前位置。</span></div></section>`, 'study');
+    shell(`<section class="content-with-side"><article class="panel detective-shell"><div class="question-head"><div class="step-label">Day ${day} · 结构证据串讲</div><span class="role-chip">证据链任务</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>这不是一道“三选一”。DBE、IR/NMR、候选排除和最终结构会分别留下能力证据。</p></div><div id="detectiveRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出</button><span class="tiny">退出后仍会记住当前位置。</span></div></article><aside class="quiet-side-image"><img src="${DECOR.boss.src}" alt="${esc(DECOR.boss.name)}"><p>证据一条条看，不用一次猜中。</p></aside></section>`, 'study');
     $('#embeddedExit').onclick = () => { location.hash = '#portal'; };
     Store.state.detective = NS.Detective.normalizeProgress(Store.state.detective);
     NS.Detective.mount($('#detectiveRoot'), kase, {
@@ -602,7 +595,7 @@
     }
     const started = performance.now();
     let completed = false;
-    shell(`<section class="panel synthesis-shell"><div class="question-head"><div class="step-label">Day ${day} · 路线综合训练</div><span class="role-chip">正向 / 逆向</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>先做目标差异与碳数账本，再走路线。非标准但可行的路线不会被简单判错。</p></div><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出，稍后继续</button><span class="tiny">完成路线评价后继续今天主线；退出后仍会记住当前位置。</span></div></section>`, 'study');
+    shell(`<section class="content-with-side"><article class="panel synthesis-shell"><div class="question-head"><div class="step-label">Day ${day} · 路线综合训练</div><span class="role-chip">正向 / 逆向</span></div><div class="embedded-task-intro"><b>${esc(question.prompt)}</b><p>先做目标差异与碳数账本，再走路线。非标准但可行的路线不会被简单判错。</p></div><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出</button><span class="tiny">退出后仍会记住当前位置。</span></div></article><aside class="quiet-side-image"><img src="${DECOR.boss.src}" alt="${esc(DECOR.boss.name)}"><p>先找起点和终点差了什么，再决定走哪条路。</p></aside></section>`, 'study');
     $('#embeddedExit').onclick = () => { location.hash = '#portal'; };
     Store.state.synthesis = NS.Synthesis.normalizeProgress(Store.state.synthesis);
     NS.Synthesis.mount($('#synthesisRoot'), kase, {
@@ -650,7 +643,7 @@
     const position = Math.min(progress.taskIndex + 1, progress.queue.length);
     const started = performance.now();
     progress.examDraft = progress.examDraft || { responses: [], startedAt: Date.now() };
-    shell(`<section class="panel question-shell exam-shell exercise-with-mascot"><div class="exercise-mascot-mini boss-mode"><img src="${DECOR.boss.src}" alt="${esc(DECOR.boss.name)}"><span>Boss 卷：先自己做完，再统一看解析</span></div><div class="question-head"><div class="step-label">Boss 卷 · ${position}/${progress.queue.length}</div><span class="role-chip">${Number(question.points || 0)} 分</span></div><div class="exam-warning">考试模式：无提示、提交即锁定、整卷结束统一看解析。</div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂存并回首页</button><span class="tiny">置信度会记录，但不影响卷面分。</span></div></section>`, 'study');
+    shell(`<section class="content-with-side"><article class="panel question-shell exam-shell"><div class="question-head"><div class="step-label">Boss 卷 · ${position}/${progress.queue.length}</div><span class="role-chip">${Number(question.points || 0)} 分</span></div><div class="exam-warning">考试模式：无提示、提交即锁定、整卷结束统一看解析。</div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂存退出</button><span class="tiny">置信度会记录，但不影响卷面分。</span></div></article><aside class="quiet-side-image"><img src="${DECOR.boss.src}" alt="${esc(DECOR.boss.name)}"><p>Boss 卷先自己做完，再统一看解析。</p></aside></section>`, 'study');
     $('#home').onclick = () => { location.hash = '#portal'; };
     const previous = Store.state.attempts.filter(row => row.questionId === question.id && row.mode === 'exam').length;
     NS.Interactions.mount($('#interactionRoot'), question, {
@@ -786,7 +779,7 @@
   }
 
   function lessonPage(day, item) {
-    shell(`<section class="panel lesson-card lesson-with-mascot"><div class="lesson-mascot-mini"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><span>今天这一步慢慢来</span></div><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1><div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="footer-actions"><button class="link-btn" id="home">← 暂时退出，稍后继续</button><button class="btn primary" id="nextLesson">继续这一小串</button></div></section>`, 'study');
+    shell(`<section class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1><div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="footer-actions"><button class="link-btn" id="home">← 暂时退出</button><button class="btn primary" id="nextLesson">继续这一小串</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>今天只看这一小步。看懂再继续 ♡</p></aside></section>`,'study');
     $('#home').onclick = () => { location.hash = '#portal'; };
     $('#nextLesson').onclick = () => {
       const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
@@ -799,9 +792,8 @@
   function studyQuestionPage(question, context) {
     const started = performance.now();
     const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习', boss: '最终 Boss', exam: '考试' }[context.mode] || context.mode;
-    const pageDecor = context.mode === 'review' ? DECOR.review : DECOR.boss;
-    const pageDecorText = context.mode === 'review' ? '把快忘的这一条捡回来' : question.day >= 19 || context.mode === 'boss' ? 'Boss 时间：一题一题来' : '先看清变化，再下判断';
-    shell(`<section class="panel question-shell exercise-with-mascot"><div class="exercise-mascot-mini ${question.day >= 19 || context.mode === 'boss' ? 'boss-mode' : ''}"><img src="${pageDecor.src}" alt="${esc(pageDecor.name)}"><span>${pageDecorText}</span></div><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionSupport(question)}<div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂时退出，稍后继续</button><span class="tiny">学习模式可以试错；化学式扶手会随着掌握度逐渐撤掉，回来会接着当前这题。</span></div></section>`, context.mode === 'review' ? 'review' : 'study');
+    const decorKey = context.mode === 'review' ? 'review' : 'boss';
+    shell(`<section class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionSupport(question)}<div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="home">← 暂时退出</button><span class="tiny">回来会接着当前这题；提示会随着掌握度慢慢撤掉。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></section>`, context.mode === 'review' ? 'review' : 'study');
     $('#home').onclick = () => { location.hash = '#portal'; };
     bindAidReveal(document);
     const previous = Store.state.attempts.filter(row => row.questionId === question.id).length;
@@ -918,7 +910,7 @@
     const state = Store.state;
     const due = NS.Review.dueCount(state);
     if (!due) {
-      shell(`<section class="panel"><div class="review-mascot-row">${mascotFigure('review')}<div class="review-panel-copy"><div class="kicker">今日复习</div><h1>今天没有到期记忆</h1><div class="empty-state">不需要为了“刷数量”硬塞复习题。继续今天主线就可以。</div><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
+      shell(`<section class="panel"><div class="review-mascot-row">${decorImage('review', 'page-side-decor')}<div class="review-panel-copy"><div class="kicker">今日复习</div><h1>今天没有到期记忆</h1><div class="empty-state">不需要为了“刷数量”硬塞复习题。继续今天主线就可以。</div><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
       $('#home').onclick = () => { location.hash = '#portal'; };
       return;
     }
@@ -963,13 +955,13 @@
   }
 
   function reviewDonePage() {
-    shell(`<section class="panel finish"><div class="review-mascot-row">${mascotFigure('review')}<div class="review-panel-copy"><div class="big">🧠</div><div class="kicker">今日复习</div><h1>到期记忆已经捡回来了</h1><p class="lead">复习只处理遗忘曲线到期内容。今天新做错的题仍留在“今日错题”里单独看。</p><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
+    shell(`<section class="panel finish"><div class="review-mascot-row">${decorImage('review', 'page-side-decor')}<div class="review-panel-copy"><div class="big">🧠</div><div class="kicker">今日复习</div><h1>到期记忆已经捡回来了</h1><p class="lead">复习只处理遗忘曲线到期内容。今天新做错的题仍留在“今日错题”里单独看。</p><div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'review');
     $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
   function mistakesPage() {
     const groups = NS.Review.todayMistakeGroups(Store.state, SKILLS);
-    shell(`<section class="panel"><div class="mistake-mascot-row">${mascotFigure('random')}<div class="mistake-panel-copy"><div class="kicker">今日错题</div><h1>只看今天真正偏掉的地方</h1><p class="lead">这里不混入遗忘曲线复习。高置信错误会优先显示。</p>${groups.length ? `<div class="mistake-list">${groups.map(group => `<article class="mistake-card ${group.highConfidence ? 'high' : ''}"><b>${esc(group.skillLabel)} · ${group.count} 次${group.highConfidence ? ' · 高置信错误' : ''}</b><p>${esc(NS.Review.errorMessage(group))}</p><p class="tiny">记录题目：${group.questionIds.map(esc).join('、')}</p></article>`).join('')}</div>` : '<div class="empty-state">今天还没有错误记录。猜对的题不会被当作“完全掌握”，但也不会混进错题列表。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'mistakes');
+    shell(`<section class="panel"><div class="mistake-mascot-row">${decorImage('random', 'page-side-decor')}<div class="mistake-panel-copy"><div class="kicker">今日错题</div><h1>只看今天真正偏掉的地方</h1><p class="lead">这里不混入遗忘曲线复习。高置信错误会优先显示。</p>${groups.length ? `<div class="mistake-list">${groups.map(group => `<article class="mistake-card ${group.highConfidence ? 'high' : ''}"><b>${esc(group.skillLabel)} · ${group.count} 次${group.highConfidence ? ' · 高置信错误' : ''}</b><p>${esc(NS.Review.errorMessage(group))}</p><p class="tiny">记录题目：${group.questionIds.map(esc).join('、')}</p></article>`).join('')}</div>` : '<div class="empty-state">今天还没有错误记录。猜对的题不会被当作“完全掌握”，但也不会混进错题列表。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'mistakes');
     $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
@@ -982,7 +974,7 @@
       return { meta, skill, effective, band: NS.Learning.masteryBand(skill, effective) };
     }).filter(Boolean).sort((a, b) => a.effective - b.effective);
     const score = NS.Learning.estimateScore(Store.state, SKILLS);
-    shell(`<section class="panel"><div class="ability-mascot-row">${mascotFigure('random')}<div class="ability-panel-copy"><div class="kicker">能力地图</div><h1>后台看细，前台只给你有用的结论</h1><p class="lead">同一天连续做对不会把技能刷成“稳定”。跨日无提示正确和迁移题证据才会真正抬高稳定度。120/150 是课程设计目标线，不是网站对个人成绩的保证；只有完整20天和Boss卷之后，估计才更有解释意义。</p><div class="score-box"><div><span class="tiny">训练估计</span><strong>${score.low}–${score.high} / 150</strong></div><div><span class="tiny">目标线</span><strong>${score.target} / 150</strong></div></div>${summary.length ? `<div class="section-title"><h2>能力域</h2></div><div class="ability-grid">${summary.map(row => abilityDomainCard(row)).join('')}</div>` : ''}<div class="section-title"><h2>已有学习证据的技能</h2><span class="tiny">弱项排在前面</span></div>${attempted.length ? `<div class="skill-detail-list">${attempted.map(row => `<div class="skill-detail"><span><b>${esc(row.meta.label)}</b></span><b>${row.effective}%</b><small>${esc(row.band)} · 尝试 ${row.skill.attempts} 次 · 首次正确 ${row.skill.firstAttemptCorrect}/${row.skill.firstAttemptAttempts} · 独立正确 ${row.skill.independentCorrect}${row.skill.crossDayVerified ? ' · 已跨日验证' : ' · 待跨日验证'}${row.skill.nextReviewAt ? ` · 下次复习 ${esc(row.skill.nextReviewAt)}` : ''}</small></div>`).join('')}</div>` : '<div class="empty-state">先完成几道题，能力地图才会开始有证据。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'abilities');
+    shell(`<section class="panel"><div class="ability-mascot-row">${decorImage('random', 'page-side-decor')}<div class="ability-panel-copy"><div class="kicker">能力地图</div><h1>后台看细，前台只给你有用的结论</h1><p class="lead">同一天连续做对不会把技能刷成“稳定”。跨日无提示正确和迁移题证据才会真正抬高稳定度。120/150 是课程设计目标线，不是网站对个人成绩的保证；只有完整20天和Boss卷之后，估计才更有解释意义。</p><div class="score-box"><div><span class="tiny">训练估计</span><strong>${score.low}–${score.high} / 150</strong></div><div><span class="tiny">目标线</span><strong>${score.target} / 150</strong></div></div>${summary.length ? `<div class="section-title"><h2>能力域</h2></div><div class="ability-grid">${summary.map(row => abilityDomainCard(row)).join('')}</div>` : ''}<div class="section-title"><h2>已有学习证据的技能</h2><span class="tiny">弱项排在前面</span></div>${attempted.length ? `<div class="skill-detail-list">${attempted.map(row => `<div class="skill-detail"><span><b>${esc(row.meta.label)}</b></span><b>${row.effective}%</b><small>${esc(row.band)} · 尝试 ${row.skill.attempts} 次 · 首次正确 ${row.skill.firstAttemptCorrect}/${row.skill.firstAttemptAttempts} · 独立正确 ${row.skill.independentCorrect}${row.skill.crossDayVerified ? ' · 已跨日验证' : ' · 待跨日验证'}${row.skill.nextReviewAt ? ` · 下次复习 ${esc(row.skill.nextReviewAt)}` : ''}</small></div>`).join('')}</div>` : '<div class="empty-state">先完成几道题，能力地图才会开始有证据。</div>'}<div class="btn-row"><button class="btn primary" id="home">回到三角入口</button></div></div></div></section>`, 'abilities');
     $('#home').onclick = () => { location.hash = '#portal'; };
   }
 
