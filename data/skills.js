@@ -5,6 +5,8 @@
 
   window.Organic637Data.SKILLS = [
     { id: 'alkene.pi_center', label: '识别烯烃 π 键反应中心', domain: 'reaction', importance: 4 },
+    { id: 'alkene.pi_bond_model', label: '理解 C=C 的 σ/π 组成', domain: 'reaction', importance: 4 },
+    { id: 'alkene.addition_atom_accounting', label: '烯烃加成的原子守恒与产物骨架', domain: 'reaction', importance: 4 },
     { id: 'alkene.hx_markovnikov', label: '普通 HX 的 Markovnikov 加成', domain: 'reaction', importance: 5 },
     { id: 'alkene.br2_addition', label: '烯烃 Br₂ 双键加成', domain: 'reaction', importance: 4 },
     { id: 'alkene.halohydrin', label: '烯烃卤代醇形成', domain: 'reaction', importance: 4 },
