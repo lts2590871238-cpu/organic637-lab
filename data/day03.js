@@ -33,10 +33,11 @@
       },
       {
         id: 'd03-lesson-diene',
+        threeDId: 'diels_alder_endo_exo',
         eyebrow: '第二条碳骨架路线',
         title: '共轭二烯与亲双烯体一次形成两根 σ 键',
         body: 'Diels–Alder 是协同 [4+2] 环加成：共轭二烯提供四个 π 电子，烯烃或炔烃亲双烯体提供两个 π 电子，生成六元环并保留一根新双键。',
-        note: '今天先抓住碳骨架变化，后续再逐层加入取代基和立体选择。'
+        note: '先抓住碳骨架变化，再用 3D 预览 endo/exo：同一连接骨架中，取代基可以朝桥下或桥外。'
       }
     ],
     questions: [

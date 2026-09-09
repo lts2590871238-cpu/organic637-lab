@@ -5,8 +5,8 @@
   window.Organic637Data.days[15] = {
   "day": 15,
   "title": "立体化学：把“看不见的空间”先变成一套二维算法",
-  "subtitle": "3D 模型留到最后一轮，但今天先把 CIP、R/S、Fischer、E/Z、对映/非对映、meso 和构象语言全部练成稳定步骤。",
-  "estimatedMinutes": 90,
+  "subtitle": "把四面体、楔线、CIP、R/S、Newman 与椅式先在空间里看懂，再撤掉模型回到二维真题。",
+  "estimatedMinutes": 85,
   "objectives": [
     "识别手性中心",
     "掌握 CIP",
@@ -20,6 +20,7 @@
   "lessons": [
     {
       "id": "d15-lesson-chirality",
+      "threeDId": "tetrahedral_intro",
       "eyebrow": "",
       "title": "手性先别想成“难看的楔线”：先问镜子里的它能不能和自己完全重合",
       "body": "一个 sp³ 碳若连四个不同基团，常成为手性中心。它的镜像可能像左手和右手：组成和连接都一样，但无论怎么转都不能完全重合。",
@@ -35,6 +36,7 @@
     },
     {
       "id": "d15-lesson-cip",
+      "threeDId": "cip_tournament",
       "eyebrow": "",
       "title": "CIP 排优先级像“先看身份证第一位，不同就停；相同再往外比”",
       "body": "直接相连原子原子序数越大优先级越高；若第一层相同，就比较下一层按原子序数降序排列的集合；多键按“重复连接”处理。",
@@ -50,6 +52,7 @@
     },
     {
       "id": "d15-lesson-rs",
+      "threeDId": "rs_rotation",
       "eyebrow": "",
       "title": "R/S 是一个固定算法：排 1>2>3>4，把 4 放后面，再看 1→2→3",
       "body": "最低优先级 4 背向观察者时，1→2→3 顺时针为 R，逆时针为 S。如果 4 朝向你，则结果反转。",
@@ -114,10 +117,11 @@
     },
     {
       "id": "d15-lesson-conformation",
+      "threeDId": "newman_intro",
       "eyebrow": "",
       "title": "构象像“同一个人换姿势”，不需要断键；构型像“左右手身份”，互变通常要断键",
       "body": "单键旋转产生不同构象。Newman 中 staggered 通常比 eclipsed 稳；环己烷椅式里大基团更偏赤道位以减少 1,3-diaxial 相互作用。",
-      "note": "3D 模块以后会真正旋转模型；今天先用二维规则建立语言。",
+      "note": "先沿 C–C 键真正转一次，再把同一个视角压回 Newman 二维速记。",
       "formulas": [
         "staggered < eclipsed（能量）",
         "cyclohexane: bulky group prefers equatorial"
@@ -127,6 +131,14 @@
         "body": "姿势可以轻松换，身份不能靠普通旋转换。",
         "boundary": "环翻转会交换 axial/equatorial，但 up/down 构型关系保留。"
       }
+    },
+    {
+      "id": "d15-lesson-chair-3d",
+      "threeDId": "chair_intro",
+      "eyebrow": "Day 15 · 同一个环换姿势",
+      "title": "椅式不是怪画法：让六元环折起来，再看大基团站哪里",
+      "body": "平面六边形藏掉了真实键角与重叠。环己烷折成椅式后，取代基可处于轴向或赤道向；翻环会交换这两类位置，却不会把 up 变成 down。",
+      "note": "甲基等较大基团通常更偏赤道位，因为这样能减少 1,3-diaxial 拥挤。"
     }
   ],
   "questions": [

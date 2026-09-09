@@ -1,17 +1,39 @@
-# BUILD STATUS — beginner closure v13
+# BUILD STATUS — final 3D
 
-- Phase 1 learning loop: PASS
-- Phase 2 ability/mastery/review: PASS
-- Phase 3 core interactions: PASS
-- Phase 4 structure inference engine: PASS
-- Phase 5 synthesis route engine: PASS
-- Day01–Day20 content: COMPLETE
-- Beginner closure v10: PASS
-- Question-level guided reasoning v11: PASS
-- Prerequisite leakage audit: PASS (COUNT 0)
-- V12 unified layout / 5-stage journey: PASS
-- V13 reading-first / mobile comfort layout: PASS
-- Daily duration rule 70–90 min: PASS
-- 3D: NOT INCLUDED YET BY DESIGN
+- Phase 1 PASS
+- Phase 2 PASS
+- Phase 3 PASS
+- Phase 4 PASS
+- Phase 5 PASS
+- Day01–Day20 COMPLETE
+- Beginner closure PASS
+- First-use terminology PASS
+- Question causal ladder PASS
+- True-exam bridge PASS
+- Mobile layout PASS
+
+## 3D
+
+- tetrahedral PASS
+- wedge/dash PASS
+- R/S PASS
+- CIP PASS
+- SN2 PASS
+- E2 PASS
+- Newman PASS
+- chair PASS
+- Diels–Alder PASS
+- 3D fallback PASS
+- 3D mobile PASS
+- 3D state restore PASS
+
+- Day19 150 POINT PASS
+- Day20 adaptive PASS
+- GitHub static PASS
+- Cloud sync compatible
+
+## FINAL COURSE STATUS
+
+COMPLETE
 
 Current mainline slogan: 学懂有机，会做真题。

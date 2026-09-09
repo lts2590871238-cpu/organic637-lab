@@ -115,12 +115,16 @@
 
     { id: 'stereo.cip', label: 'CIP 优先级', domain: 'stereo', importance: 5 },
     { id: 'stereo.rs', label: 'R/S 构型判断', domain: 'stereo', importance: 5 },
+    { id: 'stereo.wedge_dash', label: '楔线 / 虚线与空间前后', domain: 'stereo', importance: 5 },
+    { id: 'stereo.tetrahedral_view', label: '四面体碳观察方向', domain: 'stereo', importance: 4 },
     { id: 'stereo.ez', label: 'E/Z 构型判断', domain: 'stereo', importance: 4 },
     { id: 'stereo.fischer', label: 'Fischer 投影', domain: 'stereo', importance: 4 },
     { id: 'stereo.relationship', label: '对映/非对映关系', domain: 'stereo', importance: 5 },
     { id: 'stereo.meso', label: 'meso 化合物识别', domain: 'stereo', importance: 4 },
     { id: 'stereo.newman', label: 'Newman 构象', domain: 'stereo', importance: 3 },
     { id: 'stereo.chair', label: '环己烷椅式构象', domain: 'stereo', importance: 4 },
+    { id: 'stereo.ring_flip', label: '环己烷翻环与 up/down', domain: 'stereo', importance: 4 },
+    { id: 'diene.endo_exo', label: 'Diels–Alder endo / exo', domain: 'stereo', importance: 4 },
 
     { id: 'ranking.acidity', label: '酸性排序', domain: 'ranking', importance: 5 },
     { id: 'ranking.basicity', label: '碱性排序', domain: 'ranking', importance: 5 },

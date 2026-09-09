@@ -241,6 +241,8 @@
     state.completedDays = [...new Set((state.completedDays || []).map(Number))].sort((a, b) => a - b);
     state.detective = NS.Detective.normalizeProgress(state.detective);
     state.synthesis = NS.Synthesis.normalizeProgress(state.synthesis);
+    state.threeDProgress = state.threeDProgress && typeof state.threeDProgress === 'object' ? state.threeDProgress : {};
+    state.threeDNoticeSeen = Boolean(state.threeDNoticeSeen);
     if (Number(state.beginnerDeepVersion || 0) < 1) {
       for (let day = 1; day <= AVAILABLE_MAX_DAY; day += 1) {
         const progress = state.days?.[day];
@@ -349,6 +351,7 @@
   }
 
   function shell(inner, active = '') {
+    NS.Chem3D?.dispose?.();
     $('#app').innerHTML = `<div class="app cozy-app">${inner}</div>`;
   }
 
@@ -498,6 +501,8 @@
     const stable = Object.values(state.skills || {}).filter(skill => NS.Learning.masteryBand(skill, NS.Learning.getEffectiveMastery(skill)) === '稳定').length;
     const score = NS.Learning.estimateScore(state, SKILLS);
     const summary = domainSummary();
+    const showThreeDNotice = state.completedDays.includes(15) && !state.threeDNoticeSeen;
+    const threeDNotice = showThreeDNotice ? '<div class="three-d-release-note"><div><b>立体化学新增了 3D 理解卡</b><span>想回看时可自由复练 Day 15；不会改变你现在的学习位置。</span></div><button type="button" id="dismissThreeDNotice">知道了</button></div>' : '';
     const dayTiles = (MANIFEST.days || []).map(meta => {
       const available = Boolean(REGISTRY[meta.day]) && meta.day <= AVAILABLE_MAX_DAY;
       const done = state.completedDays.includes(meta.day);
@@ -505,7 +510,7 @@
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
       return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重练' : meta.day === state.currentDay ? '今天' : available ? '按顺序解锁' : ''}</small></button>`;
     }).join('');
-    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
+    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${threeDNotice}${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
@@ -513,6 +518,11 @@
     $('#backPortal').onclick = () => { location.hash = '#welcome'; };
     $('#logout').onclick = async () => { await Cloud.push().catch(() => {}); await Auth.logout(); Store.setScope('guest'); location.hash = ''; loginPage('login'); };
     $('#allAbilities')?.addEventListener('click', () => { location.hash = '#abilities'; });
+    $('#dismissThreeDNotice')?.addEventListener('click', () => {
+      Store.state.threeDNoticeSeen = true;
+      Store.save();
+      $('#dismissThreeDNotice')?.closest('.three-d-release-note')?.remove();
+    });
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => { location.hash = `#day/${button.dataset.day}`; }));
   }
 
@@ -812,6 +822,232 @@
     return `<section class="exam-bridge"><div class="exam-bridge-kicker">真题连接 · 为什么现在学这一页</div><b>${esc(bridge.title || '这一步会在真题里换一种外壳出现')}</b>${bridge.anchor ? `<p>${esc(bridge.anchor)}</p>` : ''}${formats.length ? `<div class="exam-format-chips">${formats.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}${bridge.goal ? `<small><strong>学完要能做到：</strong>${esc(bridge.goal)}</small>` : ''}</section>`;
   }
 
+  function threeDStage(lesson) {
+    const skill = Store.state.skills?.[lesson.skillId];
+    if (!skill?.attempts) return 0;
+    const mastery = NS.Learning.getEffectiveMastery(skill);
+    if (mastery < 40) return 0;
+    if (mastery < 55) return 1;
+    if (mastery < 65) return 2;
+    if (mastery < 80 || !skill.crossDayVerified) return 3;
+    return 4;
+  }
+
+  function renderThreeDCardById(id, day, compact = false) {
+    const lesson = Data.THREE_D_LESSONS?.[id];
+    if (!lesson) return '';
+    const stage = threeDStage(lesson);
+    const stageLabel = [
+      '完整空间扶手',
+      '减少文字，自己旋转',
+      '静态空间判断',
+      '二维撤扶手',
+      '真题二维模式'
+    ][stage];
+    const showIntro = stage <= 1;
+    const showModel = stage <= 2;
+    const stepRows = Array.isArray(lesson.steps) ? lesson.steps : [];
+    const controls = Array.isArray(lesson.controls) ? lesson.controls : [];
+    const practices = Array.isArray(lesson.practices) ? lesson.practices : [];
+    return `<section class="chem3d-card stage-${stage} ${compact ? 'compact-repair' : ''}" data-chem3d-id="${esc(id)}" data-chem3d-day="${day}" data-chem3d-stage-level="${stage}">
+      <header class="chem3d-head"><div><span>空间桥 · ${esc(stageLabel)}</span><h2>${esc(lesson.title)}</h2></div><span class="chem3d-badge">3D → 2D → 真题</span></header>
+      ${showIntro ? `<div class="chem3d-intro"><div><b>先用生活空间想：</b><p>${esc(lesson.lifeIntuition)}</p></div><div><b>二维少了什么：</b><p>${esc(lesson.gap2D)}</p></div></div>` : '<p class="chem3d-lean-copy">你已经见过完整解释。这次先自己判断；卡住时仍可切回二维分解。</p>'}
+      <div class="chem3d-model-wrap" ${showModel ? '' : 'hidden'}>
+        <div class="chem3d-stage" data-chem3d-mount aria-label="${esc(lesson.title)}"></div>
+        <div class="chem3d-element-legend" aria-label="原子颜色图例"><span><i class="atom-c"></i>C 碳</span><span><i class="atom-h"></i>H 氢</span><span><i class="atom-o"></i>O 氧</span><span><i class="atom-n"></i>N 氮</span><span><i class="atom-br"></i>Br 溴</span><span><i class="atom-cl"></i>Cl 氯</span></div>
+        <small class="chem3d-geometry-note">教学几何示意，重点用于理解相对空间关系；拖动模型可改变观察方向。</small>
+      </div>
+      <div class="chem3d-fallback ${showModel ? 'is-hidden' : ''}" data-chem3d-fallback>
+        <div class="chem3d-fallback-note"><b>${stage >= 3 ? '现在先用考试会给你的二维表示' : '二维分解 / 3D 不可用时仍可继续'}</b><span>先把前后、反向或投影关系压回纸面。</span></div>
+        <div class="chem3d-fallback-svg">${lesson.fallbackSvg}</div>
+      </div>
+      <div class="chem3d-controls" aria-label="三维模型控制">
+        ${stage >= 3 ? '<button type="button" data-chem3d-action="reveal3d">想转一下看看</button>' : ''}
+        ${stage <= 1 ? '<button type="button" data-chem3d-action="reset">回到标准视角</button>' : ''}
+        ${stage <= 1 ? '<button type="button" data-chem3d-action="toggle-labels">隐藏 / 显示标签</button>' : ''}
+        <button type="button" data-chem3d-action="project-2d">投影成二维</button>
+        ${stage === 2 ? '' : controls.map(row => `<button type="button" data-chem3d-action="${esc(row.action)}">${esc(row.label)}</button>`).join('')}
+      </div>
+      <div class="chem3d-stepper" data-chem3d-stepper>
+        <div><span data-chem3d-step-count></span><p data-chem3d-step-text></p></div>
+        <div class="chem3d-step-actions"><button type="button" data-chem3d-prev>上一步</button><button type="button" data-chem3d-next>看下一步</button></div>
+      </div>
+      <div class="chem3d-insight"><b>把这一条线接起来：</b><p>${esc(lesson.insight)}</p></div>
+      <section class="chem3d-practice"><header><span>马上撤掉一部分扶手</span><b>先做相似判断，再回到二维题</b></header>${practices.map((q, qIndex) => `<article class="chem3d-question" data-chem3d-question="${esc(q.id)}"><b>${qIndex + 1}. ${esc(q.prompt)}</b><div>${q.options.map((option, index) => `<button type="button" data-chem3d-answer="${index}">${esc(option)}</button>`).join('')}</div><p data-chem3d-feedback hidden></p></article>`).join('')}</section>
+      <div class="chem3d-exam-bridge"><b>真题出口</b><p>${esc(lesson.examBridge)}</p></div>
+    </section>`;
+  }
+
+  function renderLessonThreeD(item, day) {
+    return item.threeDId ? renderThreeDCardById(item.threeDId, day) : '';
+  }
+
+  function bindThreeDCard(day, item, updateOuterGate = () => {}) {
+    const id = item.threeDId;
+    const lesson = Data.THREE_D_LESSONS?.[id];
+    const card = id ? document.querySelector(`[data-chem3d-id="${id}"]`) : null;
+    if (!lesson || !card) return;
+    Store.state.threeDProgress ||= {};
+    const record = Store.state.threeDProgress[id] ||= { step: 0, completed: false, questions: {}, interactions: {} };
+    record.questions = record.questions && typeof record.questions === 'object' ? record.questions : {};
+    record.interactions = record.interactions && typeof record.interactions === 'object' ? record.interactions : {};
+    const steps = Array.isArray(lesson.steps) ? lesson.steps : [];
+    const practices = Array.isArray(lesson.practices) ? lesson.practices : [];
+    const stageLevel = Number(card.dataset.chem3dStageLevel || 0);
+    const mountPoint = card.querySelector('[data-chem3d-mount]');
+    const modelWrap = card.querySelector('.chem3d-model-wrap');
+    const fallbackBox = card.querySelector('[data-chem3d-fallback]');
+    const stepText = card.querySelector('[data-chem3d-step-text]');
+    const stepCount = card.querySelector('[data-chem3d-step-count]');
+    const prev = card.querySelector('[data-chem3d-prev]');
+    const next = card.querySelector('[data-chem3d-next]');
+    let instance = null;
+    let waitingForEngine = false;
+
+    const save = () => {
+      Store.save(false);
+      Cloud.schedule();
+      updateOuterGate();
+    };
+    const markInteraction = name => {
+      if (!record.interactions[name]) {
+        record.interactions[name] = true;
+        save();
+      }
+    };
+    const updateCompletion = () => {
+      const allAnswered = practices.every(q => Number.isInteger(record.questions?.[q.id]?.selected));
+      const reachedEnd = !steps.length || Number(record.step || 0) >= steps.length - 1;
+      record.completed = Boolean(allAnswered && reachedEnd);
+      card.classList.toggle('complete', record.completed);
+      updateOuterGate();
+    };
+    const mountModel = () => {
+      if (instance || !mountPoint) return instance;
+      if (!NS.Chem3D?.mount) {
+        mountPoint.innerHTML = '<div class="chem3d-unavailable"><b>3D 暂时不可用</b><p>继续看下面的二维分解，不影响学习。</p></div>';
+        fallbackBox?.classList.remove('is-hidden');
+        if (!waitingForEngine) {
+          waitingForEngine = true;
+          window.addEventListener('organic637:chem3d-ready', () => {
+            waitingForEngine = false;
+            if (!document.contains(card)) return;
+            const ready = mountModel();
+            if (ready) fallbackBox?.classList.add('is-hidden');
+          }, { once: true });
+        }
+        return null;
+      }
+      instance = NS.Chem3D.mount(mountPoint, Data.THREE_D_PRESETS?.[lesson.preset], {
+        interactive: stageLevel !== 2,
+        showLabels: stageLevel <= 1,
+        reducedMotion: Store.state.settings?.reducedMotion,
+        ariaLabel: lesson.title,
+        onAction(action) { markInteraction(action); },
+        onMetric(metric) {
+          record.interactions[metric.type] = metric;
+          save();
+        }
+      });
+      instance?.animateStep?.(Number(record.step || 0));
+      return instance;
+    };
+    const drawStep = () => {
+      record.step = Math.max(0, Math.min(Math.max(0, steps.length - 1), Number(record.step || 0)));
+      if (stepText) stepText.textContent = steps[record.step] || '';
+      if (stepCount) stepCount.textContent = `${record.step + 1} / ${Math.max(1, steps.length)}`;
+      if (prev) prev.disabled = record.step <= 0;
+      if (next) {
+        next.disabled = record.step >= steps.length - 1;
+        next.textContent = record.step >= steps.length - 1 ? '空间桥走完了 ✓' : '看下一步';
+      }
+      if (stageLevel !== 2) instance?.animateStep?.(record.step);
+      updateCompletion();
+    };
+
+    prev?.addEventListener('click', () => {
+      if (record.step <= 0) return;
+      record.step -= 1;
+      drawStep();
+      save();
+    });
+    next?.addEventListener('click', () => {
+      if (record.step >= steps.length - 1) return;
+      record.step += 1;
+      drawStep();
+      save();
+    });
+
+    practices.forEach(question => {
+      const box = card.querySelector(`[data-chem3d-question="${question.id}"]`);
+      if (!box) return;
+      const feedback = box.querySelector('[data-chem3d-feedback]');
+      const paint = selected => {
+        box.querySelectorAll('[data-chem3d-answer]').forEach(button => {
+          const index = Number(button.dataset.chem3dAnswer);
+          button.classList.toggle('selected', index === selected);
+          button.classList.toggle('correct', index === question.answer && selected !== null);
+          button.classList.toggle('wrong', index === selected && index !== question.answer);
+        });
+        if (Number.isInteger(selected) && feedback) {
+          const correct = selected === question.answer;
+          feedback.hidden = false;
+          feedback.className = correct ? 'good' : 'error';
+          feedback.textContent = `${correct ? '对，这一步通了。' : '先把断点找出来。'} ${question.feedback}`;
+        }
+      };
+      const saved = record.questions[question.id];
+      if (saved && Number.isInteger(saved.selected)) paint(saved.selected);
+      box.querySelectorAll('[data-chem3d-answer]').forEach(button => button.addEventListener('click', () => {
+        const selected = Number(button.dataset.chem3dAnswer);
+        record.questions[question.id] = { selected, correct: selected === question.answer, at: Date.now() };
+        paint(selected);
+        updateCompletion();
+        save();
+      }));
+    });
+
+    card.querySelectorAll('[data-chem3d-action]').forEach(button => button.addEventListener('click', () => {
+      const action = button.dataset.chem3dAction;
+      if (action === 'reveal3d') {
+        modelWrap.hidden = !modelWrap.hidden;
+        if (!modelWrap.hidden) {
+          mountModel();
+          button.textContent = '先收起 3D';
+        } else button.textContent = '想转一下看看';
+        markInteraction('reveal3d');
+        return;
+      }
+      if (action === 'project-2d') {
+        fallbackBox?.classList.toggle('is-hidden');
+        instance?.projectTo2D?.();
+        markInteraction('project2d');
+        return;
+      }
+      const api = instance || mountModel();
+      if (!api) return;
+      if (action === 'reset') api.reset();
+      if (action === 'toggle-labels') button.textContent = api.toggleLabels() ? '隐藏标签' : '显示标签';
+      if (action === 'right-view') api.setView('right');
+      if (action === 'priority-away') api.setView('priorityAway');
+      if (action === 'half-turn') api.setView('halfTurn');
+      if (action === 'wrong-attack') api.wrongAttack();
+      if (action === 'dihedral-minus') api.adjustDihedral(-60);
+      if (action === 'dihedral-plus') api.adjustDihedral(60);
+      if (action === 'try-e2') api.tryE2();
+      if (action === 'bond-view') api.setView('bond');
+      if (action === 'newman-rotate') api.rotateNewman(60);
+      if (action === 'ring-flip') api.ringFlip();
+      if (action === 'methyl-equatorial') api.methylEquatorial();
+      if (action === 'endo' || action === 'exo') api.setVariant(action);
+      markInteraction(action);
+    }));
+
+    if (stageLevel <= 2) mountModel();
+    drawStep();
+    updateCompletion();
+  }
+
   function renderQuestionExamBridge(question) {
     const bridge = question.examBridge;
     if (!bridge) return '';
@@ -971,7 +1207,8 @@
       const frameDone = !sequence.length || Number(progress.lessonFrames[item.id] || 0) >= sequence.length - 1;
       const checkDone = !micro || Boolean(progress.lessonChecks[item.id]);
       const whyDone = !whyChain.length || Number(progress.lessonWhyDepth[item.id] || 0) >= whyChain.length - 1;
-      const ready = frameDone && checkDone && whyDone;
+      const threeDDone = !item.threeDId || Boolean(Store.state.threeDProgress?.[item.threeDId]?.completed);
+      const ready = frameDone && checkDone && whyDone && threeDDone;
       if (nextLesson) nextLesson.disabled = !ready;
       if (gate) {
         if (ready) {
@@ -982,6 +1219,7 @@
           if (!frameDone) missing.push('把“一步一步看”翻到最后一帧');
           if (!checkDone) missing.push('做完这一页的小停顿');
           if (!whyDone) missing.push('把“为什么”追问到最后一层');
+          if (!threeDDone) missing.push('走完空间桥并完成紧跟的二维判断');
           gate.className = 'lesson-gate waiting';
           gate.innerHTML = `<b>先别急着翻页</b><span>${missing.join('，')}。忘了前面的内容，随时可以点“上一步”或“上一页”。</span>`;
         }
@@ -1064,6 +1302,7 @@
         apply(selected);
       }));
     });
+    bindThreeDCard(day, item, updateGate);
     updateGate();
   }
 
@@ -1096,7 +1335,7 @@
   function lessonPage(day, item) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     const prevLabel = progress.lessonIndex > 0 ? '← 上一页' : '← 回欢迎页';
-    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${renderLessonThreeD(item, day)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevLesson').onclick = () => goPreviousStudyPage(day);
     bindLessonExtras(day, item);
@@ -1113,11 +1352,14 @@
     const started = performance.now();
     const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习', boss: '最终 Boss', exam: '考试' }[context.mode] || context.mode;
     const decorKey = context.mode === 'review' ? 'review' : 'boss';
-    shell(`<section class="learning-page-wrap">${renderLearningContext(context.day || question.day)}<div class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionTranslation(question)}${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}${renderQuestionGuidedFrames(question)}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></div></section>`, context.mode === 'review' ? 'review' : 'study');
+    const repairThreeDId = Number(context.day || question.day) === 20 && context.mode === 'repair' ? Data.THREE_D_BY_SKILL?.[question.primarySkill] : null;
+    const repairThreeD = repairThreeDId ? `<details class="day20-three-d-repair" open><summary>这个漏洞涉及空间关系：重新打开对应 3D 理解卡</summary>${renderThreeDCardById(repairThreeDId, 20, true)}</details>` : '';
+    shell(`<section class="learning-page-wrap">${renderLearningContext(context.day || question.day)}<div class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionTranslation(question)}${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}${renderQuestionGuidedFrames(question)}${repairThreeD}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></div></section>`, context.mode === 'review' ? 'review' : 'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevStudy').onclick = () => { if (context.mode === 'review') { const d = context.day || Store.state.currentDay; const p = NS.Learning.ensureDayState(Store.state, d, REGISTRY); if (p.reviewIndex > 0) { p.reviewIndex -= 1; Store.save(); reviewPage(); } else { location.hash = '#welcome'; } } else { goPreviousStudyPage(context.day || question.day); } };
     bindAidReveal(document);
     bindQuestionGuidedFrames(question, context.day || question.day);
+    if (repairThreeDId) bindThreeDCard(20, { threeDId: repairThreeDId });
     const previous = Store.state.attempts.filter(row => row.questionId === question.id).length;
     NS.Interactions.mount($('#interactionRoot'), question, {
       examMode: false,
@@ -1498,6 +1740,7 @@
 
   window.addEventListener('hashchange', () => { if (Auth.user) route(); });
   window.addEventListener('pagehide', () => {
+    NS.Chem3D?.dispose?.();
     if (Auth.user) {
       Store.save();
       Cloud.push().catch(() => {});

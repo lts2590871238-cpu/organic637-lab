@@ -26,6 +26,7 @@
       },
       {
         id: 'd04-lesson-mechanism',
+        threeDId: 'sn2_backside',
         eyebrow: '两种取代 · 两种节奏',
         title: 'SN2 一步完成，SN1 先离去再进攻',
         body: 'SN2 中亲核体从离去基背面进攻，成键和断键协同发生，速率同时依赖底物和亲核体。SN1 先慢速电离形成平面碳正离子，速率主要依赖底物浓度。',
