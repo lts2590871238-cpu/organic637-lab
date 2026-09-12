@@ -200,3 +200,11 @@ Unified automated validation and Test Build release documentation.
 **V16 TEST BUILD: AUTOMATED ACCEPTANCE PASS.**
 
 **V16 FORMAL RELEASE: PENDING LIVE GITHUB PAGES / REAL-DEVICE ACCEPTANCE.**
+
+## Immersive test-build revision
+
+- Replaced placeholder-like character art with consistent built-in local portraits.
+- Added local key art, scene backgrounds and evidence images for story immersion.
+- Added story-to-learning handoff so the unresolved case question directly motivates the next chemistry lesson.
+- Added V16 test-build welcome treatment and explicit Day 1–20 QA unlocks.
+- Automated validation remains fully green; live GitHub Pages review is still required before formal release.

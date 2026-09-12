@@ -15,7 +15,7 @@ const lessonIds = new Set((day.lessons || []).map(x => x.id));
 const questionIds = new Set((day.questions || []).map(x => x.id));
 const sceneIds = new Set(Object.keys(window.Organic637.V16_STORY.scenes || {}));
 
-assert.equal(D.estimateMinutes(1), 49);
+assert.equal(D.estimateMinutes(1), 55);
 assert.deepEqual(D.validateDay(1).errors, []);
 assert.equal(plan.sequence[0].type, 'comic');
 assert.equal(plan.sequence.at(-1).sceneId, 'case01-cliffhanger');

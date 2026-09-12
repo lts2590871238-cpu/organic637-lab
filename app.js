@@ -388,6 +388,13 @@
     const day = Store.state.currentDay || 1;
     const name = Auth.user?.username || '';
     const act = journeyAct(day);
+    if (isV16TestBuild()) {
+      const keyart = NS.V16_ASSETS?.keyart?.castLab?.path || DECOR.welcome.src;
+      shell(`<section class="v16-test-welcome"><img class="v16-test-welcome-bg" src="${esc(keyart)}" alt="LAB-20 项目组"><div class="v16-test-welcome-shade"></div><div class="v16-test-welcome-card"><div class="v16-test-ribbon">TEST BUILD · 20天全解锁</div><div class="kicker">有机实验室 · LAB-20</div><h1>一份消失的样品，<br>一条被改写的记录。</h1><p class="v16-test-lead">凌晨 00:17，零号样品 L20-0 从原本的位置消失。门禁没有明显异常，实验记录却留下了三个版本。你不是来旁听一门课——你要学会读懂化学证据，把那一晚重新拼出来。</p><div class="v16-test-facts"><span>20 天</span><span>5 名实验室成员</span><span>1 条被隐藏的路线</span></div><button class="btn primary v16-test-enter" id="openPortal">进入实验室，开始调查 →</button><button class="welcome-skip" id="jumpHome">直接选择测试日期</button><small>测试版已开放 Day 1–20；正式版会恢复按学习进度解锁。</small></div></section>`);
+      $('#openPortal').onclick = () => { location.hash = '#portal'; };
+      $('#jumpHome').onclick = () => { location.hash = '#home'; };
+      return;
+    }
     shell(`<section class="welcome-stage"><img class="welcome-stage-bg" src="${DECOR.welcome.src}" alt="${esc(DECOR.welcome.name)}"><div class="welcome-stage-shade"></div><div class="welcome-center-card"><div class="welcome-badge">Day ${day} · ${name ? esc(name) : '今天'}${act ? ` · 第 ${act.id} 段` : ''}</div><h1>20天有机化学大作战！</h1><p class="course-slogan">学懂有机，会做真题。</p><p>${act ? esc(act.title) + '。' : ''} 不急着全会。今天只把眼前这一小串真正看懂，再接到明天。</p><button class="btn welcome-start" id="openPortal">开始今天 ✿</button><button class="welcome-skip" id="jumpHome">先看今日总览</button></div><div class="welcome-doodles"><span>✿</span><span>★</span><span>☁</span><span>♡</span></div></section>`);
     $('#openPortal').onclick = () => { location.hash = '#portal'; };
     $('#jumpHome').onclick = () => { location.hash = '#home'; };
@@ -400,7 +407,8 @@
     const v16Cursor = Number(progress.v16?.cursor) || 0;
     const studyText = v16Cursor || progress.lessonIndex || progress.taskIndex ? '从上次的位置继续' : '从今天第一步开始';
     const act = journeyAct(day);
-    shell(`<section class="portal-stage"><div class="portal-head"><span>🌷 Day ${day}${act ? ` · 第 ${act.id} 段` : ''}</span><h1>今天想从哪里开始？</h1><p>${act ? esc(act.title) + '。' : ''} 学累了随时退出，回来会接着原来的位置。</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>今日学习</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>返回首页</b><small>看今天进度、错题和20天地图</small></div></button></div></section>`);
+    const testBadge = isV16TestBuild() ? '<span class="v16-inline-test-badge">TEST BUILD · 20天全解锁</span>' : '';
+    shell(`<section class="portal-stage ${isV16TestBuild() ? 'v16-portal' : ''}"><div class="portal-head">${testBadge}<span>Day ${day}${act ? ` · 第 ${act.id} 段` : ''}</span><h1>${isV16TestBuild() ? '今天从哪条线索继续？' : '今天想从哪里开始？'}</h1><p>${act ? esc(act.title) + '。' : ''} ${isV16TestBuild() ? '调查、复盘、案件总览都可以直接进入。' : '学累了随时退出，回来会接着原来的位置。'}</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>${isV16TestBuild() ? '继续调查' : '今日学习'}</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>${isV16TestBuild() ? '案件总览' : '返回首页'}</b><small>看进度、证据和20天地图</small></div></button></div></section>`);
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
   }
 
@@ -466,10 +474,27 @@
     return `<section class="time-rhythm"><div class="time-rhythm-head"><b>今天约 ${minutes} 分钟</b><span>不是一直刷题，理解和练习交替进行</span></div><div class="time-rhythm-bar">${blocks.map(([label,min])=>`<div style="--w:${min}"><span>${esc(label)}</span><b>${min}m</b></div>`).join('')}</div></section>`;
   }
 
+  function isDayUnlocked(day, state = Store.state) {
+    const numericDay = Number(day || 0);
+    if (NS.V16_TEST_CONFIG?.allDaysUnlocked === true) return numericDay >= 1 && numericDay <= AVAILABLE_MAX_DAY && Boolean(REGISTRY[numericDay]);
+    return numericDay <= Number(state.currentDay || 1) || (state.completedDays || []).includes(numericDay);
+  }
+
+  function isV16TestBuild() {
+    return NS.V16_TEST_CONFIG?.showTestBadge === true;
+  }
+
+  function dayAccessLabel(day, done, current, available) {
+    if (done) return '已完成 · 可重练';
+    if (current) return '今天';
+    if (isV16TestBuild() && available) return 'TEST · 可直接进入';
+    return available ? '按顺序解锁' : '';
+  }
+
   function renderCourseActsMap(state) {
     const acts = Data.COURSE_JOURNEY?.acts || [];
     if (!acts.length) return '';
-    return `<div class="course-acts">${acts.map(act => `<section class="course-act ${act.days.includes(state.currentDay) ? 'current' : ''}"><header><span>第 ${act.id} 段</span><div><b>${esc(act.title)}</b><small>${esc(act.subtitle)}</small></div></header><div class="course-act-days">${act.days.map(day => { const meta=(MANIFEST.days||[]).find(x=>x.day===day)||{}; const done=state.completedDays.includes(day); const unlocked=day<=state.currentDay||done; const cls=done?'done':day===state.currentDay?'current':unlocked?'':'locked'; return `<button class="act-day ${cls}" ${unlocked?`data-day="${day}"`:'disabled'}><span>Day ${day}</span><b>${esc(meta.shortTitle || REGISTRY[day]?.title || '')}</b><small>${done?'已完成 · 可重练':day===state.currentDay?'今天':unlocked?'可进入':'按顺序解锁'}</small></button>`; }).join('')}</div></section>`).join('')}</div>`;
+    return `<div class="course-acts">${acts.map(act => `<section class="course-act ${act.days.includes(state.currentDay) ? 'current' : ''}"><header><span>第 ${act.id} 段</span><div><b>${esc(act.title)}</b><small>${esc(act.subtitle)}</small></div></header><div class="course-act-days">${act.days.map(day => { const meta=(MANIFEST.days||[]).find(x=>x.day===day)||{}; const done=state.completedDays.includes(day); const unlocked=isDayUnlocked(day,state); const cls=done?'done':day===state.currentDay?'current':unlocked?'':'locked'; return `<button class="act-day ${cls}" ${unlocked?`data-day="${day}"`:'disabled'}><span>Day ${day}</span><b>${esc(meta.shortTitle || REGISTRY[day]?.title || '')}</b><small>${dayAccessLabel(day,done,day===state.currentDay,Boolean(REGISTRY[day]))}</small></button>`; }).join('')}</div></section>`).join('')}</div>`;
   }
 
   function currentDayData() {
@@ -497,9 +522,9 @@
     const dayTiles = (MANIFEST.days || []).map(meta => {
       const available = Boolean(REGISTRY[meta.day]) && meta.day <= AVAILABLE_MAX_DAY;
       const done = state.completedDays.includes(meta.day);
-      const unlocked = available && (meta.day <= state.currentDay || done);
+      const unlocked = available && isDayUnlocked(meta.day,state);
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
-      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重练' : meta.day === state.currentDay ? '今天' : available ? '按顺序解锁' : ''}</small></button>`;
+      return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${dayAccessLabel(meta.day,done,meta.day===state.currentDay,available)}</small></button>`;
     }).join('');
     shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(v16Plan?.targetMinutes || data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${(Number(progress.v16?.cursor)||0) || progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button><button id="openCaseBoard" class="home-secondary-action"><b>查看案件板</b><small>只看已经解锁的事实、矛盾与路线恢复</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
@@ -610,7 +635,7 @@
   function directorDayPage(day) {
     const data = REGISTRY[day];
     if (!data || day > AVAILABLE_MAX_DAY) return notReadyPage(day);
-    if (day > Store.state.currentDay && !Store.state.completedDays.includes(day)) {
+    if (!isDayUnlocked(day)) {
       location.hash = '#home';
       return homePage();
     }
@@ -635,10 +660,18 @@
     if (step.type === 'comic') {
       if (NS.V16Comic?.renderInto) {
         const plan = NS.V16Director.getDayPlan(day);
-        const nextComic = (plan?.sequence || []).slice(v16.cursor + 1).find(item => item.type === 'comic' && item.sceneId);
+        const remaining = (plan?.sequence || []).slice(v16.cursor + 1);
+        const nextComic = remaining.find(item => item.type === 'comic' && item.sceneId);
+        const nextLesson = remaining.find(item => item.type === 'lesson' && item.caseBridge);
+        const interveningComic = remaining.findIndex(item => item.type === 'comic');
+        const interveningLesson = remaining.findIndex(item => item.type === 'lesson' && item.caseBridge);
+        const learningHook = interveningLesson >= 0 && (interveningComic < 0 || interveningLesson < interveningComic)
+          ? (nextLesson?.caseBridge || '')
+          : '';
         return NS.V16Comic.renderInto($('#app'), step.sceneId, {
           state: Store.state,
           day,
+          learningHook,
           preloadSceneIds: nextComic?.sceneId ? [nextComic.sceneId] : [],
           onComplete: () => advanceDirectorStep(day, step.id)
         });
@@ -651,6 +684,7 @@
       if (!lesson) return directorFallbackCard(day, step, `找不到课程资源：${step.ref}`);
       return lessonPage(day, lesson, {
         v16: true,
+        caseBridge: step.caseBridge || '',
         requireSupportCompletion: false,
         onPrev: () => retreatDirectorStep(day),
         onNext: () => advanceDirectorStep(day, step.id),
@@ -721,7 +755,7 @@
   function legacyDayPage(day) {
     const data = REGISTRY[day];
     if (!data || day > AVAILABLE_MAX_DAY) return notReadyPage(day);
-    if (day > Store.state.currentDay && !Store.state.completedDays.includes(day)) {
+    if (!isDayUnlocked(day)) {
       location.hash = '#home';
       return homePage();
     }
@@ -1739,7 +1773,7 @@
   function lessonPage(day, item, context = {}) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     const prevLabel = context.prevLabel || (progress.lessonIndex > 0 ? '← 上一页' : '← 回欢迎页');
-    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item, context)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item, context)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${context.v16 && context.caseBridge ? `<div class="v16-case-bridge"><b>为什么现在要学这个？</b><p>${esc(context.caseBridge)}</p></div>` : ''}${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item, context)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item, context)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
     $('#prevLesson').onclick = () => context.onPrev ? context.onPrev() : goPreviousStudyPage(day);
     bindLessonExtras(day, item, { requireSupportCompletion: context.requireSupportCompletion !== false });
