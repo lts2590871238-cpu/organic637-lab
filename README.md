@@ -1,27 +1,28 @@
-# 南京工业大学 637 · Organic637 V16 Test Build
+# 南京工业大学 637 · Organic637 V16 Formal Release
 
-这是 **V16 测试版**，不是正式发布版。
+这是 **V16 正式源码版**。
 
-核心目标保持不变：真正的有机化学知识 + 637 真题能力是骨架；漫画、案件、互动和3D只负责降低理解成本、改变学习节奏，并让学生愿意继续学。
+课程骨架仍然是真正的有机化学知识与 637 题目能力；**54章《LAB-20：零号样品》正式小说主线**、人物/证物插图、3D与互动负责把“为什么现在要学这块知识”变成真实动机，而不是课前装饰。
 
-V16 主线已经改为：
+主线：
 
-`漫画提出问题 → 学一小块真正的化学 → 立即操作 → 回到案件应用 → 再补必要知识 → 角色/任务切换 → 637正式出口 → 悬念推进`
+`案件产生疑问 → 学一小块真正需要的化学 → 立即操作 → 回到证据 → 再推进案件 → 637出口 → 新悬念`
 
-部署架构仍保持：GitHub Pages 静态前端 + 现有 Cloudflare Worker + D1。`config.js` 只放 Worker URL，不放秘密；Worker/D1/auth 不需要重建。
+正式版以小说为主叙事：20天共 **54章**，每个故事节点都有章号、章名、前情提要和当前悬念。章节目录只显示已经读到的部分，不提前暴露未来章名。人物立绘、场景与证物图负责增强现场感，即使图片失效，正文和学习流程仍可完整继续。
 
-## 当前测试版状态
+## 正式版状态
 
-- Day1–Day20 已进入 V16 Director，旧线性流程仍保留 fallback。
-- schemaVersion/version = 3，旧用户学习证据迁移保留。
-- `LAB-20：零号样品` 使用单一故事真源和防剧透门禁。
-- Mandatory Day 全部 <=60 分钟的元数据预算；Day15=59、Day19=58。
-- Day4/5 required 3D 有可达的 2D fallback。
+- Day1–Day20 正常按进度解锁；测试版全日解锁已关闭。
+- V16 Director + legacy fallback 保留。
+- schemaVersion/version = 3，旧用户学习证据无损迁移。
+- LAB-20 单一故事真源、防剧透门禁、54章正式小说（约3.36万汉字正文，不含题目与教学文本）。
+- Day4/5 required 3D 有2D fallback。
 - Day13–14 detective、Day17–18 synthesis 跨日保存。
-- Day19 20天主线使用核心审核；原始150分整卷独立保留。
-- 漫画采用本地资源优先、当前+下一幕预加载和文字/色块fallback。
+- Day19 主线核心审核 + 独立原始150分整卷。
+- 358条最终运行时 main/repair/adaptive 题库记录通过结构与语义审计。
+- 选择题展示采用稳定洗牌，避免“正确答案总在A”的模式泄漏。
 - 自动验证命令：`node scripts/run-v16-validation.js`。
 
-当前自动化 Test Build 验收已通过；**正式版仍需在 GitHub Pages 上完成真实浏览器/手机计时和交互验收**。部署后按 `GITHUB_PAGES_TEST_CHECKLIST.md` 执行。
+完整审计见 `FORMAL_RELEASE_AUDIT.md`。
 
-直接把本目录内容上传/覆盖到测试用 `organic637-lab` GitHub Pages 仓库即可。建议先用测试分支或测试仓库，不要覆盖你仍在使用的正式站点。
+部署仍保持：GitHub Pages 静态前端 + 现有 Cloudflare Worker + D1。`config.js` 只存 Worker URL，不存秘密。

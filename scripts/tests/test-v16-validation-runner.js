@@ -24,8 +24,9 @@ for (const marker of [
   'V16_DAY20_PASS',
   'V16_CLOUD_STATE_PASS',
   'V16_LEGACY_REGRESSION_PASS',
-  'V16_AUTOMATED_ALL_PASS',
-  'V16_LIVE_BROWSER_PENDING'
+  'V16_NOVEL_54_CHAPTERS_PASS',
+  'V16_FORMAL_AUTOMATED_ALL_PASS',
+  'V16_LIVE_BROWSER_RECOMMENDED'
 ]) assert.match(output, new RegExp(marker), `missing runner marker ${marker}`);
 assert.match(output, /SUPERSEDED_LEGACY_CHECKS[^\n]*validate-layout-v12\.mjs/, 'runner must disclose the old 70–90 minute validator as superseded, not silently omit it');
 

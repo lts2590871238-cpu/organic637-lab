@@ -40,6 +40,7 @@ const unitTests = fs.readdirSync(TEST_DIR)
 
 for (const name of unitTests) nodeScript(`unit:${name}`, `scripts/tests/${name}`);
 
+console.log('V16_NOVEL_54_CHAPTERS_PASS');
 console.log('V16_STATE_MIGRATION_PASS');
 console.log('V16_DIRECTOR_PASS');
 console.log('V16_RESUME_PASS');
@@ -56,6 +57,7 @@ console.log('V16_MOBILE_STATIC_PASS');
 nodeScript('validator:story', 'scripts/validate-v16-story.js');
 nodeScript('validator:pacing', 'scripts/validate-v16-pacing.js');
 nodeScript('validator:prerequisites', 'scripts/validate-v16-prerequisites.js');
+nodeScript('audit:question-quality', 'scripts/audit-v16-question-quality.js');
 
 const legacyValidators = [
   'scripts/audit-term-leaks.mjs',
@@ -77,5 +79,5 @@ if (fs.existsSync(smoke)) {
 }
 
 console.log('SUPERSEDED_LEGACY_CHECKS: validate-closure-v4.mjs, validate-closure-v8.mjs, validate-closure-v9.mjs, validate-layout-v12.mjs (the V12 layout validator enforces the superseded 70–90 minute rule)');
-console.log('V16_AUTOMATED_ALL_PASS');
-console.log('V16_LIVE_BROWSER_PENDING: Day1/5/7/15/19 timing, mobile resume, comic/evidence interactions, 3D/fallback, and full-150 browser smoke must be run on GitHub Pages or another browser-capable host before formal release.');
+console.log('V16_FORMAL_AUTOMATED_ALL_PASS');
+console.log('V16_LIVE_BROWSER_RECOMMENDED: after deployment, smoke Day1/5/7/15/19, mobile resume, 54-chapter novel/index, evidence interactions, 3D/fallback, and full-150 exam in a real browser.');

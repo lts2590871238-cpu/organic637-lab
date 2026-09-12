@@ -1,0 +1,14 @@
+const assert = require('assert');
+const fs = require('fs');
+global.window = global;
+window.Organic637 = {};
+require('../../data/v16-release-config.js');
+const cfg = window.Organic637.V16_RELEASE_CONFIG;
+assert.equal(cfg.mode, 'formal');
+assert.equal(cfg.allDaysUnlocked, false, 'formal build must restore sequential day unlocking');
+assert.equal(cfg.showTestBadge, false, 'formal build must not show TEST BUILD labels');
+const app = fs.readFileSync('app.js','utf8');
+assert.match(app, /一份消失的样品/, 'formal welcome should keep the LAB-20 immersive mystery instead of reverting to generic course copy');
+assert.doesNotMatch(app, /20天有机化学大作战！/, 'formal welcome should not fall back to the old generic campaign headline');
+assert.match(app, /V16_RELEASE_CONFIG/, 'unlock/badge behavior must use the formal release config');
+console.log('PASS test-v16-formal-release');

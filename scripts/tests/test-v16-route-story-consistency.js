@@ -1,0 +1,14 @@
+const assert = require('assert');
+global.window = { Organic637: {} };
+require('../../data/v16-story.js');
+const S = window.Organic637.V16_STORY;
+assert.ok(S.facts.postIncidentChemistryContinued, 'Day8 continuation fact must exist');
+assert.equal(S.factGates.post_incident_chemistry_continued, 8, 'continuation can be confirmed on Day8');
+assert.equal(S.factGates.backup_route_used, 15, 'actual Route-B tail must not be confirmed before Day15');
+assert.ok(S.scenes['case08-cliff'].unlockFacts.includes('post_incident_chemistry_continued'));
+assert.ok(!(S.scenes['case09-open'].unlockFacts || []).includes('backup_route_used'), 'Day9 archive fragment must not prove actual Route-B use');
+assert.ok((S.scenes['case15-close'].unlockFacts || []).includes('backup_route_used'), 'Day15 chemistry must close actual Route-B inference');
+const day9Text = JSON.stringify(S.scenes['case09-open']) + JSON.stringify(S.scenes['case09-return']);
+assert.match(day9Text, /档案|旧路线/, 'Day9 C-C work must be framed as archive evidence');
+assert.doesNotMatch(day9Text, /X-17[^。]*多出|X-17[^。]*C—C/, 'Day9 must not claim X-17 itself proves a new C-C construction');
+console.log('PASS test-v16-route-story-consistency');

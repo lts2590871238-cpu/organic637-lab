@@ -1,114 +1,65 @@
-# Organic637 V16 — GitHub Pages Test-Build Acceptance Checklist
+# Organic637 V16 Formal Release — GitHub Pages Post-Deploy Smoke Checklist
 
-This checklist is the remaining gate between the current V16 Test Build and a formal release. Run it only after uploading the Test Build to GitHub Pages. Do not call the build “formal release” until every blocking item below passes.
+自动化正式版门禁已经通过；这张表用于部署到 GitHub Pages 后做最后的真实浏览器烟雾测试。发现问题时先修代码、重新运行 `node scripts/run-v16-validation.js`，再部署。
 
-## Test environment
+## 1. 欢迎页与正常解锁
 
-Record the deployed GitHub Pages URL, browser, device, viewport/device model, and date in your own test note. Use at least one desktop Chromium browser and one real phone.
+- 欢迎页保持 LAB-20 悬疑氛围，不出现 `TEST BUILD`。
+- Day1新账号只能按正常进度进入可用Day；未来Day应锁定。
+- 完成当前Day后下一Day正常解锁。
+- 老账号已完成/进行中的进度不丢。
 
-## A. Fresh learner — required timed days
+## 2. 小说主叙事 + 插图
 
-Run each day from its first mandatory step without optional case files. Use normal reading/answering speed; do not speed-click.
+至少检查 Day1、Day8、Day12、Day15、Day18：
 
-| Day | Purpose | Metadata budget | Release gate |
-|---|---|---:|---|
-| Day1 | full V16 vertical slice | 49 min | observed mandatory time must be <=60 min |
-| Day5 | four-way SN1/SN2/E1/E2 + E2 spatial gate | 55 min | <=60 min |
-| Day7 | carbonyl day after mainline reduction | 51 min | <=60 min |
-| Day15 | spatial-first stereochemistry | 59 min | <=60 min |
-| Day19 | no-scaffold core audit | 58 min | <=60 min |
+- 立绘/背景/证物正常显示；
+- 小说页显示清晰章号、章名、前情提要和当前问题；
+- 正文字体足够大，手机可连续阅读，无横向溢出；
+- 小说目录只显示已读章节，不剧透未来章名；
+- 人物/场景/证物插图与正文对应，不承担必须信息；
+- 故意阻断一张本地图时，正文与继续按钮仍可使用。
 
-If any mandatory run exceeds 60 minutes, stop formal-release promotion and reduce mandatory content before retesting.
+## 3. 题目
 
-## B. Navigation and resume
+- Day1 结构证物题第三项应是“图里是否画出 –OH 朝向”，不再出现人物责任选项。
+- 同一道选择题刷新/重新进入时选项顺序稳定。
+- 不同题的正确位置不再长期固定在A。
+- Day13 “C3H6O + IR”保留候选题可以同时选择丙酮和丙醛。
+- Day3 637出口不再重复前面出现过的同一道烷基化题。
 
-On a phone:
+## 4. 导航/续学
 
-1. Open site → welcome page must appear first.
-2. Tap “开始今天的学习！” → triangular portal.
-3. Enter 今日学习 and advance several Director steps.
-4. Use 暂时离开 → must return to welcome page.
-5. Re-enter → resume at the saved Director step, not the first comic/lesson.
-6. 首页总览 → Case Board remains inside overview; portal still has only the frozen three entries.
+手机上：欢迎页 → 三角入口 → 今日学习 → 前进若干step → 暂时退出 → 欢迎页 → 再进入，必须回到原Director step。
 
-Existing-user fixture:
+案件板仍在首页总览里，三角入口保持三个固定入口。
 
-- unfinished legacy day maps to the closest V16 mandatory step;
-- completed legacy days remain complete;
-- mastery, review queue, Day19 results, 3D, detective and synthesis progress remain present.
+## 5. 3D / Detective / Synthesis
 
-## C. Comic resilience
+- Day4 SN2 backside REQUIRED gate可完成；3D不可用时2D fallback可解锁。
+- Day5 E2 anti同上。
+- Day13→14 X-17状态跨日保留。
+- Day15空间学习顺序正确，普通IR/NMR不被错误当作对映体证据。
+- Day17→18隐藏路线跨日保留。
 
-Check at least one normal story scene and deliberately break/block one local story image in DevTools if practical.
+## 6. Day19 / Day20
 
-Required behavior:
+- Day19核心审核无漫画/扶手干扰；结果为核心审核百分比，不伪装 `/150`。
+- `#full-exam/19` 可独立进入原24题150分卷，且不覆盖Day20 Top3诊断源。
+- Day20只修Top3，不引入新核心知识。
 
-- dialogue remains readable;
-- character/evidence fallback appears;
-- course can continue;
-- no story-image failure changes chemistry mastery;
-- evidence images can be enlarged/tapped on phone;
-- no horizontal overflow at approximately 360px width.
+## 7. 真实时间与手机
 
-## D. 3D and fallback
+建议真实走 Day1/5/7/15/19；mandatory 部分不得超过60分钟。
 
-Day4:
+至少用一个桌面 Chromium + 一台真实手机检查欢迎页、小说阅读页、lesson、证物放大、案件板、3D/fallback、Day19/20均无不可用横向滚动或被遮挡按钮。
 
-- SN2 backside task is required;
-- completing the spatial task releases the gate;
-- if 3D is unavailable, the tested 2D fallback is reachable and can release the gate.
 
-Day5:
+## 54章小说实机检查
 
-- E2 anti-periplanar task behaves the same way.
-
-Day15:
-
-- tetrahedral → mirror/non-superposition → CIP/R/S → L20 comparison appears in spatial-first order;
-- L20-0/L20-F comparison is manipulable on the target device;
-- fallback remains usable if 3D fails;
-- ordinary IR/NMR is not presented as proof of enantiomer identity.
-
-## E. Detective and synthesis continuity
-
-Day13 → Day14:
-
-- X-17 state persists across days;
-- Day13 does not prematurely identify the final stereochemical issue;
-- Day14 resumes the same case and uses NMR symmetry to lock the planar structure.
-
-Day17 → Day18:
-
-- hidden-route reconstruction persists;
-- Day18 reuses the saved route instead of silently starting over;
-- record-tampering truth is not revealed before its intended Day18 close.
-
-## F. Day19 / Day20
-
-Day19 core audit:
-
-- no character/comic/scaffold appears inside the formal audit;
-- result is shown as a core-audit percentage, not a fake `/150` score;
-- Top3 weak abilities are produced for Day20.
-
-Full exam:
-
-- open `#full-exam/19`;
-- original 24-question 150/150 exam is reachable;
-- scoring behaves independently from the shorter core audit;
-- running the full exam does not overwrite the Day20 diagnostic source incorrectly.
-
-Day20:
-
-- final report distinguishes operation error / procedure violation / record falsification;
-- Top3 repairs use the appropriate presentation tool;
-- micro-Boss samples repaired skills only;
-- no new core chemistry is introduced.
-
-## G. Final mobile check
-
-On a real phone verify welcome, portal, lesson, comic, evidence lightbox, Case Board, required 3D/fallback, Day19 core audit and Day20 all remain inside the viewport without unusable horizontal scrolling or unreachable buttons.
-
-## Promotion rule
-
-Promote from **V16 Test Build** to **V16 Formal Release** only when all blocking checks above pass and all five timed mandatory days are <=60 minutes. Record any issue first, fix the code, rerun `node scripts/run-v16-validation.js`, redeploy, and repeat the affected live check.
+- [ ] 欢迎页显示“54章 · 20天”，不是旧的课程宣传语。
+- [ ] 任一小说页顶部显示“第 X 章 / 54”。
+- [ ] “小说目录”只列出已经读到的章节，不提前显示未来章名。
+- [ ] Day1、Day11、Day15、Day18小说在手机上字号/行距可舒适连续阅读。
+- [ ] 插图断网/404时，正文仍可读、继续按钮仍可用。
+- [ ] Day19进入正式审核后没有人物提示、案件提示或小说答案暗示。

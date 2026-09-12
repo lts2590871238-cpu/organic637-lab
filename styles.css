@@ -349,3 +349,49 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 .v16-story-hook span{display:block;color:#c7d7e8;font-size:.82rem;letter-spacing:.04em;margin-bottom:5px}
 .v16-story-hook b{display:block;font-size:1.05rem;margin-bottom:6px}.v16-story-hook p{margin:0;line-height:1.72;color:rgba(255,255,255,.86)}
 
+
+/* V16 formal story recap: optional large-type novel companion after each comic scene. */
+.v16-story-recap-modal{position:fixed;inset:0;z-index:1600;display:grid;place-items:center;padding:18px;background:rgba(18,22,30,.72);backdrop-filter:blur(10px);overflow:auto}
+.v16-story-recap-card{position:relative;width:min(820px,100%);max-height:min(88vh,920px);overflow:auto;margin:auto;padding:clamp(24px,4vw,42px);border-radius:28px;background:#fffaf4;box-shadow:0 28px 90px rgba(10,14,22,.35);border:1px solid rgba(83,61,42,.12)}
+.v16-story-recap-card h2{font-size:clamp(1.65rem,3vw,2.3rem);margin:.35rem 0 .65rem;color:#182334}
+.v16-story-recap-lead{font-size:clamp(1.02rem,1.8vw,1.18rem);line-height:1.85;padding:14px 16px;margin-bottom:18px;border-radius:16px;background:#f1ece5;color:#4c443d}
+.v16-story-recap-copy p{font-size:clamp(1.14rem,2vw,1.34rem);line-height:2.05;letter-spacing:.015em;color:#24201d;margin:0 0 1.25em;text-align:justify}
+.v16-story-recap-close{position:sticky;float:right;top:0;margin:-8px -8px 0 12px;width:44px;height:44px;border:0;border-radius:50%;background:#1e2a39;color:white;font-size:1.55rem;cursor:pointer;z-index:2}
+.v16-story-recap-done{display:block;width:min(360px,100%);margin:20px auto 0}
+@media(max-width:560px){.v16-story-recap-modal{padding:0}.v16-story-recap-card{min-height:100dvh;max-height:none;border-radius:0;padding:24px 18px 34px}.v16-story-recap-copy p{font-size:1.18rem;line-height:2}.v16-story-recap-close{top:6px}}
+@media(max-width:560px){
+  .v16-comic-actions{grid-template-columns:1fr}
+  .v16-comic-actions .btn,.v16-comic-actions .link-btn{min-height:48px;font-size:1rem}
+}
+
+/* V16 formal voice: story, learning and feedback should feel like one investigation. */
+.v16-investigation-context{border-color:rgba(116,73,61,.16);background:linear-gradient(135deg,rgba(255,249,244,.96),rgba(246,249,247,.96))}
+.v16-investigation-context span{letter-spacing:.08em;color:#8b6256}
+.v16-investigation-context b{font-size:1.02rem;line-height:1.55;color:#2f3540}
+.v16-learning-voice{margin:18px 0 20px;padding:18px;border:1px solid rgba(116,73,61,.14);border-radius:22px;background:linear-gradient(150deg,#fffaf6,#f7faf8);display:grid;gap:12px}
+.v16-learning-voice-head span,.v16-human-chemistry small,.v16-learning-payoff small,.v16-question-voice span,.v16-novel-previously span{display:block;font-size:.78rem;font-weight:800;letter-spacing:.08em;color:#a35f5a;text-transform:none}
+.v16-learning-voice-head b{display:block;margin-top:6px;font-size:1.02rem;line-height:1.65;color:#28313d}
+.v16-human-chemistry,.v16-learning-payoff{padding:13px 15px;border-radius:16px;background:rgba(255,255,255,.78)}
+.v16-human-chemistry p,.v16-learning-payoff p,.v16-question-voice p,.v16-novel-previously p{margin:6px 0 0;line-height:1.8;color:#3f464f}
+.v16-learning-payoff{border-left:4px solid rgba(80,132,118,.45)}
+.v16-question-voice{margin:0 0 16px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,249,244,.95),rgba(245,249,248,.95));border:1px solid rgba(116,73,61,.13)}
+.v16-novel-previously{margin:18px 0 20px;padding:16px 18px;border-radius:18px;background:rgba(247,244,239,.82);border:1px solid rgba(97,83,75,.12)}
+@media (max-width:640px){.v16-learning-voice{padding:15px;border-radius:18px}.v16-learning-voice-head b,.v16-human-chemistry p,.v16-learning-payoff p,.v16-question-voice p{font-size:1rem}.v16-novel-previously{padding:14px 15px}}
+.v16-formal-chemistry{margin:16px 0 8px;padding:16px 18px;border-radius:18px;background:#fff;border:1px solid rgba(46,57,69,.09)}
+.v16-formal-chemistry>small{display:block;margin-bottom:8px;font-weight:800;letter-spacing:.08em;color:#5b756e}
+.v16-formal-chemistry .lesson-body{margin:0;line-height:1.85}
+
+/* V16 formal novel · 54-chapter reading structure */
+.v16-novel-chapterbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px}
+.v16-novel-chapterbar .kicker{margin:0}
+.v16-novel-index-modal{position:fixed;inset:0;z-index:1750;display:grid;place-items:center;padding:18px;background:rgba(14,19,27,.76);backdrop-filter:blur(10px);overflow:auto}
+.v16-novel-index-card{position:relative;width:min(760px,100%);max-height:min(88vh,920px);overflow:auto;padding:clamp(24px,4vw,40px);border-radius:28px;background:#fffaf4;box-shadow:0 30px 90px rgba(0,0,0,.34);border:1px solid rgba(83,61,42,.12)}
+.v16-novel-index-card h2{font-size:clamp(1.8rem,4vw,2.55rem);margin:.35rem 0 .55rem;color:#182334}
+.v16-novel-index-card>p{font-size:1.04rem;line-height:1.8;color:#625c55;margin:0 0 14px}
+.v16-novel-index-progress{display:inline-flex;margin:2px 0 18px;padding:8px 12px;border-radius:999px;background:#efe6dc;color:#55483d;font-size:.86rem;font-weight:800}
+.v16-novel-index-card ol{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.v16-novel-index-card li{display:grid;grid-template-columns:82px 1fr auto;align-items:center;gap:10px;padding:13px 14px;border-radius:15px;background:rgba(255,255,255,.86);border:1px solid rgba(83,61,42,.09)}
+.v16-novel-index-card li.is-current{background:#edf4f1;border-color:rgba(70,126,108,.24)}
+.v16-novel-index-card li span{font-size:.82rem;font-weight:900;color:#9a6657}.v16-novel-index-card li b{font-size:.98rem;color:#2d3139}.v16-novel-index-card li small{color:#81786f}
+.v16-novel-index-close{position:sticky;float:right;top:0;width:44px;height:44px;border:0;border-radius:50%;background:#1e2a39;color:#fff;font-size:1.5rem;cursor:pointer;z-index:2}
+@media(max-width:560px){.v16-novel-chapterbar{align-items:flex-start}.v16-novel-index-modal{padding:0}.v16-novel-index-card{min-height:100dvh;max-height:none;border-radius:0;padding:24px 17px 34px}.v16-novel-index-card li{grid-template-columns:74px 1fr}.v16-novel-index-card li small{grid-column:2}.v16-novel-chapterbar .tiny-link{white-space:nowrap}}
