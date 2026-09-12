@@ -9,7 +9,7 @@
         day: 1,
         act: 1,
         title: '零号样品',
-        targetMinutes: 49,
+        targetMinutes: 55,
         legacy: {
           lessonOrder: [
             'd01-zero-01-language','d01-zero-02-groups','d01-zero-03-electrons','d01-zero-04-break-bond',
@@ -23,8 +23,9 @@
           ]
         },
         sequence: [
+          { id:'d01-cast-intro', type:'comic', sceneId:'case00-cast', minutes:6, engagement:'story' },
           { id:'d01-story-open', type:'comic', sceneId:'case01-open', minutes:2, engagement:'story' },
-          { id:'d01-learn-language', type:'lesson', ref:'d01-zero-01-language', minutes:4, engagement:'instruction', introducesCoreConcept:true, introduces:['structure.line_angle'], prerequisites:[] },
+          { id:'d01-learn-language', type:'lesson', ref:'d01-zero-01-language', minutes:4, engagement:'instruction', caseBridge:'想弄清 L20-0 为什么会从原位消失、记录又为什么被改过，你得先会把结构式读成真正的连接关系。只有看懂分子，证据才不会只是几根线。', introducesCoreConcept:true, introduces:['structure.line_angle'], prerequisites:[] },
           { id:'d01-learn-groups', type:'lesson', ref:'d01-zero-02-groups', minutes:3, engagement:'instruction', introducesCoreConcept:true, introduces:['structure.functional_group'], prerequisites:['structure.line_angle'] },
           { id:'d01-evidence-mark', type:'interaction', ref:'v16-d01-evidence-mark', minutes:3, engagement:'interaction', prerequisites:['structure.line_angle','structure.functional_group'] },
           { id:'d01-learn-electrons', type:'lesson', ref:'d01-zero-03-electrons', minutes:4, engagement:'instruction', introducesCoreConcept:true, introduces:['electron.rich_poor'], prerequisites:['structure.line_angle'] },
@@ -493,4 +494,30 @@
       }
     }
   };
+
+  const CASE_BRIDGES = {
+    1: '想弄清 L20-0 为什么会从原位消失、记录又为什么被改过，你得先会把结构式读成真正的连接关系。只有看懂分子，证据才不会只是几根线。',
+    2: '三份实验记录只差几个条件。要判断哪一处改动足以改变结果，先把“条件怎样改写反应出口”这件事看懂。',
+    3: 'R-17 的两个标签只差一点，但小小的结构差异可能让整条路线分叉。先学会读炔键、酸性和选择性，才能判断拿错一瓶究竟会造成什么后果。',
+    4: '顾遥说“许老师接手处理”，但第二只烧瓶里到底发生的是替代还是别的过程，不能靠猜。先学 SN1 / SN2，才能从底物和条件判断那一步是否说得通。',
+    5: '同一个底物可能走四条路。要判断事故之后有没有人主动改变路线，必须先学会把 SN1、SN2、E1、E2 放进同一张判断地图。',
+    6: '中间样品里出现了新的含氧线索。先掌握醇、醚和环氧化物怎样互相转换，才能判断这条痕迹是正常副产物还是人为补救留下的。',
+    7: '系统里多出一个编号 X-17。它最明显的证据是一组羰基信号；先学羰基的电子结构和亲核加成，才有能力判断这个陌生样品可能从哪一步来。',
+    8: '重新贴过的标签把事故线索指向了酰基衍生物。要判断这一步只是换标签，还是实际发生了取代，先把亲核酰基取代的共同骨架看清。',
+    9: 'X-17 比事故原料多出了一段新的 C—C 连接。要解释这根键从哪里来，先学 enolate 与 Aldol；只有这样才能判断是否真的存在第二条路线。',
+    10: '六个月前被否决的旧路线重新出现。它的核心就是怎样系统造 C—C 键；先把 Claisen、Michael 和 β-二羰基工具串起来，才能重建隐藏路线。',
+    11: '备用路线在芳环上留下了位置“指纹”。想判断这个取代位置是否吻合旧路线，必须先理解芳香取代为什么有方向性。',
+    12: 'B3 即将打开，而样品编号里出现了含氮转化线索。先掌握重氮盐和腈这些关键桥梁，才能判断路线是否可能在这里发生过改写。',
+    13: 'X-17 终于摆到你面前。现在不允许猜结构；先从分子式、DBE、IR 和化学检验逐条排除，让证据自己缩小范围。',
+    14: '昨天只能把 X-17 缩到一类结构，今天要用 1H NMR 锁定具体连接方式。信号数、积分、裂分和对称性将决定它真正的身份。',
+    15: 'L20-F 的普通谱图几乎和零号样品一样，但“连接关系一样”不等于“就是同一个分子”。先学三维手性、CIP 和 R/S，才能读懂真正翻案的证据。',
+    16: '目前每条证据都只说明一部分事实。今天要把结构、谱图、立体和反应行为合在一起，判断究竟哪个因素真正主导结论。',
+    17: '隐藏路线已经露出轮廓，但要证明它完整可行，必须倒着从 L20-F 走回起点。先学逆合成、碳数账本和断键，再重建那晚真正发生的路线。',
+    18: '路线已经重建，最后的问题是：它在真实实验顺序里是否兼容？先检查保护、氧化还原和先后顺序，才能把 22:14 的记录修改与化学事实严丝合缝地对上。'
+  };
+  for (const [dayText, bridge] of Object.entries(CASE_BRIDGES)) {
+    const day = Number(dayText);
+    const firstLesson = NS.V16_DIRECTOR_DATA.days?.[day]?.sequence?.find(step => step.type === 'lesson');
+    if (firstLesson && !firstLesson.caseBridge) firstLesson.caseBridge = bridge;
+  }
 })();

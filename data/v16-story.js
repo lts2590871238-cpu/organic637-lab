@@ -119,6 +119,12 @@
     },
 
     scenes: {
+      'case00-cast': {
+        id: 'case00-cast', day: 1, title: 'LAB-20｜调查组成员', layout: 'cast-intro',
+        cast: ['zhouYan','chengYe','linCen','guYao','xuLinchuan'],
+        intro: 'L-20 是校内联合实验室最重要的一条合成项目。三个月前，零号样品 L20-0 曾成功通过全部验收。今晚，它从应该出现的位置消失了。',
+        outro: '凌晨 00:17，项目组被临时叫回实验室。你作为刚进入项目的调查助理，将从他们每个人的证词和化学证据里重建那一晚。'
+      },
       'case01-open': {
         id: 'case01-open', day: 1, title: 'CASE 01｜零号样品',
         unlockFacts: ['zero_sample_missing_appearance'],
