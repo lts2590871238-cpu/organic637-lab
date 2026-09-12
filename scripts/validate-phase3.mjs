@@ -76,7 +76,7 @@ const L = context.Organic637.Learning;
 const I = context.Organic637.Interactions;
 const oldState = { version:1, currentDay:1, completedDays:[], day1:{lessonIndex:1,questionIndex:2,phase:'questions',queue:['pi-center-1'],answered:{'pi-center-1':{correct:true}},repairUsed:{},finished:false}, skills:{'alkene.pi_center':{mastery:55,attempts:2,correct:1,lastSeen:'2026-09-07',nextReview:'2026-09-08'}}, attempts:[{id:'a1',day:1,questionId:'pi-center-1',skill:'alkene.pi_center',correct:true,confidence:'sure',hints:0,at:Date.now()}] };
 const migrated = L.migrateState(oldState, data.days);
-assert(migrated.schemaVersion === 2 && migrated.days[1].taskIndex === 2, 'v1 migration failed');
+assert(migrated.schemaVersion === 3 && migrated.version === 3 && migrated.days[1].taskIndex === 2 && migrated.days[1].v16?.cursor === 0, 'v1 migration failed');
 assert(migrated.attempts.length === 1 && migrated.skills['alkene.pi_center'].mastery === 55, 'v1 evidence lost');
 assert(L.evidenceQuality({correct:true,hintsUsed:0,confidence:'sure'}) > L.evidenceQuality({correct:true,hintsUsed:0,confidence:'guess'}), 'confidence weighting failed');
 assert(L.evidenceQuality({correct:true,hintsUsed:0,confidence:'guess'}) > L.evidenceQuality({correct:true,hintsUsed:2,confidence:'sure'}), 'hint weighting failed');

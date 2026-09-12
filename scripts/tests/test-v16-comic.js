@@ -1,0 +1,16 @@
+const assert = require('assert');
+global.window = { Organic637: {} };
+require('../../data/v16-story.js');
+require('../../data/v16-assets.js');
+require('../../js/comic-renderer.js');
+const C = window.Organic637.V16Comic;
+const html = C.render('case01-open', { day: 1 });
+assert.match(html, /v16-comic/);
+assert.match(html, /00:17/);
+assert.match(html, /周砚/);
+assert.match(html, /零号样品/);
+assert.ok((html.match(/v16-comic-panel/g) || []).length >= 2, 'scene should render multiple comic panels');
+assert.match(html, /v16-dialogue/, 'dialogue text must remain present even without images');
+const fallback = C.render('missing-scene', { day: 1 });
+assert.match(fallback, /案件片段暂时无法显示/);
+console.log('PASS test-v16-comic');

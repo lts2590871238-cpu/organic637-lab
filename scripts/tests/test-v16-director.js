@@ -1,0 +1,13 @@
+const assert = require('assert');
+global.window = { Organic637: {} };
+require('../../data/v16-director.js');
+require('../../js/director-engine.js');
+const D = window.Organic637.V16Director;
+assert.equal(D.getDayPlan(1).targetMinutes, 49);
+assert.equal(D.getStep(1, 0).type, 'comic');
+assert.equal(D.getStep(1, 999), null);
+assert.equal(D.estimateMinutes(1), 49);
+const report = D.validateDay(1);
+assert.deepEqual(report.errors, []);
+assert.equal(D.findCursorForLegacy(1, { phase: 'lesson', lessonIndex: 0 }), 1);
+console.log('PASS test-v16-director');

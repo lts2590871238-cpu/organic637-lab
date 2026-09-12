@@ -224,8 +224,8 @@
   function normalizeState() {
     const state = Store.state;
     if (!state) return;
-    state.schemaVersion = 2;
-    state.version = 2;
+    state.schemaVersion = 3;
+    state.version = 3;
     for (let day = 1; day <= AVAILABLE_MAX_DAY; day += 1) {
       if (!REGISTRY[day]) continue;
       const progress = NS.Learning.ensureDayState(state, day, REGISTRY);
@@ -241,8 +241,6 @@
     state.completedDays = [...new Set((state.completedDays || []).map(Number))].sort((a, b) => a - b);
     state.detective = NS.Detective.normalizeProgress(state.detective);
     state.synthesis = NS.Synthesis.normalizeProgress(state.synthesis);
-    state.threeDProgress = state.threeDProgress && typeof state.threeDProgress === 'object' ? state.threeDProgress : {};
-    state.threeDNoticeSeen = Boolean(state.threeDNoticeSeen);
     if (Number(state.beginnerDeepVersion || 0) < 1) {
       for (let day = 1; day <= AVAILABLE_MAX_DAY; day += 1) {
         const progress = state.days?.[day];
@@ -269,23 +267,13 @@
       this.timer = setTimeout(() => this.push().catch(() => {}), 900);
     },
     chunks(state) {
-      const core = { ...state };
-      delete core.skills;
-      delete core.attempts;
-      const chunks = { core, skills: state.skills || {} };
-      const attempts = state.attempts || [];
-      for (let i = 0; i < attempts.length; i += 100) chunks[`attempts:${Math.floor(i / 100)}`] = attempts.slice(i, i + 100);
-      return chunks;
+      return NS.V16CloudCodec?.chunks ? NS.V16CloudCodec.chunks(state) : { core: state, skills: state?.skills || {} };
     },
     fromChunks(chunks) {
-      const state = chunks.core?.data && typeof chunks.core.data === 'object' ? { ...chunks.core.data } : Store.fresh();
-      state.skills = chunks.skills?.data || state.skills || {};
-      state.attempts = [];
-      Object.keys(chunks)
-        .filter(key => key.startsWith('attempts:'))
-        .sort((a, b) => Number(a.split(':')[1]) - Number(b.split(':')[1]))
-        .forEach(key => { if (Array.isArray(chunks[key]?.data)) state.attempts.push(...chunks[key].data); });
-      return NS.Learning.migrateState(state, REGISTRY);
+      const raw = NS.V16CloudCodec?.fromChunks
+        ? NS.V16CloudCodec.fromChunks(chunks, () => Store.fresh())
+        : (chunks.core?.data && typeof chunks.core.data === 'object' ? { ...chunks.core.data } : Store.fresh());
+      return NS.Learning.migrateState(raw, REGISTRY);
     },
     async pull() {
       this.status = 'syncing';
@@ -351,7 +339,6 @@
   }
 
   function shell(inner, active = '') {
-    NS.Chem3D?.dispose?.();
     $('#app').innerHTML = `<div class="app cozy-app">${inner}</div>`;
   }
 
@@ -410,7 +397,8 @@
     const day = Store.state.currentDay || 1;
     const due = NS.Review.dueCount(Store.state);
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
-    const studyText = progress.lessonIndex || progress.taskIndex ? '从上次的位置继续' : '从今天第一步开始';
+    const v16Cursor = Number(progress.v16?.cursor) || 0;
+    const studyText = v16Cursor || progress.lessonIndex || progress.taskIndex ? '从上次的位置继续' : '从今天第一步开始';
     const act = journeyAct(day);
     shell(`<section class="portal-stage"><div class="portal-head"><span>🌷 Day ${day}${act ? ` · 第 ${act.id} 段` : ''}</span><h1>今天想从哪里开始？</h1><p>${act ? esc(act.title) + '。' : ''} 学累了随时退出，回来会接着原来的位置。</p></div><div class="portal-triangle"><button class="portal-card study" data-go="#day/${day}"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><div><b>今日学习</b><small>${studyText}</small></div></button><button class="portal-card review" data-go="#review"><img src="${DECOR.review.src}" alt="${esc(DECOR.review.name)}"><div><b>今日复习</b><small>${due ? `有 ${due} 条到期内容` : '今天暂无到期内容'}</small></div></button><button class="portal-card home" data-go="#home"><img src="${DECOR.random.src}" alt="${esc(DECOR.random.name)}"><div><b>返回首页</b><small>看今天进度、错题和20天地图</small></div></button></div></section>`);
     document.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
@@ -466,12 +454,14 @@
   }
 
   function renderTimeRhythm(day) {
-    const minutes = Number(journeyMeta(day)?.minutes || REGISTRY[day]?.estimatedMinutes || 85);
+    const minutes = Number(NS.V16Director?.getDayPlan?.(day)?.targetMinutes || journeyMeta(day)?.minutes || REGISTRY[day]?.estimatedMinutes || 85);
     let blocks = [
       ['捡回旧知识',10],['看懂新动作',20],['带着做',20],['独立/对比',20],['迁移与收口',Math.max(10, minutes-70)]
     ];
-    if (day === 1) blocks = [['看懂结构语言',15],['电子与键',20],['第一组反应电影',20],['带练/对比',20],['独立收口',10]];
-    if (day === 19) blocks = [['热身读题',5],['Boss 卷',75],['统一检查',10]];
+    if (day === 1 && NS.V16Director?.getDayPlan?.(1)) blocks = [['案件开场',5],['结构与电子',12],['第一条反应',12],['案件应用',10],['637与收口',10]];
+    else if (day === 1) blocks = [['看懂结构语言',15],['电子与键',20],['第一组反应电影',20],['带练/对比',20],['独立收口',10]];
+    if (day === 19 && NS.V16Director?.getDayPlan?.(19)) blocks = [['考试说明',1],['核心审核',57]];
+    else if (day === 19) blocks = [['热身读题',5],['Boss 卷',75],['统一检查',10]];
     if (day === 20) blocks = [['Top3诊断',15],['退回一层重建',20],['新结构修复',20],['迁移 Boss',20],['总结',10]];
     return `<section class="time-rhythm"><div class="time-rhythm-head"><b>今天约 ${minutes} 分钟</b><span>不是一直刷题，理解和练习交替进行</span></div><div class="time-rhythm-bar">${blocks.map(([label,min])=>`<div style="--w:${min}"><span>${esc(label)}</span><b>${min}m</b></div>`).join('')}</div></section>`;
   }
@@ -495,14 +485,15 @@
     const progress = NS.Learning.ensureDayState(state, day, REGISTRY);
     const baseCount = data.questions.length;
     const answeredMain = Object.keys(progress.answered || {}).filter(id => data.questions.some(q => q.id === id)).length;
-    const percent = progress.finished ? 100 : Math.min(96, Math.round((progress.lessonIndex + answeredMain) / Math.max(1, data.lessons.length + baseCount) * 100));
+    const v16Plan = Store.state.v16?.enabled ? NS.V16Director?.getDayPlan?.(day) : null;
+    const percent = progress.finished ? 100 : v16Plan
+      ? Math.min(96, Math.round((Number(progress.v16?.cursor) || 0) / Math.max(1, v16Plan.sequence.length) * 100))
+      : Math.min(96, Math.round((progress.lessonIndex + answeredMain) / Math.max(1, data.lessons.length + baseCount) * 100));
     const due = NS.Review.dueCount(state);
     const mistakes = NS.Learning.todayMistakes(state).length;
     const stable = Object.values(state.skills || {}).filter(skill => NS.Learning.masteryBand(skill, NS.Learning.getEffectiveMastery(skill)) === '稳定').length;
     const score = NS.Learning.estimateScore(state, SKILLS);
     const summary = domainSummary();
-    const showThreeDNotice = state.completedDays.includes(15) && !state.threeDNoticeSeen;
-    const threeDNotice = showThreeDNotice ? '<div class="three-d-release-note"><div><b>立体化学新增了 3D 理解卡</b><span>想回看时可自由复练 Day 15；不会改变你现在的学习位置。</span></div><button type="button" id="dismissThreeDNotice">知道了</button></div>' : '';
     const dayTiles = (MANIFEST.days || []).map(meta => {
       const available = Boolean(REGISTRY[meta.day]) && meta.day <= AVAILABLE_MAX_DAY;
       const done = state.completedDays.includes(meta.day);
@@ -510,20 +501,28 @@
       const cls = done ? 'done' : meta.day === state.currentDay ? 'current' : !unlocked ? 'locked' : '';
       return `<button class="day-tile ${cls}" ${unlocked ? `data-day="${meta.day}"` : 'disabled'}><span class="day-number">DAY ${String(meta.day).padStart(2, '0')}</span><strong>${esc(meta.shortTitle || meta.title)}</strong><small>${done ? '已完成 · 可重练' : meta.day === state.currentDay ? '今天' : available ? '按顺序解锁' : ''}</small></button>`;
     }).join('');
-    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${threeDNotice}${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
+    shell(`<section class="home-simple"><div class="home-main panel"><div class="home-title-row"><div><div class="kicker">DAY ${String(day).padStart(2, '0')} · 今天</div><div class="home-slogan">学懂有机，会做真题</div><h1>${esc(data.title)}</h1><p>${esc(data.subtitle || '')}</p></div>${decorImage('random', 'home-tiny-decor')}</div>${renderJourneyStrip(day)}<div class="progress-line"><i style="width:${percent}%"></i></div><div class="home-progress-note"><span>进度 ${percent}%</span><span>约 ${Number(v16Plan?.targetMinutes || data.estimatedMinutes || 80)} 分钟</span><span>可随时退出继续</span></div>${renderTimeRhythm(day)}<div class="home-simple-actions"><button id="startDay" class="home-primary-action"><b>${(Number(progress.v16?.cursor)||0) || progress.lessonIndex || progress.taskIndex ? '继续今日学习' : '开始今日学习'}</b><small>先理解，再带练，再独立；今天只长出一组明确能力</small></button><button id="openReview" class="home-secondary-action"><b>今日复习 ${due}</b><small>只处理到期记忆</small></button><button id="openMistakes" class="home-secondary-action"><b>错题回看 ${mistakes}</b><small>只看今天真正卡住的地方</small></button><button id="abilities" class="home-secondary-action"><b>能力地图</b><small>${stable} 个技能已稳定 · 估计 ${score.low}–${score.high}/150</small></button><button id="openCaseBoard" class="home-secondary-action"><b>查看案件板</b><small>只看已经解锁的事实、矛盾与路线恢复</small></button></div><div class="home-bottom-links"><button id="backPortal" class="soft-link">← 回到欢迎页</button><button id="logout" class="soft-link">退出账号</button></div></div><div class="section-title home-section-title"><h2>20 天不是 20 个孤岛</h2><span>每四天长出一层能力，前一天负责给后一天搭地基。</span></div>${renderCourseActsMap(state)}${summary.length ? `<div class="section-title home-section-title"><h2>能力概览</h2><button class="tiny-link" id="allAbilities">查看全部 →</button></div><div class="ability-grid">${summary.slice(0, 4).map(row => abilityDomainCard(row)).join('')}</div>` : ''}</section>`,'home');
     $('#startDay').onclick = () => { location.hash = `#day/${day}`; };
     $('#openReview').onclick = () => { location.hash = '#review'; };
     $('#openMistakes').onclick = () => { location.hash = '#mistakes'; };
     $('#abilities').onclick = () => { location.hash = '#abilities'; };
+    $('#openCaseBoard').onclick = () => { location.hash = '#case-board'; };
     $('#backPortal').onclick = () => { location.hash = '#welcome'; };
     $('#logout').onclick = async () => { await Cloud.push().catch(() => {}); await Auth.logout(); Store.setScope('guest'); location.hash = ''; loginPage('login'); };
     $('#allAbilities')?.addEventListener('click', () => { location.hash = '#abilities'; });
-    $('#dismissThreeDNotice')?.addEventListener('click', () => {
-      Store.state.threeDNoticeSeen = true;
-      Store.save();
-      $('#dismissThreeDNotice')?.closest('.three-d-release-note')?.remove();
-    });
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => { location.hash = `#day/${button.dataset.day}`; }));
+  }
+
+
+  function caseBoardPage() {
+    const model = NS.V16CaseBoard.getModel(Store.state);
+    shell(NS.V16CaseBoard.render(model), 'home');
+    $('#caseBoardBack').onclick = () => { location.hash = '#home'; };
+    document.querySelectorAll('[data-case-target][data-case-mark]').forEach(button => button.addEventListener('click', () => {
+      NS.V16CaseBoard.setPersonalMark(Store.state, button.dataset.caseTarget, button.dataset.caseMark || null);
+      Store.save();
+      caseBoardPage();
+    }));
   }
 
   function abilityDomainCard(row) {
@@ -531,6 +530,195 @@
   }
 
   function dayPage(day) {
+    const v16 = NS.Learning.ensureV16RootState(Store.state);
+    const plan = NS.V16Director?.getDayPlan?.(day);
+    if (v16.enabled && plan) {
+      const report = NS.V16Director.validateDay(day);
+      if (!report.errors.length) return directorDayPage(day);
+      console.error(`[V16] Day ${day} Director plan invalid; falling back to legacy flow`, report.errors);
+    }
+    return legacyDayPage(day);
+  }
+
+  function hasLegacyProgress(progress) {
+    return Boolean(
+      progress.startedAt ||
+      Number(progress.lessonIndex) > 0 ||
+      Number(progress.taskIndex) > 0 ||
+      (progress.phase && progress.phase !== 'opening') ||
+      Object.keys(progress.answered || {}).length
+    );
+  }
+
+  function advanceDirectorStep(day, stepId) {
+    const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    const step = NS.V16Director.getStep(day, v16.cursor);
+    if (!step || (stepId && step.id !== stepId)) return false;
+    v16.completedSteps[step.id] = Date.now();
+    v16.cursor += 1;
+    Store.save();
+    dayPage(day);
+    return true;
+  }
+
+  function retreatDirectorStep(day) {
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    v16.cursor = Math.max(0, v16.cursor - 1);
+    Store.save();
+    dayPage(day);
+  }
+
+  function directorFallbackCard(day, step, message, { allowContinue = false } = {}) {
+    shell(`<section class="panel"><div class="kicker">LAB-20 · V16</div><h1>${esc(message)}</h1><p class="lead">当前位置已经保存。旧版学习路径仍然完整可用，不会因为新导演层尚未接完而丢失学习内容。</p><div class="btn-row"><button class="btn ghost" id="directorLegacy">使用旧版学习路径</button>${allowContinue ? '<button class="btn primary" id="directorContinue">继续</button>' : ''}<button class="link-btn" id="directorExit">暂时退出</button></div></section>`, 'study');
+    $('#directorLegacy').onclick = () => legacyDayPage(day);
+    $('#directorExit').onclick = () => { location.hash = '#welcome'; };
+    if (allowContinue) $('#directorContinue').onclick = () => advanceDirectorStep(day, step.id);
+  }
+
+  function directorQuestionGroupPage(day, step, progress, v16) {
+    v16.stepState = v16.stepState && typeof v16.stepState === 'object' ? v16.stepState : {};
+    const state = v16.stepState[step.id] && typeof v16.stepState[step.id] === 'object' ? v16.stepState[step.id] : { index: 0 };
+    v16.stepState[step.id] = state;
+    const refs = Array.isArray(step.refs) ? step.refs : [];
+    const ref = refs[Math.max(0, Number(state.index) || 0)];
+    if (!ref) return advanceDirectorStep(day, step.id);
+    const question = QMAP.get(ref);
+    if (!question) return directorFallbackCard(day, step, `找不到题目资源：${ref}`);
+    return studyQuestionPage(question, {
+      mode: step.mode === '637_exit' ? 'exam' : (question.role || 'learn'),
+      day,
+      positionLabel: step.mode === '637_exit' ? `Day ${day} · 637 正式出口` : `Day ${day} · 导演任务`,
+      onPrev: () => {
+        if (state.index > 0) { state.index -= 1; Store.save(); dayPage(day); }
+        else retreatDirectorStep(day);
+      },
+      onNext(result) {
+        progress.answered[question.id] = { correct: Boolean(result?.correct), partialScore: Number(result?.partialScore ?? 0), at: Date.now() };
+        state.index += 1;
+        Store.save();
+        if (state.index >= refs.length) advanceDirectorStep(day, step.id);
+        else dayPage(day);
+      },
+      onSubmitted(result) {
+        progress.answered[question.id] = { correct: result.correct, partialScore: result.partialScore, at: Date.now() };
+        Store.save();
+      }
+    });
+  }
+
+  function directorDayPage(day) {
+    const data = REGISTRY[day];
+    if (!data || day > AVAILABLE_MAX_DAY) return notReadyPage(day);
+    if (day > Store.state.currentDay && !Store.state.completedDays.includes(day)) {
+      location.hash = '#home';
+      return homePage();
+    }
+    const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
+    if (progress.finished) {
+      if (day === 19 && Store.state.examResults?.v16Day19Core) return coreExamResultsPage();
+      if (day === 19 && Store.state.examResults?.[19]) return examResultsPage();
+      if (day === 20) return finalSummaryPage();
+      return dayFinishPage(day);
+    }
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    if (!v16.migratedFromLegacy) {
+      v16.cursor = hasLegacyProgress(progress) ? NS.V16Director.findCursorForLegacy(day, progress) : 0;
+      v16.migratedFromLegacy = true;
+      Store.save();
+    }
+    if (!progress.startedAt) { progress.startedAt = Date.now(); Store.save(); }
+
+    const step = NS.V16Director.getStep(day, v16.cursor);
+    if (!step) return completeDay(day);
+
+    if (step.type === 'comic') {
+      if (NS.V16Comic?.renderInto) {
+        const plan = NS.V16Director.getDayPlan(day);
+        const nextComic = (plan?.sequence || []).slice(v16.cursor + 1).find(item => item.type === 'comic' && item.sceneId);
+        return NS.V16Comic.renderInto($('#app'), step.sceneId, {
+          state: Store.state,
+          day,
+          preloadSceneIds: nextComic?.sceneId ? [nextComic.sceneId] : [],
+          onComplete: () => advanceDirectorStep(day, step.id)
+        });
+      }
+      return directorFallbackCard(day, step, '案件漫画渲染器正在接入', { allowContinue: true });
+    }
+
+    if (step.type === 'lesson') {
+      const lesson = (data.lessons || []).find(item => item.id === step.ref);
+      if (!lesson) return directorFallbackCard(day, step, `找不到课程资源：${step.ref}`);
+      return lessonPage(day, lesson, {
+        v16: true,
+        requireSupportCompletion: false,
+        onPrev: () => retreatDirectorStep(day),
+        onNext: () => advanceDirectorStep(day, step.id),
+        prevLabel: '← 上一步'
+      });
+    }
+
+    if (step.type === '3d') {
+      if (!NS.Chem3D?.getLesson?.(step.ref)) return directorFallbackCard(day, step, `找不到空间学习资源：${step.ref}`);
+      shell(`<section class="panel chem3d-shell"><div id="chem3dRoot"></div></section>`, 'study');
+      const root = $('#chem3dRoot');
+      NS.Chem3D.mount(root, step.ref, {
+        state: Store.state,
+        mode: step.mode || 'required',
+        onProgress() {
+          Store.save(false);
+          Cloud.schedule();
+        },
+        onComplete() {
+          Store.save();
+          advanceDirectorStep(day, step.id);
+        },
+        onSkip() {
+          if (step.mode === 'on_demand') advanceDirectorStep(day, step.id);
+        },
+        onExit() {
+          Store.save();
+          location.hash = '#welcome';
+        }
+      });
+      return;
+    }
+
+    if (step.type === 'detective') return directorDetectiveTask(day, step);
+
+    if (step.type === 'synthesis') return directorSynthesisTask(day, step);
+
+    if (step.type === 'exam') return directorCoreExamTask(day, step);
+    if (step.type === 'case-report') return directorCaseReportTask(day, step);
+    if (step.type === 'adaptive-repair') return directorAdaptiveRepairTask(day, step);
+    if (step.type === 'final-boss') return directorFinalBossTask(day, step);
+
+    if (['question', 'interaction', 'case-apply'].includes(step.type)) {
+      const question = QMAP.get(step.ref);
+      if (!question) return directorFallbackCard(day, step, `找不到题目资源：${step.ref}`);
+      return studyQuestionPage(question, {
+        mode: step.type === 'case-apply' ? 'transfer' : (step.mode || question.role || 'learn'),
+        day,
+        positionLabel: step.mode === '637_exit' ? `Day ${day} · 637 正式出口` : `Day ${day} · 导演任务`,
+        onPrev: () => retreatDirectorStep(day),
+        onNext(result) {
+          progress.answered[question.id] = { correct: Boolean(result?.correct), partialScore: Number(result?.partialScore ?? 0), at: Date.now() };
+          advanceDirectorStep(day, step.id);
+        },
+        onSubmitted(result) {
+          progress.answered[question.id] = { correct: result.correct, partialScore: result.partialScore, at: Date.now() };
+          if (!result.correct && question.role !== 'repair' && day !== 20) queueRepair(day, question.primarySkill);
+          Store.save();
+        }
+      });
+    }
+
+    if (step.type === 'question-group') return directorQuestionGroupPage(day, step, progress, v16);
+
+    return directorFallbackCard(day, step, `V16 节点“${step.type}”尚未接入`, { allowContinue: false });
+  }
+
+  function legacyDayPage(day) {
     const data = REGISTRY[day];
     if (!data || day > AVAILABLE_MAX_DAY) return notReadyPage(day);
     if (day > Store.state.currentDay && !Store.state.completedDays.includes(day)) {
@@ -593,6 +781,67 @@
     });
   }
 
+  function directorDetectiveTask(day, step) {
+    const cases = Array.isArray(Data.DETECTIVE_CASES) ? Data.DETECTIVE_CASES : [];
+    const caseId = step.caseId || step.ref;
+    const kase = cases.find(row => row.id === caseId);
+    if (!kase) return directorFallbackCard(day, step, `找不到结构侦探案件：${caseId}`);
+
+    const started = performance.now();
+    let completed = false;
+    shell(`<section class="panel detective-shell"><div class="question-head"><div class="step-label">Day ${day} · LAB-20 结构证据</div><span class="role-chip">持续案件</span></div><div class="embedded-task-intro"><b>${esc(kase.title)}</b><p>${day === 13 ? '今天只做到 DBE 与 IR。NMR 会在明天解锁，不提前剧透。' : '继续昨天同一份 X-17 证据，从 NMR 开始把平面结构收住。'}</p></div><div id="detectiveRoot"></div><div class="footer-actions"><button class="link-btn" id="embeddedExit">← 暂时退出</button><span class="tiny">退出后会保留同一案件的证据选择。</span></div></section>`, 'study');
+    $('#embeddedExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+    Store.state.detective = NS.Detective.normalizeProgress(Store.state.detective);
+
+    const recordFullSummary = summary => {
+      const elapsed = Math.max(0, Math.round(performance.now() - started));
+      summary.skillEvidence.forEach(evidence => {
+        const questionId = `${kase.id}:${evidence.questionSuffix}`;
+        const previous = Store.state.attempts.filter(row => row.questionId === questionId).length;
+        const pseudoQuestion = { id: questionId, day, type: 'detective-step', role: 'transfer', primarySkill: evidence.skillId, skillIds: [evidence.skillId] };
+        NS.Learning.recordAttempt(Store.state, pseudoQuestion, {
+          mode: 'detective', correct: evidence.correct, firstAttempt: previous === 0, attemptNumber: previous + 1,
+          hintsUsed: evidence.hintsUsed || 0, confidence: summary.confidence,
+          responseTimeMs: Math.round(elapsed / Math.max(1, summary.skillEvidence.length)), isTransfer: true,
+          answerPayload: summary.answers, partialScore: evidence.partialScore, errorType: evidence.errorType
+        });
+      });
+      Store.state.detective.cases[kase.id] = {
+        completedAt: Date.now(), score: summary.score, dbeCorrect: summary.dbeCorrect, irCorrect: summary.irCorrect,
+        nmrCorrect: summary.nmrCorrect, eliminationScore: summary.eliminationScore, finalCorrect: summary.finalCorrect,
+        hintsUsed: summary.hintsUsed, confidence: summary.confidence
+      };
+      delete Store.state.detective.inProgress[kase.id];
+    };
+
+    NS.Detective.mount($('#detectiveRoot'), kase, {
+      initialState: Store.state.detective.inProgress?.[kase.id] || null,
+      resumeStage: step.resumeStage,
+      pauseAfterStage: step.pauseAfterStage,
+      backLabel: '证据已确认，继续今日主线',
+      onProgress(snapshot) {
+        Store.state.detective.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
+      onPartialComplete(snapshot) {
+        Store.state.detective.inProgress[kase.id] = snapshot;
+        Store.save();
+        advanceDirectorStep(day, step.id);
+      },
+      onComplete(summary) {
+        completed = true;
+        recordFullSummary(summary);
+        Store.save();
+      },
+      onBack() {
+        if (!completed) return;
+        advanceDirectorStep(day, step.id);
+      },
+      onNext() {}
+    });
+  }
+
   function embeddedDetectiveTask(question, day) {
     const cases = Array.isArray(Data.DETECTIVE_CASES) ? Data.DETECTIVE_CASES : [];
     const kase = cases.find(row => row.id === question.caseId);
@@ -642,6 +891,74 @@
         progress.taskIndex += 1;
         Store.save();
         dayPage(day);
+      },
+      onNext() {}
+    });
+  }
+
+  function directorSynthesisTask(day, step) {
+    const cases = Array.isArray(Data.SYNTHESIS_CASES) ? Data.SYNTHESIS_CASES : [];
+    const caseId = step.caseId || step.ref;
+    const kase = cases.find(row => row.id === caseId);
+    if (!kase) return directorFallbackCard(day, step, `找不到合成路线案件：${caseId}`);
+
+    Store.state.synthesis = NS.Synthesis.normalizeProgress(Store.state.synthesis);
+    const savedResult = Store.state.synthesis.cases?.[kase.id];
+
+    if (step.reviewCompleted && savedResult?.completedAt) {
+      const route = Array.isArray(savedResult.route) ? savedResult.route : [];
+      const equation = NS.Synthesis.routeEquation(kase, route);
+      shell(`<section class="panel synthesis-shell"><div class="question-head"><div class="step-label">Day ${day} · LAB-20 路线复审</div><span class="role-chip">同一案件 · 不重复刷迷宫</span></div><div class="embedded-task-intro"><b>${esc(kase.title)}</b><p>昨天已经把隐藏路线恢复出来。今天不要求再走一遍，而是用保护、顺序与兼容性重新审查这条已保存路线。</p></div><div class="panel-inset preferred-route"><h3>你保存的路线</h3><div class="route-equation"><b>${esc(equation || '已完成路线')}</b></div><p>复审重点：每一步除了“能发生”，还要问已有官能团能否撑过下一步；实验失败与后来修改记录也必须分开判断。</p></div><div class="btn-row"><button class="btn primary" id="directorSynthesisReviewContinue">带着这条路线继续审证据</button><button class="btn ghost" id="directorSynthesisReplay">重新走一次路线</button></div><div class="footer-actions"><button class="link-btn" id="directorSynthesisExit">← 暂时退出</button></div></section>`, 'study');
+      $('#directorSynthesisReviewContinue').onclick = () => advanceDirectorStep(day, step.id);
+      $('#directorSynthesisReplay').onclick = () => {
+        delete Store.state.synthesis.inProgress[kase.id];
+        Store.save();
+        directorSynthesisTask(day, { ...step, reviewCompleted:false });
+      };
+      $('#directorSynthesisExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+      return;
+    }
+
+    const started = performance.now();
+    let completed = false;
+    shell(`<section class="panel synthesis-shell"><div class="question-head"><div class="step-label">Day ${day} · LAB-20 路线重建</div><span class="role-chip">正向 / 逆向</span></div><div class="embedded-task-intro"><b>${esc(kase.title)}</b><p>先做目标差异与碳数账本，再走路线。一个看似合理的分叉可以先走；如果后续条件不兼容，问题会在真正冲突的那一步暴露。</p></div><div id="synthesisRoot"></div><div class="footer-actions"><button class="link-btn" id="directorSynthesisExit">← 暂时退出</button><span class="tiny">退出后保留路线状态，回来继续同一案件。</span></div></section>`, 'study');
+    $('#directorSynthesisExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+
+    NS.Synthesis.mount($('#synthesisRoot'), kase, {
+      nextCaseId: null,
+      backLabel: '路线证据已保存，继续今日主线',
+      initialState: Store.state.synthesis.inProgress?.[kase.id] || null,
+      onProgress(snapshot) {
+        Store.state.synthesis.inProgress[kase.id] = snapshot;
+        Store.save(false);
+        Cloud.schedule();
+      },
+      onComplete(summary) {
+        completed = true;
+        const elapsed = Math.max(0, Math.round(performance.now() - started));
+        (summary.skillEvidence || []).forEach(evidence => {
+          const questionId = `${kase.id}:${evidence.questionSuffix}`;
+          const previous = Store.state.attempts.filter(row => row.questionId === questionId).length;
+          const pseudoQuestion = { id: questionId, day, type:'synthesis-step', role:'transfer', primarySkill:evidence.skillId, skillIds:[evidence.skillId] };
+          NS.Learning.recordAttempt(Store.state, pseudoQuestion, {
+            mode:'synthesis', correct:evidence.correct, firstAttempt:previous === 0, attemptNumber:previous + 1,
+            hintsUsed:summary.hintsUsed || 0, confidence:summary.confidence,
+            responseTimeMs:Math.round(elapsed / Math.max(1, summary.skillEvidence.length)), isTransfer:true,
+            answerPayload:{ mode:summary.mode, route:summary.route }, partialScore:evidence.partialScore, errorType:evidence.errorType
+          });
+        });
+        Store.state.synthesis.cases[kase.id] = {
+          completedAt:Date.now(), score:summary.score, mode:summary.mode,
+          differenceCorrect:summary.differenceCorrect, carbonCorrect:summary.carbonCorrect,
+          route:summary.route, routeScore:summary.routeResult?.score || 0,
+          hintsUsed:summary.hintsUsed, confidence:summary.confidence
+        };
+        delete Store.state.synthesis.inProgress[kase.id];
+        Store.save();
+      },
+      onBack() {
+        if (!completed) return;
+        advanceDirectorStep(day, step.id);
       },
       onNext() {}
     });
@@ -699,6 +1016,303 @@
       },
       onNext() {}
     });
+  }
+
+  function directorCaseReportTask(day, step) {
+    const report = NS.V16_STORY?.finalReport;
+    if (Number(day) !== 20 || !report) return directorFallbackCard(day, step, '最终案件报告配置没有正确加载');
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    v16.stepState = v16.stepState && typeof v16.stepState === 'object' ? v16.stepState : {};
+    const state = v16.stepState[step.id] && typeof v16.stepState[step.id] === 'object' ? v16.stepState[step.id] : { answers:{} };
+    state.answers = state.answers && typeof state.answers === 'object' ? state.answers : {};
+    v16.stepState[step.id] = state;
+    const categories = Array.isArray(report.categories) ? report.categories : [];
+    const actors = Object.entries(report.actors || {});
+    shell(`<section class="panel final-case-report"><div class="kicker">CASE 20 · 最终案件报告</div><h1>把错误按证据强度分开</h1><p class="lead">事故、程序违规和记录篡改不是同一件事。先给每个人的行为定性，再看证据能支持到哪一步。</p><div class="case-report-grid">${actors.map(([actorId, actor]) => `<article class="case-report-card"><b>${esc(actor.name)}</b><p>${esc(actor.detail)}</p><label>你的定性<select data-report-actor="${esc(actorId)}"><option value="">请选择</option>${categories.map(category => `<option value="${esc(category.id)}" ${state.answers[actorId] === category.id ? 'selected' : ''}>${esc(category.label)}</option>`).join('')}</select></label></article>`).join('')}</div><div id="caseReportFeedback" class="note">结论必须覆盖三个人，且不能把“结果严重”直接等同于“记录造假”。</div><div class="btn-row"><button id="submitCaseReport" class="btn primary">提交最终报告</button><button id="caseReportExit" class="link-btn">暂时退出</button></div></section>`, 'study');
+    document.querySelectorAll('[data-report-actor]').forEach(select => select.addEventListener('change', () => {
+      state.answers[select.dataset.reportActor] = select.value;
+      Store.save(false);
+    }));
+    $('#caseReportExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+    $('#submitCaseReport').onclick = () => {
+      const missing = actors.filter(([actorId]) => !state.answers[actorId]);
+      const wrong = actors.filter(([actorId, actor]) => state.answers[actorId] && state.answers[actorId] !== actor.correct);
+      const feedback = $('#caseReportFeedback');
+      if (missing.length) {
+        feedback.className = 'error';
+        feedback.textContent = `还没有完成：${missing.map(([,actor]) => actor.name).join('、')}。`;
+        return;
+      }
+      if (wrong.length) {
+        feedback.className = 'error';
+        feedback.textContent = `还有 ${wrong.length} 处定性没有和证据强度对齐。再区分“操作事故 / 越程序保存证据 / 主动删除真实记录”。`;
+        return;
+      }
+      NS.Learning.ensureV16RootState(Store.state).story.finalReport = { answers:{...state.answers}, completedAt:Date.now() };
+      Store.save();
+      advanceDirectorStep(day, step.id);
+    };
+  }
+
+  function day20PoolForSkill(data, skillId) {
+    const pools = data?.adaptivePools || {};
+    if (Array.isArray(pools[skillId]) && pools[skillId].length) return pools[skillId];
+    const family = String(skillId || '').split('.')[0];
+    return Object.entries(pools).find(([key, rows]) => key.split('.')[0] === family && Array.isArray(rows) && rows.length)?.[1] || [];
+  }
+
+  function ensureDay20AdaptiveRuntime() {
+    const data = REGISTRY[20];
+    const v16 = NS.Learning.ensureV16DayState(Store.state, 20);
+    v16.adaptiveRuntime = v16.adaptiveRuntime && typeof v16.adaptiveRuntime === 'object' ? v16.adaptiveRuntime : null;
+    if (v16.adaptiveRuntime?.groups?.length) return v16.adaptiveRuntime;
+    const plan = Store.state.day20Plan && Array.isArray(Store.state.day20Plan.skills)
+      ? Store.state.day20Plan
+      : NS.Learning.buildDay20Plan(Store.state, data);
+    Store.state.day20Plan = plan;
+    const groups = (plan.skills || []).map(skillId => {
+      const pool = day20PoolForSkill(data, skillId);
+      const repairIds = pool.slice(0, Math.min(2, pool.length)).map(question => question.id);
+      const bossId = pool.length >= 3 ? pool[2].id : (pool.at(-1)?.id || null);
+      return { skillId, repairIds, bossId };
+    }).filter(group => group.repairIds.length || group.bossId);
+    v16.adaptiveRuntime = { groups, createdAt:Date.now() };
+    Store.save(false);
+    return v16.adaptiveRuntime;
+  }
+
+  function renderDay20RepairPresentation(day, step, state, group) {
+    const skillId = group.skillId;
+    const presentation = NS.V16RepairPresentation?.getRepairPresentation(skillId) || 'standard';
+    const skillLabel = SKILL_META.get(skillId)?.label || skillId;
+    const descriptions = {
+      electron:'先只盯电子从哪里来、到哪里去，再回题目。不要背整段机理。',
+      'decision-map':'先把底物、试剂强弱、溶剂/温度放回决策图，再选路径。',
+      'evidence-board':'把每一条谱图/检验证据当成一把锁：它能排除谁，而不是“像不像答案”。',
+      'route-board':'先做碳数账本和最后一步，再看路线兼容性。',
+      standard:'先回到这个技能最短的判断依据，再用新结构验证。'
+    };
+    if (presentation === '3d') {
+      const ref = NS.V16RepairPresentation?.get3DRef(skillId);
+      if (ref && NS.Chem3D?.getLesson?.(ref)) {
+        shell(`<section class="panel chem3d-shell"><div class="kicker">DAY 20 · Top3 修复</div><h1>${esc(skillLabel)}</h1><p class="lead">这一处卡点来自空间关系，先拿起来看，再做新结构。</p><div id="chem3dRoot"></div><div class="footer-actions"><button class="link-btn" id="repair3dExit">暂时退出</button></div></section>`, 'study');
+        $('#repair3dExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+        return NS.Chem3D.mount($('#chem3dRoot'), ref, {
+          state:Store.state, mode:'required',
+          onProgress(){ Store.save(false); },
+          onComplete(){ state.introDone[skillId] = true; Store.save(); dayPage(day); },
+          onSkip(){ state.introDone[skillId] = true; Store.save(); dayPage(day); },
+          onExit(){ Store.save(); location.hash = '#welcome'; }
+        });
+      }
+    }
+    shell(`<section class="panel"><div class="kicker">DAY 20 · Top3 修复</div><h1>${esc(skillLabel)}</h1><p class="lead">${esc(descriptions[presentation] || descriptions.standard)}</p><div class="repair-presentation-tag">修复工具：${esc(presentation)}</div><div class="btn-row"><button id="startRepairSkill" class="btn primary">用新结构验证</button><button id="repairExit" class="link-btn">暂时退出</button></div></section>`, 'study');
+    $('#repairExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+    $('#startRepairSkill').onclick = () => { state.introDone[skillId] = true; Store.save(); dayPage(day); };
+  }
+
+  function directorAdaptiveRepairTask(day, step) {
+    const runtime = ensureDay20AdaptiveRuntime();
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    v16.stepState = v16.stepState && typeof v16.stepState === 'object' ? v16.stepState : {};
+    const state = v16.stepState[step.id] && typeof v16.stepState[step.id] === 'object'
+      ? v16.stepState[step.id]
+      : { groupIndex:0, questionIndex:0, introDone:{} };
+    state.introDone = state.introDone && typeof state.introDone === 'object' ? state.introDone : {};
+    v16.stepState[step.id] = state;
+    const group = runtime.groups[Math.max(0, Number(state.groupIndex) || 0)];
+    if (!group) return advanceDirectorStep(day, step.id);
+    if (!state.introDone[group.skillId]) return renderDay20RepairPresentation(day, step, state, group);
+    const questionId = group.repairIds[Math.max(0, Number(state.questionIndex) || 0)];
+    if (!questionId) {
+      state.groupIndex += 1;
+      state.questionIndex = 0;
+      Store.save();
+      return dayPage(day);
+    }
+    const question = QMAP.get(questionId);
+    if (!question) {
+      state.questionIndex += 1;
+      Store.save();
+      return dayPage(day);
+    }
+    const presentation = NS.V16RepairPresentation?.getRepairPresentation(group.skillId) || 'standard';
+    return studyQuestionPage(question, {
+      mode:'repair', day:20, isTransfer:false,
+      positionLabel:`Top3 修复 · ${SKILL_META.get(group.skillId)?.label || group.skillId} · ${presentation}`,
+      onPrev:() => { state.introDone[group.skillId] = false; Store.save(); dayPage(day); },
+      onNext(){ state.questionIndex += 1; Store.save(); dayPage(day); },
+      onSubmitted(){ Store.save(); }
+    });
+  }
+
+  function directorFinalBossTask(day, step) {
+    const runtime = ensureDay20AdaptiveRuntime();
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    v16.stepState = v16.stepState && typeof v16.stepState === 'object' ? v16.stepState : {};
+    const state = v16.stepState[step.id] && typeof v16.stepState[step.id] === 'object' ? v16.stepState[step.id] : { index:0 };
+    v16.stepState[step.id] = state;
+    const bossIds = runtime.groups.map(group => group.bossId).filter(Boolean);
+    const questionId = bossIds[Math.max(0, Number(state.index) || 0)];
+    if (!questionId) return advanceDirectorStep(day, step.id);
+    const question = QMAP.get(questionId);
+    if (!question) { state.index += 1; Store.save(); return dayPage(day); }
+    return studyQuestionPage(question, {
+      mode:'boss', day:20, isTransfer:true,
+      positionLabel:`修复后独立验证 · ${Number(state.index) + 1}/${bossIds.length}`,
+      onPrev:() => { state.index = Math.max(0, Number(state.index) - 1); Store.save(); dayPage(day); },
+      onNext(){ state.index += 1; Store.save(); if (state.index >= bossIds.length) advanceDirectorStep(day, step.id); else dayPage(day); },
+      onSubmitted(){ Store.save(); }
+    });
+  }
+
+  function directorCoreExamTask(day, step) {
+    const config = NS.V16_EXAM?.day19Core;
+    if (!config || step.ref !== config.id) return directorFallbackCard(day, step, `找不到核心审核配置：${step.ref}`);
+    const v16 = NS.Learning.ensureV16DayState(Store.state, day);
+    v16.stepState = v16.stepState && typeof v16.stepState === 'object' ? v16.stepState : {};
+    const draft = v16.stepState[step.id] && typeof v16.stepState[step.id] === 'object'
+      ? v16.stepState[step.id]
+      : { index:0, responses:[], startedAt:Date.now() };
+    v16.stepState[step.id] = draft;
+    const ids = config.itemIds || [];
+    const questionId = ids[Math.max(0, Number(draft.index) || 0)];
+    if (!questionId) return completeCoreExam(day, step, draft);
+    const question = QMAP.get(questionId);
+    if (!question) return directorFallbackCard(day, step, `核心审核找不到题目：${questionId}`);
+
+    const started = performance.now();
+    shell(`<section class="panel question-shell exam-shell"><div class="question-head"><div class="step-label">DAY 19 · 综合能力审核 · ${Number(draft.index) + 1}/${ids.length}</div><span class="role-chip">封闭卷宗</span></div><div class="exam-warning">正式审核模式：无提示、无即时解析、无漫画、无3D。整组完成后统一看能力域结果。</div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="coreExamExit">← 暂存退出</button><span class="tiny">答案提交后锁定；置信度只作为诊断证据，不影响得分。</span></div></section>`, 'study');
+    $('#coreExamExit').onclick = () => { Store.save(); location.hash = '#welcome'; };
+    const previous = Store.state.attempts.filter(row => row.questionId === question.id && row.mode === 'v16-core-exam').length;
+    NS.Interactions.mount($('#interactionRoot'), question, {
+      examMode:true,
+      onSubmit(submission, feedback) {
+        const responseTimeMs = Math.max(0, Math.round(performance.now() - started));
+        NS.Learning.recordAttempt(Store.state, question, {
+          day:19, mode:'v16-core-exam', correct:submission.correct, firstAttempt:previous === 0, attemptNumber:previous + 1,
+          hintsUsed:0, confidence:submission.confidence, responseTimeMs, isTransfer:true,
+          answerPayload:submission.payload, partialScore:submission.partialScore, errorType:submission.errorType, reasoningState:submission.reasoningState
+        });
+        if (!draft.responses.some(row => row.questionId === question.id)) {
+          draft.responses.push({
+            questionId:question.id, correct:submission.correct, partialScore:Number(submission.partialScore || 0),
+            confidence:submission.confidence, points:Number(question.points || 0), responseTimeMs
+          });
+        }
+        draft.index += 1;
+        Store.save();
+        feedback.insertAdjacentHTML('beforeend', `<div class="btn-row"><button id="nextCoreExam" class="btn primary">${draft.index >= ids.length ? '提交核心审核' : '下一题'}</button></div>`);
+        feedback.querySelector('#nextCoreExam').onclick = () => {
+          if (draft.index >= ids.length) completeCoreExam(day, step, draft);
+          else dayPage(day);
+        };
+      }
+    });
+  }
+
+  function completeCoreExam(day, step, draft) {
+    const config = NS.V16_EXAM?.day19Core;
+    if (!config) return directorFallbackCard(day, step, '核心审核配置缺失');
+    const rows = Array.isArray(draft.responses) ? draft.responses : [];
+    const itemMeta = new Map((config.items || []).map(item => [item.id, item]));
+    const rawTotal = rows.reduce((sum, row) => sum + Number(row.points || QMAP.get(row.questionId)?.points || 0), 0);
+    const rawEarned = rows.reduce((sum, row) => sum + Number(row.points || QMAP.get(row.questionId)?.points || 0) * Number(row.partialScore || 0), 0);
+    const domains = {};
+    rows.forEach(row => {
+      const pts = Number(row.points || QMAP.get(row.questionId)?.points || 0);
+      const earned = pts * Number(row.partialScore || 0);
+      const coverage = itemMeta.get(row.questionId)?.coverage || [];
+      coverage.forEach(domain => {
+        const bucket = domains[domain] ||= { earned:0, total:0 };
+        bucket.earned += earned;
+        bucket.total += pts;
+      });
+    });
+    const percent = rawTotal ? Math.round(rawEarned / rawTotal * 100) : 0;
+    const highConfidenceWrong = rows.filter(row => !row.correct && row.confidence === 'sure').map(row => row.questionId);
+    const topWeakSkills = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
+    Store.state.examResults.v16Day19Core = {
+      mode:'core', completedAt:Date.now(), percent, rawEarned, rawTotal, domains,
+      highConfidenceWrong, topWeakSkills, responseCount:rows.length
+    };
+    Store.save();
+    advanceDirectorStep(day, step.id);
+  }
+
+  function coreExamResultsPage() {
+    const result = Store.state.examResults?.v16Day19Core;
+    if (!result) return homePage();
+    const order = NS.V16_EXAM?.day19Core?.requiredDomains || Object.keys(result.domains || {});
+    const domainRows = order.map(domain => {
+      const row = result.domains?.[domain] || { earned:0, total:0 };
+      return { domain, percent:row.total ? Math.round(row.earned / row.total * 100) : 0 };
+    });
+    const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">DAY 19 · 综合能力审核</div><h1>${Number(result.percent || 0)}%</h1><p class="lead">这是20天主线的核心诊断，不伪装成150分正式卷。它只负责找出 Day20 最该修的能力。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label,index) => `<div class="skill-row"><span>${index + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：Day20 会提高对应修复优先级。</div>` : '<div class="good">没有高置信错误；Top3仍按真实 mastery 与迁移证据生成。</div>'}<div class="note">如果你现在想做完整150分模拟，可以单独进入“考前正式模拟”。它不会覆盖这次核心审核结果。</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="openFull150">考前正式模拟 · 150分</button><button class="btn ghost" id="home">回首页</button></div></section>`, 'study');
+    $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#openFull150').onclick = () => { location.hash = '#full-exam/19'; };
+    $('#home').onclick = () => { location.hash = '#home'; };
+  }
+
+  function full150ExamPage() {
+    const config = NS.V16_EXAM?.full150;
+    if (!config) return homePage();
+    if (Store.state.examResults?.full150 && !Store.state.examResults?.full150Draft) return full150ResultsPage();
+    const draft = Store.state.examResults.full150Draft ||= { index:0, responses:[], startedAt:Date.now() };
+    const questionId = config.itemIds[Math.max(0, Number(draft.index) || 0)];
+    if (!questionId) return completeFull150Exam(draft);
+    const question = QMAP.get(questionId);
+    if (!question) { draft.index += 1; Store.save(); return full150ExamPage(); }
+    const started = performance.now();
+    shell(`<section class="panel question-shell exam-shell"><div class="question-head"><div class="step-label">考前正式模拟 · ${Number(draft.index) + 1}/${config.itemIds.length}</div><span class="role-chip">${Number(question.points || 0)} 分</span></div><div class="exam-warning">完整150分模拟：无提示、提交锁定、整卷结束统一看分。它独立于20天主线。</div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="fullExamExit">← 暂存退出</button><span class="tiny">退出后保留整卷位置，不改变 Day19 核心审核。</span></div></section>`, 'study');
+    $('#fullExamExit').onclick = () => { Store.save(); location.hash = '#home'; };
+    const previous = Store.state.attempts.filter(row => row.questionId === question.id && row.mode === 'full150-exam').length;
+    NS.Interactions.mount($('#interactionRoot'), question, {
+      examMode:true,
+      onSubmit(submission, feedback) {
+        const responseTimeMs = Math.max(0, Math.round(performance.now() - started));
+        NS.Learning.recordAttempt(Store.state, question, {
+          day:19, mode:'full150-exam', correct:submission.correct, firstAttempt:previous === 0, attemptNumber:previous + 1,
+          hintsUsed:0, confidence:submission.confidence, responseTimeMs, isTransfer:true,
+          answerPayload:submission.payload, partialScore:submission.partialScore, errorType:submission.errorType, reasoningState:submission.reasoningState
+        });
+        if (!draft.responses.some(row => row.questionId === question.id)) {
+          draft.responses.push({ questionId:question.id, partialScore:Number(submission.partialScore || 0), confidence:submission.confidence, points:Number(question.points || 0), correct:submission.correct, responseTimeMs });
+        }
+        draft.index += 1;
+        Store.save();
+        feedback.insertAdjacentHTML('beforeend', `<div class="btn-row"><button id="nextFullExam" class="btn primary">${draft.index >= config.itemIds.length ? '交卷' : '下一题'}</button></div>`);
+        feedback.querySelector('#nextFullExam').onclick = () => full150ExamPage();
+      }
+    });
+  }
+
+  function completeFull150Exam(draft) {
+    const config = NS.V16_EXAM?.full150;
+    const responses = Array.isArray(draft.responses) ? draft.responses : [];
+    const total = Number(config?.points || 150) || 150;
+    const earned = responses.reduce((sum,row) => sum + Number(row.points || 0) * Number(row.partialScore || 0), 0);
+    Store.state.examResults.full150 = {
+      completedAt:Date.now(), score150:Math.round(earned / total * 150), rawEarned:earned, rawTotal:total,
+      responseCount:responses.length
+    };
+    delete Store.state.examResults.full150Draft;
+    Store.save();
+    full150ResultsPage();
+  }
+
+  function full150ResultsPage() {
+    const result = Store.state.examResults?.full150;
+    if (!result) return full150ExamPage();
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">考前正式模拟 · 完整150分卷</div><h1>${Number(result.score150 || 0)} / 150</h1><p class="lead">这是原 Day19 的完整24题正式训练卷，150分语义保持不变；它与20天主线的核心审核分开记录。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="fullExamHome">回首页</button><button class="btn ghost" id="fullExamRestart">重新做整卷</button></div></section>`, 'study');
+    $('#fullExamHome').onclick = () => { location.hash = '#home'; };
+    $('#fullExamRestart').onclick = () => {
+      delete Store.state.examResults.full150;
+      delete Store.state.examResults.full150Draft;
+      Store.save();
+      full150ExamPage();
+    };
   }
 
   function examQuestionPage(question, progress) {
@@ -773,18 +1387,29 @@
 
   function finalSummaryPage() {
     const score = NS.Learning.estimateScore(Store.state, SKILLS);
-    const boss = Store.state.examResults?.[19];
+    const coreAudit = Store.state.examResults?.v16Day19Core;
+    const fullBoss = Store.state.examResults?.full150 || Store.state.examResults?.[19];
     const weak = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 5);
     const stable = Object.values(Store.state.skills || {}).filter(skill => NS.Learning.masteryBand(skill, NS.Learning.getEffectiveMastery(skill)) === '稳定').length;
-    const day20Attempts = (Store.state.attempts || []).filter(a => a.day === 20);
+    const day20Attempts = (Store.state.attempts || []).filter(a => a.day === 20 && a.isTransfer);
     const independent = day20Attempts.filter(a => a.correct && a.hintsUsed === 0 && a.firstAttempt);
     const transferRate = day20Attempts.length ? Math.round(independent.length / day20Attempts.length * 100) : 0;
-    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。真正接近 120/150 目标线，需要未见题与换结构迁移都保持在较高水平。</p><div class="score-box"><div><span class="tiny">Day19 Boss</span><strong>${boss ? boss.score150 : '—'} / 150</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${boss && boss.score150 >= 120 && transferRate >= 75 ? 'good' : 'note'}">${boss && boss.score150 >= 120 && transferRate >= 75 ? '当前训练证据已经接近 120/150 目标线：继续按复习队列保持。' : '当前还不建议把“学完20天”直接等同于120分。按复习队列继续补低 mastery 和高置信错误，直到未见题与迁移都更稳。'}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button><button class="btn ghost" id="review">继续到期复习</button></div></section>`);
+    const targetEvidenceReady = Boolean(fullBoss && Number(fullBoss.score150 || 0) >= 120 && transferRate >= 75);
+    const targetMessage = targetEvidenceReady
+      ? '完整150分卷与Day20换结构迁移都达到目标线附近：继续按复习队列保持，而不是停止复习。'
+      : fullBoss
+        ? '已经有完整150分卷证据，但目前还不能把“学完20天”直接等同于120分。继续修低 mastery 和迁移薄弱处。'
+        : '20天核心审核已经完成，但还没有完整150分卷证据；在做完“考前正式模拟”前，不给出120分达成判断。';
+    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。Day19核心审核负责诊断；只有完整150分卷才用于判断是否接近120分目标线。</p><div class="score-box"><div><span class="tiny">Day19 核心审核</span><strong>${coreAudit ? `${Number(coreAudit.percent || 0)}%` : '未完成'}</strong></div><div><span class="tiny">完整150分模拟</span><strong>${fullBoss ? `${Number(fullBoss.score150 || 0)} / 150` : '未做'}</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${targetEvidenceReady ? 'good' : 'note'}">${targetMessage}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button>${!fullBoss ? '<button class="btn soft" id="fullExam">考前正式模拟 · 150分</button>' : ''}<button class="btn ghost" id="review">继续到期复习</button></div></section>`);
     $('#home').onclick = () => { location.hash = '#abilities'; };
+    $('#fullExam')?.addEventListener('click', () => { location.hash = '#full-exam/19'; });
     $('#review').onclick = () => { location.hash = '#review'; };
   }
 
   function questionAidLevel(question) {
+    const recentWrong = [...(Store.state.attempts || [])].reverse().find(row => row.questionId === question.id && !row.correct);
+    if (recentWrong?.confidence === 'sure') return 'full';
+    if (recentWrong) return 'full';
     const skill = Store.state.skills?.[question.primarySkill];
     if (!skill?.attempts) return 'full';
     const effective = NS.Learning.getEffectiveMastery(skill);
@@ -822,241 +1447,21 @@
     return `<section class="exam-bridge"><div class="exam-bridge-kicker">真题连接 · 为什么现在学这一页</div><b>${esc(bridge.title || '这一步会在真题里换一种外壳出现')}</b>${bridge.anchor ? `<p>${esc(bridge.anchor)}</p>` : ''}${formats.length ? `<div class="exam-format-chips">${formats.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}${bridge.goal ? `<small><strong>学完要能做到：</strong>${esc(bridge.goal)}</small>` : ''}</section>`;
   }
 
-  function threeDStage(lesson) {
-    const skill = Store.state.skills?.[lesson.skillId];
-    if (!skill?.attempts) return 0;
-    const mastery = NS.Learning.getEffectiveMastery(skill);
-    if (mastery < 40) return 0;
-    if (mastery < 55) return 1;
-    if (mastery < 65) return 2;
-    if (mastery < 80 || !skill.crossDayVerified) return 3;
-    return 4;
-  }
-
-  function renderThreeDCardById(id, day, compact = false) {
-    const lesson = Data.THREE_D_LESSONS?.[id];
-    if (!lesson) return '';
-    const stage = threeDStage(lesson);
-    const stageLabel = [
-      '完整空间扶手',
-      '减少文字，自己旋转',
-      '静态空间判断',
-      '二维撤扶手',
-      '真题二维模式'
-    ][stage];
-    const showIntro = stage <= 1;
-    const showModel = stage <= 2;
-    const stepRows = Array.isArray(lesson.steps) ? lesson.steps : [];
-    const controls = Array.isArray(lesson.controls) ? lesson.controls : [];
-    const practices = Array.isArray(lesson.practices) ? lesson.practices : [];
-    return `<section class="chem3d-card stage-${stage} ${compact ? 'compact-repair' : ''}" data-chem3d-id="${esc(id)}" data-chem3d-day="${day}" data-chem3d-stage-level="${stage}">
-      <header class="chem3d-head"><div><span>空间桥 · ${esc(stageLabel)}</span><h2>${esc(lesson.title)}</h2></div><span class="chem3d-badge">3D → 2D → 真题</span></header>
-      ${showIntro ? `<div class="chem3d-intro"><div><b>先用生活空间想：</b><p>${esc(lesson.lifeIntuition)}</p></div><div><b>二维少了什么：</b><p>${esc(lesson.gap2D)}</p></div></div>` : '<p class="chem3d-lean-copy">你已经见过完整解释。这次先自己判断；卡住时仍可切回二维分解。</p>'}
-      <div class="chem3d-model-wrap" ${showModel ? '' : 'hidden'}>
-        <div class="chem3d-stage" data-chem3d-mount aria-label="${esc(lesson.title)}"></div>
-        <div class="chem3d-element-legend" aria-label="原子颜色图例"><span><i class="atom-c"></i>C 碳</span><span><i class="atom-h"></i>H 氢</span><span><i class="atom-o"></i>O 氧</span><span><i class="atom-n"></i>N 氮</span><span><i class="atom-br"></i>Br 溴</span><span><i class="atom-cl"></i>Cl 氯</span></div>
-        <small class="chem3d-geometry-note">教学几何示意，重点用于理解相对空间关系；拖动模型可改变观察方向。</small>
-      </div>
-      <div class="chem3d-fallback ${showModel ? 'is-hidden' : ''}" data-chem3d-fallback>
-        <div class="chem3d-fallback-note"><b>${stage >= 3 ? '现在先用考试会给你的二维表示' : '二维分解 / 3D 不可用时仍可继续'}</b><span>先把前后、反向或投影关系压回纸面。</span></div>
-        <div class="chem3d-fallback-svg">${lesson.fallbackSvg}</div>
-      </div>
-      <div class="chem3d-controls" aria-label="三维模型控制">
-        ${stage >= 3 ? '<button type="button" data-chem3d-action="reveal3d">想转一下看看</button>' : ''}
-        ${stage <= 1 ? '<button type="button" data-chem3d-action="reset">回到标准视角</button>' : ''}
-        ${stage <= 1 ? '<button type="button" data-chem3d-action="toggle-labels">隐藏 / 显示标签</button>' : ''}
-        <button type="button" data-chem3d-action="project-2d">投影成二维</button>
-        ${stage === 2 ? '' : controls.map(row => `<button type="button" data-chem3d-action="${esc(row.action)}">${esc(row.label)}</button>`).join('')}
-      </div>
-      <div class="chem3d-stepper" data-chem3d-stepper>
-        <div><span data-chem3d-step-count></span><p data-chem3d-step-text></p></div>
-        <div class="chem3d-step-actions"><button type="button" data-chem3d-prev>上一步</button><button type="button" data-chem3d-next>看下一步</button></div>
-      </div>
-      <div class="chem3d-insight"><b>把这一条线接起来：</b><p>${esc(lesson.insight)}</p></div>
-      <section class="chem3d-practice"><header><span>马上撤掉一部分扶手</span><b>先做相似判断，再回到二维题</b></header>${practices.map((q, qIndex) => `<article class="chem3d-question" data-chem3d-question="${esc(q.id)}"><b>${qIndex + 1}. ${esc(q.prompt)}</b><div>${q.options.map((option, index) => `<button type="button" data-chem3d-answer="${index}">${esc(option)}</button>`).join('')}</div><p data-chem3d-feedback hidden></p></article>`).join('')}</section>
-      <div class="chem3d-exam-bridge"><b>真题出口</b><p>${esc(lesson.examBridge)}</p></div>
-    </section>`;
-  }
-
-  function renderLessonThreeD(item, day) {
-    return item.threeDId ? renderThreeDCardById(item.threeDId, day) : '';
-  }
-
-  function bindThreeDCard(day, item, updateOuterGate = () => {}) {
-    const id = item.threeDId;
-    const lesson = Data.THREE_D_LESSONS?.[id];
-    const card = id ? document.querySelector(`[data-chem3d-id="${id}"]`) : null;
-    if (!lesson || !card) return;
-    Store.state.threeDProgress ||= {};
-    const record = Store.state.threeDProgress[id] ||= { step: 0, completed: false, questions: {}, interactions: {} };
-    record.questions = record.questions && typeof record.questions === 'object' ? record.questions : {};
-    record.interactions = record.interactions && typeof record.interactions === 'object' ? record.interactions : {};
-    const steps = Array.isArray(lesson.steps) ? lesson.steps : [];
-    const practices = Array.isArray(lesson.practices) ? lesson.practices : [];
-    const stageLevel = Number(card.dataset.chem3dStageLevel || 0);
-    const mountPoint = card.querySelector('[data-chem3d-mount]');
-    const modelWrap = card.querySelector('.chem3d-model-wrap');
-    const fallbackBox = card.querySelector('[data-chem3d-fallback]');
-    const stepText = card.querySelector('[data-chem3d-step-text]');
-    const stepCount = card.querySelector('[data-chem3d-step-count]');
-    const prev = card.querySelector('[data-chem3d-prev]');
-    const next = card.querySelector('[data-chem3d-next]');
-    let instance = null;
-    let waitingForEngine = false;
-
-    const save = () => {
-      Store.save(false);
-      Cloud.schedule();
-      updateOuterGate();
-    };
-    const markInteraction = name => {
-      if (!record.interactions[name]) {
-        record.interactions[name] = true;
-        save();
-      }
-    };
-    const updateCompletion = () => {
-      const allAnswered = practices.every(q => Number.isInteger(record.questions?.[q.id]?.selected));
-      const reachedEnd = !steps.length || Number(record.step || 0) >= steps.length - 1;
-      record.completed = Boolean(allAnswered && reachedEnd);
-      card.classList.toggle('complete', record.completed);
-      updateOuterGate();
-    };
-    const mountModel = () => {
-      if (instance || !mountPoint) return instance;
-      if (!NS.Chem3D?.mount) {
-        mountPoint.innerHTML = '<div class="chem3d-unavailable"><b>3D 暂时不可用</b><p>继续看下面的二维分解，不影响学习。</p></div>';
-        fallbackBox?.classList.remove('is-hidden');
-        if (!waitingForEngine) {
-          waitingForEngine = true;
-          window.addEventListener('organic637:chem3d-ready', () => {
-            waitingForEngine = false;
-            if (!document.contains(card)) return;
-            const ready = mountModel();
-            if (ready) fallbackBox?.classList.add('is-hidden');
-          }, { once: true });
-        }
-        return null;
-      }
-      instance = NS.Chem3D.mount(mountPoint, Data.THREE_D_PRESETS?.[lesson.preset], {
-        interactive: stageLevel !== 2,
-        showLabels: stageLevel <= 1,
-        reducedMotion: Store.state.settings?.reducedMotion,
-        ariaLabel: lesson.title,
-        onAction(action) { markInteraction(action); },
-        onMetric(metric) {
-          record.interactions[metric.type] = metric;
-          save();
-        }
-      });
-      instance?.animateStep?.(Number(record.step || 0));
-      return instance;
-    };
-    const drawStep = () => {
-      record.step = Math.max(0, Math.min(Math.max(0, steps.length - 1), Number(record.step || 0)));
-      if (stepText) stepText.textContent = steps[record.step] || '';
-      if (stepCount) stepCount.textContent = `${record.step + 1} / ${Math.max(1, steps.length)}`;
-      if (prev) prev.disabled = record.step <= 0;
-      if (next) {
-        next.disabled = record.step >= steps.length - 1;
-        next.textContent = record.step >= steps.length - 1 ? '空间桥走完了 ✓' : '看下一步';
-      }
-      if (stageLevel !== 2) instance?.animateStep?.(record.step);
-      updateCompletion();
-    };
-
-    prev?.addEventListener('click', () => {
-      if (record.step <= 0) return;
-      record.step -= 1;
-      drawStep();
-      save();
-    });
-    next?.addEventListener('click', () => {
-      if (record.step >= steps.length - 1) return;
-      record.step += 1;
-      drawStep();
-      save();
-    });
-
-    practices.forEach(question => {
-      const box = card.querySelector(`[data-chem3d-question="${question.id}"]`);
-      if (!box) return;
-      const feedback = box.querySelector('[data-chem3d-feedback]');
-      const paint = selected => {
-        box.querySelectorAll('[data-chem3d-answer]').forEach(button => {
-          const index = Number(button.dataset.chem3dAnswer);
-          button.classList.toggle('selected', index === selected);
-          button.classList.toggle('correct', index === question.answer && selected !== null);
-          button.classList.toggle('wrong', index === selected && index !== question.answer);
-        });
-        if (Number.isInteger(selected) && feedback) {
-          const correct = selected === question.answer;
-          feedback.hidden = false;
-          feedback.className = correct ? 'good' : 'error';
-          feedback.textContent = `${correct ? '对，这一步通了。' : '先把断点找出来。'} ${question.feedback}`;
-        }
-      };
-      const saved = record.questions[question.id];
-      if (saved && Number.isInteger(saved.selected)) paint(saved.selected);
-      box.querySelectorAll('[data-chem3d-answer]').forEach(button => button.addEventListener('click', () => {
-        const selected = Number(button.dataset.chem3dAnswer);
-        record.questions[question.id] = { selected, correct: selected === question.answer, at: Date.now() };
-        paint(selected);
-        updateCompletion();
-        save();
-      }));
-    });
-
-    card.querySelectorAll('[data-chem3d-action]').forEach(button => button.addEventListener('click', () => {
-      const action = button.dataset.chem3dAction;
-      if (action === 'reveal3d') {
-        modelWrap.hidden = !modelWrap.hidden;
-        if (!modelWrap.hidden) {
-          mountModel();
-          button.textContent = '先收起 3D';
-        } else button.textContent = '想转一下看看';
-        markInteraction('reveal3d');
-        return;
-      }
-      if (action === 'project-2d') {
-        fallbackBox?.classList.toggle('is-hidden');
-        instance?.projectTo2D?.();
-        markInteraction('project2d');
-        return;
-      }
-      const api = instance || mountModel();
-      if (!api) return;
-      if (action === 'reset') api.reset();
-      if (action === 'toggle-labels') button.textContent = api.toggleLabels() ? '隐藏标签' : '显示标签';
-      if (action === 'right-view') api.setView('right');
-      if (action === 'priority-away') api.setView('priorityAway');
-      if (action === 'half-turn') api.setView('halfTurn');
-      if (action === 'wrong-attack') api.wrongAttack();
-      if (action === 'dihedral-minus') api.adjustDihedral(-60);
-      if (action === 'dihedral-plus') api.adjustDihedral(60);
-      if (action === 'try-e2') api.tryE2();
-      if (action === 'bond-view') api.setView('bond');
-      if (action === 'newman-rotate') api.rotateNewman(60);
-      if (action === 'ring-flip') api.ringFlip();
-      if (action === 'methyl-equatorial') api.methylEquatorial();
-      if (action === 'endo' || action === 'exo') api.setVariant(action);
-      markInteraction(action);
-    }));
-
-    if (stageLevel <= 2) mountModel();
-    drawStep();
-    updateCompletion();
-  }
-
   function renderQuestionExamBridge(question) {
     const bridge = question.examBridge;
     if (!bridge) return '';
     return `<section class="question-exam-bridge"><div><span>${esc(bridge.label || '真题能力训练')}</span><b>${esc(bridge.format || '真题同型')}</b></div><p>${esc(bridge.ask || '')}</p>${bridge.dayNote ? `<small>${esc(bridge.dayNote)}</small>` : ''}</section>`;
   }
 
-  function renderFirstUseTerms(item) {
+  function renderFirstUseTerms(item, context = {}) {
     const cards = Array.isArray(item.termCards) ? item.termCards : [];
     if (!cards.length) return '';
+    if (context.v16) {
+      return `<details class="first-use-terms v16-first-use"><summary>第一次出现 · 点我看看（${cards.map(card => esc(card.term)).join(' / ')}）</summary><div class="term-card-grid compact">${cards.map(card => {
+        const visual = card.diagram && NS.Visuals?.render ? NS.Visuals.render(card.diagram) : '';
+        return `<article class="term-card first-use-term-details"><h3>${esc(card.term)}</h3><p><b>人话：</b>${esc(card.plain || '')}</p><p><b>为什么现在要懂：</b>${esc(card.why || '')}</p>${visual ? `<div class="mini-term-visual">${visual}</div>` : ''}${card.limit ? `<small><b>边界：</b>${esc(card.limit)}</small>` : ''}</article>`;
+      }).join('')}</div></details>`;
+    }
     return `<section class="first-use-terms"><div class="first-use-head"><span>第一次见到这些词</span><b>先把词翻译成人话，再读下面正文</b><small>这里没有“默认你会”。每个词都回答：它是什么、为什么有用、哪里不能乱套。</small></div><div class="term-card-grid">${cards.map((card, index) => {
       const visual = card.diagram && NS.Visuals?.render ? NS.Visuals.render(card.diagram) : '';
       return `<article class="term-card ${index < 2 ? 'important' : ''}"><div class="term-title"><span>${index + 1}</span><h3>${esc(card.term)}</h3></div><div class="term-explain"><p><b>先说人话：</b>${esc(card.plain || '')}</p><p><b>为什么要懂它：</b>${esc(card.why || '')}</p></div>${visual ? `<div class="term-visual"><div class="term-visual-label">把刚才这句话变成一张图</div>${visual}</div>` : ''}${card.limit ? `<p class="term-limit"><b>别把它套过头：</b>${esc(card.limit)}</p>` : ''}</article>`;
@@ -1162,7 +1567,7 @@
     }
   }
 
-  function renderLessonSupport(item) {
+  function renderLessonSupport(item, context = {}) {
     const extra = SCAFFOLDS.lessons?.[item.id] || {};
     const formulas = [...new Set([...(item.formulas || []), ...(extra.equations || [])].filter(Boolean))];
     const concept = extra.concept || item.concept || '';
@@ -1189,10 +1594,12 @@
     const lookHtml = lookQuestions.length ? `<div class="look-say"><b>👀 看图说一句</b><p>先别背名词，试着自己说出下面这些变化：</p><ol>${lookQuestions.map(x => `<li>${esc(x)}</li>`).join('')}</ol><small>不用写长答案。能准确指出“谁变了、哪里变了”就已经在建立做题语言。</small></div>` : '';
     const checkHtml = microCheck ? `<div class="micro-check" data-micro-check="${esc(item.id)}"><div class="micro-check-head"><span>小停顿</span><b>${esc(microCheck.prompt || '')}</b></div><div class="micro-check-options">${(microCheck.options || []).map((option, index) => `<button type="button" data-micro-option="${index}">${esc(option)}</button>`).join('')}</div><div class="micro-check-feedback" data-micro-feedback hidden></div></div>` : '';
     const wonderHtml = wonder ? `<div class="wonder-card"><b>✨ 原来如此</b><p>${esc(wonder)}</p></div>` : '';
-    return `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(concept || '把这一小步先用化学式看清楚')}</b></div>${definition ? `<p>${esc(definition)}</p>` : ''}${analogyHtml}${sequenceHtml}${whyHtml}${visualHtml}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${lookHtml}${checkHtml}${wonderHtml}${watch ? `<div class="support-watch"><b>容易混：</b>${esc(watch)}</div>` : ''}</div>`;
+    const supportBody = `<div class="learning-support lesson-support"><div class="support-head"><span>先学会，再做题</span><b>${esc(concept || '把这一小步先用化学式看清楚')}</b></div>${definition ? `<p>${esc(definition)}</p>` : ''}${analogyHtml}${sequenceHtml}${whyHtml}${visualHtml}${formulas.length ? `<div class="formula-stack">${formulas.map(formula => `<div class="formula-line">${esc(formula)}</div>`).join('')}</div>` : ''}${lookHtml}${checkHtml}${wonderHtml}${watch ? `<div class="support-watch"><b>容易混：</b>${esc(watch)}</div>` : ''}</div>`;
+    if (context.v16) return `<details class="v16-lesson-support"><summary>我还是不太懂 · 展开深层扶手</summary>${supportBody}</details>`;
+    return supportBody;
   }
 
-  function bindLessonExtras(day, item) {
+  function bindLessonExtras(day, item, { requireSupportCompletion = true } = {}) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
     progress.lessonFrames = progress.lessonFrames || {};
     progress.lessonChecks = progress.lessonChecks || {};
@@ -1204,11 +1611,10 @@
     const gate = $('#lessonGate');
 
     const updateGate = () => {
-      const frameDone = !sequence.length || Number(progress.lessonFrames[item.id] || 0) >= sequence.length - 1;
-      const checkDone = !micro || Boolean(progress.lessonChecks[item.id]);
-      const whyDone = !whyChain.length || Number(progress.lessonWhyDepth[item.id] || 0) >= whyChain.length - 1;
-      const threeDDone = !item.threeDId || Boolean(Store.state.threeDProgress?.[item.threeDId]?.completed);
-      const ready = frameDone && checkDone && whyDone && threeDDone;
+      const frameDone = !requireSupportCompletion || !sequence.length || Number(progress.lessonFrames[item.id] || 0) >= sequence.length - 1;
+      const checkDone = !requireSupportCompletion || !micro || Boolean(progress.lessonChecks[item.id]);
+      const whyDone = !requireSupportCompletion || !whyChain.length || Number(progress.lessonWhyDepth[item.id] || 0) >= whyChain.length - 1;
+      const ready = frameDone && checkDone && whyDone;
       if (nextLesson) nextLesson.disabled = !ready;
       if (gate) {
         if (ready) {
@@ -1219,7 +1625,6 @@
           if (!frameDone) missing.push('把“一步一步看”翻到最后一帧');
           if (!checkDone) missing.push('做完这一页的小停顿');
           if (!whyDone) missing.push('把“为什么”追问到最后一层');
-          if (!threeDDone) missing.push('走完空间桥并完成紧跟的二维判断');
           gate.className = 'lesson-gate waiting';
           gate.innerHTML = `<b>先别急着翻页</b><span>${missing.join('，')}。忘了前面的内容，随时可以点“上一步”或“上一页”。</span>`;
         }
@@ -1302,7 +1707,6 @@
         apply(selected);
       }));
     });
-    bindThreeDCard(day, item, updateGate);
     updateGate();
   }
 
@@ -1332,15 +1736,16 @@
     }));
   }
 
-  function lessonPage(day, item) {
+  function lessonPage(day, item, context = {}) {
     const progress = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
-    const prevLabel = progress.lessonIndex > 0 ? '← 上一页' : '← 回欢迎页';
-    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item)}${renderLessonThreeD(item, day)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
+    const prevLabel = context.prevLabel || (progress.lessonIndex > 0 ? '← 上一页' : '← 回欢迎页');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(day)}<div class="content-with-side"><article class="panel lesson-card"><div class="kicker">${esc(item.eyebrow || `Day ${day}`)}</div><h1>${esc(item.title)}</h1>${renderLessonGrounding(item, day)}${renderLessonHeroVisual(item)}${renderFirstUseTerms(item, context)}<div class="lesson-body">${esc(item.body)}</div>${renderLessonSupport(item, context)}${renderLessonExamBridge(item, day)}${item.note ? `<div class="note">${esc(item.note)}</div>` : ''}<div class="lesson-gate" id="lessonGate"></div><div class="footer-actions lesson-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevLesson">${prevLabel}</button><button class="link-btn" id="home">暂时退出</button></div><button class="btn primary" id="nextLesson">我看懂了，去下一页</button></div></article><aside class="quiet-side-image"><img src="${DECOR.study.src}" alt="${esc(DECOR.study.name)}"><p>如果有一句话不懂，就在这一页多停一会儿。能自己讲出“为什么”再继续 ♡</p></aside></div></section>`,'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
-    $('#prevLesson').onclick = () => goPreviousStudyPage(day);
-    bindLessonExtras(day, item);
+    $('#prevLesson').onclick = () => context.onPrev ? context.onPrev() : goPreviousStudyPage(day);
+    bindLessonExtras(day, item, { requireSupportCompletion: context.requireSupportCompletion !== false });
     $('#nextLesson').onclick = () => {
       if ($('#nextLesson').disabled) return;
+      if (context.onNext) return context.onNext(item);
       const current = NS.Learning.ensureDayState(Store.state, day, REGISTRY);
       current.lessonIndex += 1;
       Store.save();
@@ -1352,14 +1757,11 @@
     const started = performance.now();
     const roleName = { learn: '新母概念', practice: '同核心练习', contrast: '近邻对比', transfer: '迁移', repair: '修复', review: '到期复习', boss: '最终 Boss', exam: '考试' }[context.mode] || context.mode;
     const decorKey = context.mode === 'review' ? 'review' : 'boss';
-    const repairThreeDId = Number(context.day || question.day) === 20 && context.mode === 'repair' ? Data.THREE_D_BY_SKILL?.[question.primarySkill] : null;
-    const repairThreeD = repairThreeDId ? `<details class="day20-three-d-repair" open><summary>这个漏洞涉及空间关系：重新打开对应 3D 理解卡</summary>${renderThreeDCardById(repairThreeDId, 20, true)}</details>` : '';
-    shell(`<section class="learning-page-wrap">${renderLearningContext(context.day || question.day)}<div class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionTranslation(question)}${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}${renderQuestionGuidedFrames(question)}${repairThreeD}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></div></section>`, context.mode === 'review' ? 'review' : 'study');
+    shell(`<section class="learning-page-wrap">${renderLearningContext(context.day || question.day)}<div class="content-with-side"><article class="panel question-shell"><div class="question-head"><div class="step-label">${esc(context.positionLabel || `Day ${question.day}`)}</div><span class="role-chip">${esc(roleName)}</span></div>${renderQuestionTranslation(question)}${renderQuestionExamBridge(question)}${renderQuestionPreflight(question)}${renderQuestionTermSupport(question)}${renderQuestionSupport(question)}${renderQuestionGuidedFrames(question)}<div id="interactionRoot"></div><div class="footer-actions question-nav-actions"><div class="nav-left"><button class="btn ghost" id="prevStudy">← 上一页</button><button class="link-btn" id="home">暂时退出</button></div><span class="tiny">忘了上一页可以直接翻回去；回来也会接着当前这题。</span></div></article><aside class="quiet-side-image"><img src="${DECOR[decorKey].src}" alt="${esc(DECOR[decorKey].name)}"><p>${context.mode === 'review' ? '把快忘的捡回来，不用重学一遍。' : '先看结构变化，再做判断。'}</p></aside></div></section>`, context.mode === 'review' ? 'review' : 'study');
     $('#home').onclick = () => { location.hash = '#welcome'; };
-    $('#prevStudy').onclick = () => { if (context.mode === 'review') { const d = context.day || Store.state.currentDay; const p = NS.Learning.ensureDayState(Store.state, d, REGISTRY); if (p.reviewIndex > 0) { p.reviewIndex -= 1; Store.save(); reviewPage(); } else { location.hash = '#welcome'; } } else { goPreviousStudyPage(context.day || question.day); } };
+    $('#prevStudy').onclick = () => { if (context.onPrev) { context.onPrev(); } else if (context.mode === 'review') { const d = context.day || Store.state.currentDay; const p = NS.Learning.ensureDayState(Store.state, d, REGISTRY); if (p.reviewIndex > 0) { p.reviewIndex -= 1; Store.save(); reviewPage(); } else { location.hash = '#welcome'; } } else { goPreviousStudyPage(context.day || question.day); } };
     bindAidReveal(document);
     bindQuestionGuidedFrames(question, context.day || question.day);
-    if (repairThreeDId) bindThreeDCard(20, { threeDId: repairThreeDId });
     const previous = Store.state.attempts.filter(row => row.questionId === question.id).length;
     NS.Interactions.mount($('#interactionRoot'), question, {
       examMode: false,
@@ -1376,7 +1778,7 @@
           responseTimeMs,
           isRepair: context.mode === 'repair',
           isReview: context.mode === 'review',
-          isTransfer: question.role === 'transfer',
+          isTransfer: context.isTransfer === true || question.role === 'transfer',
           answerPayload: submission.payload,
           partialScore: submission.partialScore,
           errorType: submission.errorType,
@@ -1445,6 +1847,7 @@
     Store.state.completedDays.sort((a, b) => a - b);
     if (Store.state.currentDay === day && day < AVAILABLE_MAX_DAY && REGISTRY[day + 1]) Store.state.currentDay = day + 1;
     Store.save();
+    if (day === 19 && Store.state.examResults?.v16Day19Core) return coreExamResultsPage();
     if (day === 20) return finalSummaryPage();
     dayFinishPage(day);
   }
@@ -1712,12 +2115,14 @@
     if (hash === '#review') return reviewPage();
     if (hash === '#mistakes') return mistakesPage();
     if (hash === '#abilities') return abilitiesPage();
+    if (hash === '#case-board') return caseBoardPage();
     if (hash === '#detective') return detectiveHubPage();
     if (hash === '#synthesis') return synthesisHubPage();
     const detectiveMatch = hash.match(/^#detective\/(.+)$/);
     if (detectiveMatch) return detectiveCasePage(decodeURIComponent(detectiveMatch[1]));
     const synthesisMatch = hash.match(/^#synthesis\/(.+)$/);
     if (synthesisMatch) return synthesisCasePage(decodeURIComponent(synthesisMatch[1]));
+    if (hash === '#full-exam/19') return full150ExamPage();
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
     location.hash = '#welcome';
@@ -1740,7 +2145,6 @@
 
   window.addEventListener('hashchange', () => { if (Auth.user) route(); });
   window.addEventListener('pagehide', () => {
-    NS.Chem3D?.dispose?.();
     if (Auth.user) {
       Store.save();
       Cloud.push().catch(() => {});

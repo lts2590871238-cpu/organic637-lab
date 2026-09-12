@@ -1,0 +1,10 @@
+const assert = require('assert');
+const fs = require('fs');
+const source = fs.readFileSync('app.js', 'utf8');
+assert.match(source, /id="openCaseBoard"/, 'overview should expose a case-board action');
+assert.match(source, /location\.hash\s*=\s*'#case-board'/, 'case-board action should use its own route');
+assert.match(source, /if\s*\(hash\s*===\s*'#case-board'\)\s*return\s+caseBoardPage\(\)/, 'router should support #case-board');
+assert.match(source, /function\s+caseBoardPage\s*\(\)/, 'app should render case board without adding a fourth portal tile');
+const portalBlock = source.slice(source.indexOf('function portalPage()'), source.indexOf('const domainNames'));
+assert.doesNotMatch(portalBlock, /case-board|案件板/, 'triangle portal must remain exactly the existing three choices');
+console.log('PASS test-v16-case-board-app');
