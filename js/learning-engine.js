@@ -93,11 +93,35 @@
     };
   }
 
+  function ensureV16RootState(state) {
+    state.v16 = state.v16 && typeof state.v16 === 'object' ? state.v16 : {};
+    if (typeof state.v16.enabled !== 'boolean') state.v16.enabled = true;
+    const story = state.v16.story && typeof state.v16.story === 'object' ? state.v16.story : {};
+    story.unlockedScenes = Array.isArray(story.unlockedScenes) ? story.unlockedScenes : [];
+    story.confirmedFacts = Array.isArray(story.confirmedFacts) ? story.confirmedFacts : [];
+    story.contradictions = Array.isArray(story.contradictions) ? story.contradictions : [];
+    story.personalMarks = story.personalMarks && typeof story.personalMarks === 'object' ? story.personalMarks : {};
+    story.routeRecovery = Math.max(0, Number(story.routeRecovery) || 0);
+    state.v16.story = story;
+    return state.v16;
+  }
+
+  function ensureV16DayState(state, day) {
+    state.days = state.days && typeof state.days === 'object' ? state.days : {};
+    state.days[day] = state.days[day] && typeof state.days[day] === 'object' ? state.days[day] : { day };
+    const v16 = state.days[day].v16 && typeof state.days[day].v16 === 'object' ? state.days[day].v16 : {};
+    v16.cursor = Math.max(0, Number(v16.cursor) || 0);
+    v16.completedSteps = v16.completedSteps && typeof v16.completedSteps === 'object' ? v16.completedSteps : {};
+    if (typeof v16.migratedFromLegacy !== 'boolean') v16.migratedFromLegacy = false;
+    state.days[day].v16 = v16;
+    return v16;
+  }
+
   function freshState(registry) {
     const today = dateISO();
     return {
-      schemaVersion: 2,
-      version: 2,
+      schemaVersion: 3,
+      version: 3,
       currentDay: 1,
       created: today,
       updatedAt: Date.now(),
@@ -145,8 +169,8 @@
   function migrateState(input, registry) {
     const source = input && typeof input === 'object' ? input : freshState(registry);
     const out = Object.assign(freshState(registry), source);
-    out.schemaVersion = 2;
-    out.version = 2;
+    out.schemaVersion = 3;
+    out.version = 3;
     out.currentDay = clamp(Math.round(out.currentDay || 1), 1, 20);
     out.completedDays = [...new Set((Array.isArray(out.completedDays) ? out.completedDays : []).map(Number).filter(n => n >= 1 && n <= 20))].sort((a, b) => a - b);
     out.days = out.days && typeof out.days === 'object' ? Object.assign({}, out.days) : {};
@@ -179,9 +203,12 @@
       normalized.finished = Boolean(normalized.finished);
       delete normalized.questionIndex;
       out.days[day] = normalized;
+      ensureV16DayState(out, day);
     });
 
     if (!out.days[1]) out.days[1] = blankDay(1, registry);
+    ensureV16DayState(out, 1);
+    ensureV16RootState(out);
     out.skills = out.skills && typeof out.skills === 'object' ? out.skills : {};
     Object.keys(out.skills).forEach(id => { out.skills[id] = normalizeSkill(id, out.skills[id]); });
     out.attempts = (Array.isArray(out.attempts) ? out.attempts : []).map(oldAttemptToV2).slice(-1200);
@@ -196,6 +223,7 @@
   function ensureDayState(state, day, registry) {
     state.days = state.days || {};
     if (!state.days[day]) state.days[day] = blankDay(day, registry);
+    ensureV16DayState(state, day);
     return state.days[day];
   }
 
@@ -442,6 +470,8 @@
     addDays,
     freshState,
     migrateState,
+    ensureV16RootState,
+    ensureV16DayState,
     ensureDayState,
     ensureSkill,
     evidenceQuality,

@@ -331,6 +331,73 @@
       ],
       correctCandidate: 'a',
       explanation: 'DBE=5 先提示“苯环 4 + 另一个不饱和单位 1”的组合；IR 给出共轭羰基，NMR 再用 5H 芳香区和 3H COCH3 单峰把结构收敛到苯乙酮。'
+    },
+    {
+      id: 'lab20-x17',
+      stage: 'LAB-20 · Day 13–14 持续案件',
+      title: '无名样品 X-17',
+      subtitle: 'Day13 先锁分子式、DBE 与 IR；Day14 再用 ¹H NMR 对称性确定取代位置。',
+      formula: 'C8H7BrO',
+      dbe: 5,
+      hints: {
+        dbe: '卤素按一个 H 计入 DBE：DBE = (2C + 2 − H − X) / 2。',
+        ir: '1685 cm⁻¹ 左右的强峰配合芳环吸收，优先考虑与芳环共轭的羰基。',
+        nmr: '对二取代苯环若两边具有对称关系，芳香区常能简化成两组、各约 2H 的信号。',
+        candidates: '三个溴代苯乙酮异构体分子式和羰基 IR 很接近，真正拉开差距的是芳香氢的对称性。'
+      },
+      hardEvidence: [
+        { id: 'formula', label: '分子式', text: 'C8H7BrO' },
+        { id: 'dnph', label: '化学检验', text: '2,4-DNP：橙黄色沉淀（羰基阳性）' }
+      ],
+      ir: {
+        peaks: [
+          { wavenumber: 1685, intensity: 0.94, label: '共轭 C=O 强峰' },
+          { wavenumber: 1600, intensity: 0.46, label: '芳环' },
+          { wavenumber: 1490, intensity: 0.32, label: '芳环' }
+        ],
+        prompt: '这组 IR 与 2,4-DNP 阳性最稳妥支持哪一层判断？',
+        options: [
+          { id: 'a', label: '样品含有与芳环共轭的醛/酮型羰基' },
+          { id: 'b', label: '已经能仅凭 IR 确定 Br 在对位' },
+          { id: 'c', label: '样品一定是手性醇' }
+        ],
+        answer: 'a',
+        skill: 'structure.ir'
+      },
+      nmr: {
+        signals: [
+          { ppm: 7.86, integral: 2, multiplicity: 'd', label: 'Ar–H · 2H' },
+          { ppm: 7.58, integral: 2, multiplicity: 'd', label: 'Ar–H · 2H' },
+          { ppm: 2.58, integral: 3, multiplicity: 's', label: 'COCH3 · 3H' }
+        ],
+        prompt: '芳香区主要是两组各 2H doublet，再加一个 3H 的 COCH3 singlet，最支持哪种取代关系？',
+        options: [
+          { id: 'a', label: '对位二取代苯环：p-Br–C6H4–COCH3' },
+          { id: 'b', label: '邻位二取代；四个芳香氢都应完全等价' },
+          { id: 'c', label: '单取代苯环；应有约 5H 芳香氢' }
+        ],
+        answer: 'a',
+        skill: 'structure.symmetry'
+      },
+      candidates: [
+        {
+          id: 'para', label: '对溴苯乙酮', structure: 'p-Br–C6H4–COCH3',
+          constraints: { formula: 'pass', dbe: 'pass', ir: 'pass', nmr: 'pass', dnph: 'pass' },
+          eliminationReason: '同一分子式与羰基证据下，芳香区两组各 2H 的近似对称信号最符合 para 二取代。'
+        },
+        {
+          id: 'meta', label: '间溴苯乙酮', structure: 'm-Br–C6H4–COCH3',
+          constraints: { formula: 'pass', dbe: 'pass', ir: 'pass', nmr: 'fail', dnph: 'pass' },
+          eliminationReason: '分子式与羰基都可满足，但 meta 取代通常不会给出如此简单的两组各 2H 芳香氢模式。'
+        },
+        {
+          id: 'ortho', label: '邻溴苯乙酮', structure: 'o-Br–C6H4–COCH3',
+          constraints: { formula: 'pass', dbe: 'pass', ir: 'pass', nmr: 'fail', dnph: 'pass' },
+          eliminationReason: '同样可有羰基，但 ortho 取代破坏对称性，芳香区应更复杂。'
+        }
+      ],
+      correctCandidate: 'para',
+      explanation: 'Day13 的 DBE、IR 与羰基检验只能把 X-17 收到“溴代芳香酮”范围；Day14 的两组 2H 芳香信号才把取代位置锁定为 para。这里仍然没有任何手性结论。'
     }
   ];
 })();

@@ -261,6 +261,65 @@
           full: '把“识别反应中心→读完整条件→判断产物类型→区域/立体→正向核对原子”固定成流程，是后面20天处理陌生题的底层习惯。'
         },
         options: [{ id: 'a', label: '先读完整条件，确定反应类型' }, { id: 'b', label: '先凭感觉画一个产物，再找试剂解释' }, { id: 'c', label: '只看试剂中第一个化学式' }], answer: 'a'
+      },
+      {
+        id: 'v16-d01-evidence-mark', day: 1, type: 'multi-choice', role: 'learn',
+        primarySkill: 'structure.constraint_elimination', skillIds: ['structure.constraint_elimination'], difficulty: 1,
+        prompt: '证物卡只给你 L20-0 的结构式。暂时不猜反应，哪些是可以直接从结构上确认的“把手”？选择所有能直接看见的。',
+        formula: 'p-Br–C₆H₄–CH(OH)–CH₃', examTags: ['结构语言', '案件证据'],
+        hints: ['只选结构上能直接看到的，不要推断谁做了什么。', '先找 O、Br 这类醒目的原子和特殊连接。'],
+        explanationLayers: {
+          short: '可以直接确认 –OH 和芳环上的 Br。',
+          why: '结构式能直接告诉你连接关系与官能团；它不能单独告诉你谁改了记录。',
+          full: '这一步训练“事实与推测分开”：结构上可直接看到苄位 –OH 和芳基 Br，也能数出碳骨架；但责任归属、路线来源都需要后续证据。'
+        },
+        options: [
+          { id: 'oh', label: '苄位 –OH' },
+          { id: 'br', label: '芳环上的 Br' },
+          { id: 'culprit', label: '许临川修改了记录' }
+        ],
+        answer: ['br','oh']
+      },
+      {
+        id: 'v16-d01-electron-drag', day: 1, type: 'electron-arrow', role: 'learn',
+        primarySkill: 'mechanism.electron_source', skillIds: ['mechanism.electron_source','mechanism.electron_target'], difficulty: 1,
+        prompt: '把普通 HBr 加成的第一步画出来：先选电子来源，再选目的地。需要画两支双电子箭头。',
+        formula: 'CH₂=CH₂ + H–Br', examTags: ['电子箭头', 'HBr加成'],
+        hints: ['第一支箭从 π 电子出发指向 Hδ+。', '同时 H–Br 键电子回到 Br。'],
+        explanationLayers: {
+          short: 'π→H，同时 H–Br→Br。',
+          why: '曲箭表示电子对移动：π电子形成新的 C–H 键，旧 H–Br 键电子留给 Br。',
+          full: '第一步不是 Br 先扑向双键。π 键是电子来源，Hδ+ 是电子缺口；质子化发生的同时 H–Br 异裂，生成 Br⁻ 和碳正离子中间体。'
+        },
+        baseSvg: '<svg viewBox="0 0 640 300" role="img" aria-label="乙烯与HBr电子箭头练习"><text x="75" y="155" font-size="34">CH₂=CH₂</text><text x="360" y="155" font-size="34">H—Br</text><text x="95" y="205" font-size="16">π电子</text><text x="372" y="205" font-size="16">δ+</text><text x="470" y="205" font-size="16">δ−</text></svg>',
+        hotspots: [
+          { id: 'pi', label: 'π电子', x: 170, y: 138, role: 'source' },
+          { id: 'H', label: 'Hδ+', x: 385, y: 138, role: 'target' },
+          { id: 'hbrBond', label: 'H–Br键电子', x: 435, y: 138, role: 'source' },
+          { id: 'Br', label: 'Brδ−', x: 500, y: 138, role: 'target' }
+        ],
+        expectedArrows: [
+          { source: 'pi', target: 'H', arrowType: 'pair' },
+          { source: 'hbrBond', target: 'Br', arrowType: 'pair' }
+        ]
+      },
+      {
+        id: 'v16-d01-record-diff', day: 1, type: 'choice', role: 'transfer',
+        primarySkill: 'structure.constraint_elimination', skillIds: ['structure.constraint_elimination'], difficulty: 1,
+        prompt: '回到案件。你目前只知道：L20-0 原位置为空、结构卡能读懂、实验记录存在两个不同版本。下面哪句话现在可以作为“确认事实”写进案件板？',
+        examTags: ['案件应用', '证据边界'],
+        hints: ['不要把“记录变过”直接等同于“已经知道谁改的”。'],
+        explanationLayers: {
+          short: '只能确认记录发生过变化。',
+          why: '当前证据还不足以确认修改者，也不足以确认样品真的被偷出实验室。',
+          full: '科学推理先区分观测与解释：版本不同是观测；谁修改、为什么修改、样品是否被盗都需要后续独立证据。'
+        },
+        options: [
+          { id: 'a', label: '这份实验记录确实发生过版本变化' },
+          { id: 'b', label: '许临川一定在22:14删除了数据' },
+          { id: 'c', label: 'L20-0 已经被人带出实验室' }
+        ],
+        answer: 'a'
       }
     ],
     repairs: {

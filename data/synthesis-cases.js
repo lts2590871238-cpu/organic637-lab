@@ -217,6 +217,53 @@
         ],
         referenceRoutes: [['e1', 'e2']], preferredPath: ['e1', 'e2']
       }
+    },
+    {
+      id: 'lab20-hidden-route',
+      stage: 'LAB-20 · Day 17–18',
+      title: '隐藏补救路线：从异常体系到 L20-F',
+      subtitle: '先逆推“为什么会出现 X-17”，再正向审计每一步是否真的兼容。',
+      start: { id:'r17-abnormal', label:'R-17事故后的异常体系', structure:'p-Br-Ph-CH(OAc/OH)-CH₃（混合物）', carbonCount:8 },
+      target: { id:'l20f', label:'L20-F', structure:'p-Br-Ph-CH(OH)-CH₃（S:R≈51:49）', carbonCount:8 },
+      analysis: {
+        differencePrompt:'要解释 L20-F 的来源，最关键的是哪条“身份变化”？',
+        differenceOptions:[
+          {id:'a',label:'异常苄位含氧组分经过非手性 X-17，再被还原回醇'},
+          {id:'b',label:'碳链需要增加 2 个碳'},
+          {id:'c',label:'芳环需要被完全加氢'}
+        ],
+        differenceAnswer:'a',
+        carbonPrompt:'整条补救尾段的主碳骨架怎样变化？',
+        carbonOptions:[{id:'a',label:'8C → 8C，碳骨架不变'},{id:'b',label:'8C → 9C'},{id:'c',label:'8C → 7C'}],
+        carbonAnswer:'a',
+        teaching:'真正的路线指纹不是“多了几个碳”，而是手性苄位醇被氧化成非手性酮 X-17；一旦经过这一步，原有单一构型信息被擦除。'
+      },
+      hints:[
+        '先从 L20-F 往回看：普通 NaBH₄ 最自然的前体是什么？',
+        'X-17 已经在 Day14 被锁定为 4-bromoacetophenone。',
+        '保护一个必须被氧化的 OH，会让下一步 PCC 失去反应位点。'
+      ],
+      graph:{
+        start:'r17-abnormal', target:'l20f',
+        nodes:[
+          {id:'r17-abnormal',label:'R-17异常体系',structure:'p-Br-Ph-CH(OAc/OH)-CH₃（混合物）'},
+          {id:'recovered-alcohol',label:'可回收苄位醇组分',structure:'p-Br-Ph-CH(OH)-CH₃'},
+          {id:'x17',label:'X-17',structure:'p-Br-Ph-COCH₃'},
+          {id:'l20f',label:'L20-F',structure:'p-Br-Ph-CH(OH)-CH₃（S:R≈51:49）'},
+          {id:'protected-alcohol',label:'被乙酰化的醇',structure:'p-Br-Ph-CH(OAc)-CH₃'},
+          {id:'blocked-oxidation',label:'被保护基卡住的死路',structure:'OH 已被保护，PCC 无法按计划生成 X-17'}
+        ],
+        edges:[
+          {id:'lab20-e1',from:'r17-abnormal',to:'recovered-alcohol',reagent:'分离 / 必要时温和水解',transformation:'回收苄位醇组分',status:'green',selectivity:.85,compatibility:true,reason:'从异常体系中得到可继续处理的苄位醇，是补救路线的真实起点。'},
+          {id:'lab20-e2',from:'recovered-alcohol',to:'x17',reagent:'PCC / CH₂Cl₂',transformation:'苄位醇氧化为非手性酮',status:'green',selectivity:1,compatibility:true,reason:'生成 X-17，同时把原来的手性中心变成平面羰基碳。'},
+          {id:'lab20-e3',from:'x17',to:'l20f',reagent:'NaBH₄ / MeOH',transformation:'非手性羰基还原',status:'green',selectivity:.5,compatibility:true,reason:'普通非手性还原从羰基两面进攻，得到近外消旋醇，符合 L20-F 的手性HPLC证据。'},
+          {id:'lab20-e4',from:'recovered-alcohol',to:'protected-alcohol',reagent:'Ac₂O / pyridine',transformation:'把 OH 乙酰化保护',status:'yellow',selectivity:1,compatibility:true,reason:'这一步本身化学上成立，所以不会立刻判错；但要继续问它是否兼容后面的氧化目标。'},
+          {id:'lab20-e5',from:'protected-alcohol',to:'blocked-oxidation',reagent:'PCC / CH₂Cl₂',transformation:'尝试氧化被保护的 OH',status:'red',selectivity:0,compatibility:false,reason:'需要被氧化的醇已经被保护成乙酸酯，PCC 不再有目标 OH；这条路线在后续兼容性上才暴露错误。'}
+        ],
+        referenceRoutes:[['lab20-e1','lab20-e2','lab20-e3']],
+        preferredPath:['lab20-e1','lab20-e2','lab20-e3']
+      }
     }
+
   ];
 })();

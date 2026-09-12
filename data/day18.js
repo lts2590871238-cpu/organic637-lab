@@ -454,6 +454,33 @@
         "why": "过程中的每一步都会分别记录。",
         "full": "该任务使用专门的结构推断/路线训练引擎。"
       }
+    },
+    {
+      "id": "v16-d18-evidence-synthesis",
+      "day": 18,
+      "type": "choice",
+      "role": "transfer",
+      "primarySkill": "synthesis.route_evaluation",
+      "skillIds": [
+        "synthesis.route_evaluation",
+        "synthesis.compatibility"
+      ],
+      "difficulty": 4,
+      "prompt": "把目前的化学路线、两个记录版本、顾遥证词、备用路线知情情况和22:14时间窗口放在一起，哪项结论现在最稳妥？",
+      "examTags": ["综合证据"],
+      "hints": [],
+      "explanationLayers": {
+        "short": "多条独立证据共同支持：许临川在已知偏差与Route-B的情况下，后来主动删除了真实偏差记录。",
+        "why": "R-17事故解释起点，X-17与L20-F解释补救路线；21:06与22:19版本差异、顾遥证词、备用路线知情和时间窗口则把‘实验失败’与‘后来修改记录’区分开。",
+        "full": "不能用单一门禁或单一句证词定案。化学证据说明Route-B确实被执行且产生了错误空间身份；文档证据说明21:06曾诚实记录偏差，而22:19版本已删除；证词和知情情况说明许临川在20:30后继续处理；22:14又落在样品被移走、问题可能暴露之后。多条相互独立的证据共同支持记录被主动改写。"
+      },
+      "options": [
+        { "id": "a", "label": "顾遥拿错试剂本身就等于22:14一定由她修改了记录" },
+        { "id": "b", "label": "化学、文档、证词、知情与时间证据共同支持许临川在明知偏差后删除了真实记录；实验失败与记录篡改应分开判断" },
+        { "id": "c", "label": "林岑进入冷库这一条门禁记录已经足以证明她制造了全部异常" }
+      ],
+      "answer": "b",
+      "formula": "chemistry + document + witness + knowledge + time → convergent evidence"
     }
   ],
   "repairs": {

@@ -72,8 +72,9 @@
 
   function mount(root, kase, settings = {}) {
     const saved = settings.initialState && typeof settings.initialState === 'object' ? settings.initialState : {};
+    const resumeStage = Math.max(0, Math.min(4, Number(settings.resumeStage) || 0));
     const state = {
-      stage: Math.max(0, Math.min(4, Number(saved.stage) || 0)),
+      stage: Math.max(resumeStage, Math.max(0, Math.min(4, Number(saved.stage) || 0))),
       dbeValue: saved.dbeValue || '',
       irSelected: saved.irSelected ?? null,
       nmrSelected: saved.nmrSelected ?? null,
@@ -84,7 +85,7 @@
       hintsByStage: saved.hintsByStage && typeof saved.hintsByStage === 'object' ? { ...saved.hintsByStage } : {},
       submitted: false
     };
-    const emitProgress = () => settings.onProgress?.({
+    const snapshot = () => ({
       stage: state.stage,
       dbeValue: state.dbeValue,
       irSelected: state.irSelected,
@@ -95,6 +96,7 @@
       hintsUsed: state.hintsUsed,
       hintsByStage: { ...state.hintsByStage }
     });
+    const emitProgress = () => settings.onProgress?.(snapshot());
 
     const stages = ['DBE', 'IR', 'NMR', '候选排除', '最终结构'];
     const currentHintKey = () => ['dbe', 'ir', 'nmr', 'candidates', 'candidates'][state.stage] || 'candidates';
@@ -139,7 +141,16 @@
       });
       bindHint();
       root.querySelector('#prevDetective').onclick = () => { state.stage -= 1; render(); };
-      root.querySelector('#nextDetective').onclick = () => { state.stage += 1; render(); };
+      root.querySelector('#nextDetective').onclick = () => {
+        const pauseAfterStage = Number.isInteger(Number(settings.pauseAfterStage)) ? Number(settings.pauseAfterStage) : null;
+        state.stage += 1;
+        if (pauseAfterStage === state.stage - 1) {
+          emitProgress();
+          settings.onPartialComplete?.(snapshot());
+          return;
+        }
+        render();
+      };
     }
 
     function renderCandidates() {
