@@ -63,7 +63,8 @@
 
     revealGates: {
       guYaoIncidentPartial: { minDay: 3 },
-      secretRouteConfirmed: { minDay: 9 },
+      postIncidentContinuation: { minDay: 8 },
+      secretRouteConfirmed: { minDay: 15 },
       zeroSampleFound: { minDay: 12 },
       x17IdentityConfirmed: { minDay: 14 },
       stereoMismatchConfirmed: { minDay: 15 },
@@ -74,7 +75,8 @@
       zeroSampleMissingAppearance: { id: 'zero_sample_missing_appearance', truth: 'L20-0离开原储存位置，但并未离开实验室。' },
       guYaoR17Mixup: { id: 'guyao_r17_mixup', truth: '顾遥发生R-17A/R-17B体系混淆，这是第一起事故。' },
       linPreservedEvidence: { id: 'lin_preserved_evidence', truth: '林岑将三份关键样品封存到B3以保存证据。' },
-      backupRouteUsed: { id: 'backup_route_used', truth: '事故后有人主动执行了被否决的Route-B补救尾段。' },
+      postIncidentChemistryContinued: { id: 'post_incident_chemistry_continued', truth: 'R-17事故被发现后，实验没有立即终止；有人主动继续了后续化学操作。' },
+      backupRouteUsed: { id: 'backup_route_used', truth: '综合X-17身份、Route-B档案指纹与立体结果，可确认当晚执行了被否决的Route-B补救尾段。' },
       x17IdentityConfirmed: { id: 'x17_identity_confirmed', truth: 'X-17被确定为4-bromoacetophenone，是非手性芳香酮中间体。' },
       xuDeletedRecord: { id: 'xu_deleted_record', truth: '许临川于22:14删除“条件偏差+补救路线”说明。' },
       finalSampleWrongIdentity: { id: 'final_sample_wrong_identity', truth: 'L20-F连接关系接近目标，但对映体组成与L20-0不等价。' }
@@ -83,7 +85,8 @@
     factGates: {
       zero_sample_missing_appearance: 1,
       guyao_r17_mixup: 3,
-      backup_route_used: 9,
+      post_incident_chemistry_continued: 8,
+      backup_route_used: 15,
       lin_preserved_evidence: 12,
       x17_identity_confirmed: 14,
       final_sample_wrong_identity: 15,
@@ -321,23 +324,23 @@
         ]
       },
       'case08-cliff': {
-        id:'case08-cliff', day:8, title:'“你先走，我来处理”',
+        id:'case08-cliff', day:8, title:'“你先走，我来处理”', unlockFacts:['post_incident_chemistry_continued'],
         panels:[
           { background:'meetingRoom', characters:[{id:'guYao',pose:'nervous'}], dialogue:[{speaker:'guYao',text:'20:23以后，许老师让我先走。他说：“你先走，我来处理。”'}] },
           { background:'analysisLab', dialogue:[{speaker:'linCen',text:'现在已经能排除一个解释：最终异常不可能只由最初拿错试剂自动产生。事故后有人主动继续了化学操作。'}] }
         ]
       },
       'case09-open': {
-        id:'case09-open', day:9, title:'CASE 09｜多出来的一根C—C键', unlockFacts:['backup_route_used'],
+        id:'case09-open', day:9, title:'CASE 09｜多出来的一根C—C键',
         panels:[
-          { background:'analysisLab', evidence:'routeFragment', caption:'把已知中间体与后续样品做碳数账本，一根新的C—C键无法由原正式路线解释。' },
-          { background:'meetingRoom', characters:[{id:'zhouYan',pose:'serious'}], dialogue:[{speaker:'zhouYan',text:'从这里开始，“第二条路线存在”不再只是猜测。我们要重建它。'}] }
+          { background:'analysisLab', evidence:'routeFragment', caption:'项目旧档案里有一段被删去路线名的构碳片段：前后结构相比，明确多出一根C—C键。它来自六个月前的路线评审，不是X-17本身的成键步骤。' },
+          { background:'meetingRoom', characters:[{id:'zhouYan',pose:'serious'}], dialogue:[{speaker:'zhouYan',text:'先别把这段旧档案硬套到当晚。今天只做一件事：看懂这根键是怎样造出来的，给后面辨认Route-B留下“路线指纹”。'}] }
         ]
       },
       'case09-return': {
-        id:'case09-return', day:9, title:'碳骨架不会替人圆谎',
+        id:'case09-return', day:9, title:'旧路线也会留下化学指纹',
         panels:[
-          { background:'synthesisLab', dialogue:[{speaker:'linCen',text:'条件可以写错，标签可以重贴，但新出现的C—C键必须有真正的成键步骤。今天的enolate就是一把追路线的尺子。'}] }
+          { background:'synthesisLab', dialogue:[{speaker:'linCen',text:'档案文字可以被改名，构碳逻辑却很难伪装。学会enolate与Aldol后，我们能判断这份匿名片段属于哪一类旧路线；但现在仍不能说当晚一定执行了它。'}] }
         ]
       },
       'case09-cliff': {
@@ -513,13 +516,13 @@
       },
       'case15-close': {
         id: 'case15-close', day: 15, title: '备用路线的立体风险',
-        unlockFacts: ['final_sample_wrong_identity'],
+        unlockFacts: ['backup_route_used','final_sample_wrong_identity'],
         panels: [
           {
             background: 'analysisLab', evidence: 'chiralHplc',
             dialogue: [
               { speaker: 'linCen', text: '这正是六个月前我在备用路线评审里写的风险：一旦经过非手性 X-17，再普通还原，原来的单一空间信息不会自动回来。' },
-              { speaker: 'zhouYan', text: '到这里我们才能确认：L20-F 不是合格的零号样品替代物。' }
+              { speaker: 'zhouYan', text: '把X-17身份、旧Route-B档案指纹和这份手性结果合在一起，到这里我们才能确认：当晚确实走过那条补救尾段，而且L20-F不是合格的零号样品替代物。' }
             ]
           },
           {

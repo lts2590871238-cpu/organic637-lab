@@ -240,6 +240,27 @@
           referenceRoutes: [['e1', 'e2']]
         },
         answer: { acceptedPaths: [['e1', 'e2']], preferredPath: ['e1', 'e2'] }
+      },
+      {
+        id: 'd03-transfer-build-reduce-01', day: 3, type: 'choice', role: 'transfer',
+        primarySkill: 'alkyne.acetylide_alkylation',
+        skillIds: ['alkyne.acetylide_alkylation', 'alkyne.partial_reduction_cis', 'synthesis.carbon_count'],
+        difficulty: 3,
+        prompt: '从 1-丁炔出发：先用 NaNH₂，再加 CH₃CH₂Br，最后用 H₂/Lindlar。最终主要得到什么？',
+        formula: 'HC≡CCH₂CH₃ → CH₃CH₂C≡CCH₂CH₃ → ?',
+        examTags: ['637出口', '增碳', 'Lindlar还原'],
+        hints: ['第一步先把端炔变成炔负离子并接入两个碳。', 'Lindlar 只把炔键还原到顺式烯烃。'],
+        explanationLayers: {
+          short: '主要得到顺-3-己烯。',
+          why: '炔负离子先通过一级卤代物新增两个碳形成 3-己炔，再经 Lindlar 同面加氢停在顺式烯烃。',
+          full: '这题把 Day3 两个核心动作串在一起：端炔去质子化/烷基化负责建 C–C 键，Lindlar 负责把炔键还原到顺式烯烃而不停留到烷烃。整个过程碳数从4增加到6，最后不继续还原成烷烃。'
+        },
+        options: [
+          { id: 'cis', label: '顺-3-己烯' },
+          { id: 'trans', label: '反-3-己烯' },
+          { id: 'alkane', label: '己烷' }
+        ],
+        answer: 'cis'
       }
     ],
     repairs: {

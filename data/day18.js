@@ -154,7 +154,7 @@
         "synthesis.compatibility"
       ],
       "difficulty": 2,
-      "prompt": "一个分子同时有酮和酯，你想让 Grignard 只在后续特定阶段攻击酮，而当前先做别的强亲核步骤。常见策略？",
+      "prompt": "一个一个分子里有酮羰基，但你计划先经历一段强亲核条件，暂时不希望亲核试剂攻击这个酮。常见保护策略是什么？",
       "examTags": [],
       "hints": [],
       "explanationLayers": {

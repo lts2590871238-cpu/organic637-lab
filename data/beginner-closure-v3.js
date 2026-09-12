@@ -314,7 +314,7 @@
   }
   x = q(13,'d13-case-acetone');
   if (x) {
-    x.type = 'detective';
+    x.type = 'multi-choice';
     delete x.caseId;
     x.prompt = '证据练习：C₃H₆O，DBE=1，IR 约1715 cm⁻¹有强峰且没有宽 O–H。现阶段哪些候选最值得保留？';
     x.primarySkill = 'structure.constraint_elimination';
@@ -330,7 +330,12 @@
         {id:'c',formula:'CH₂=CHCH₂OH（烯丙醇）',constraints:{carbonyl:'fail','no-oh':'fail'},eliminationReason:'应有 O–H，且没有羰基。'}
       ]
     };
-    x.answer = {candidateId:['a','b']};
+    x.options = [
+      {id:'a',label:'丙酮 CH₃COCH₃'},
+      {id:'b',label:'丙醛 CH₃CH₂CHO'},
+      {id:'c',label:'烯丙醇 CH₂=CHCH₂OH'}
+    ];
+    x.answer = ['a','b'];
     x.explanationLayers = {short:'先保留丙酮和丙醛，排除烯丙醇。',why:'现有证据只证明“有羰基、没有 O–H”，还不足以把醛/酮二选一。',full:'结构推断最重要的能力之一，就是敢于停在“证据还不够”的阶段。不要为了想立刻得到唯一答案而偷偷使用尚未提供的证据。'};
   }
   // Keep acetone full NMR case for Day14.

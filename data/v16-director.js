@@ -84,7 +84,7 @@
           { id:'d03-metal', type:'question', ref:'d03-dissolving-metal-01', minutes:4, engagement:'practice' },
           { id:'d03-hydration-short', type:'question', ref:'d03-hydration-01', minutes:3, engagement:'practice' },
           { id:'d03-case-apply', type:'case-apply', ref:'d03-detective-terminal-01', minutes:5, engagement:'case' },
-          { id:'d03-637-exit', type:'question-group', refs:['d03-route-hexyne-01','d03-alkylation-01'], minutes:8, engagement:'exam', mode:'637_exit' },
+          { id:'d03-637-exit', type:'question-group', refs:['d03-route-hexyne-01','d03-transfer-build-reduce-01'], minutes:8, engagement:'exam', mode:'637_exit' },
           { id:'d03-story-cliff', type:'comic', sceneId:'case03-cliff', minutes:3, engagement:'story' }
         ]
       },
@@ -504,8 +504,8 @@
     6: '中间样品里出现了新的含氧线索。先掌握醇、醚和环氧化物怎样互相转换，才能判断这条痕迹是正常副产物还是人为补救留下的。',
     7: '系统里多出一个编号 X-17。它最明显的证据是一组羰基信号；先学羰基的电子结构和亲核加成，才有能力判断这个陌生样品可能从哪一步来。',
     8: '重新贴过的标签把事故线索指向了酰基衍生物。要判断这一步只是换标签，还是实际发生了取代，先把亲核酰基取代的共同骨架看清。',
-    9: 'X-17 比事故原料多出了一段新的 C—C 连接。要解释这根键从哪里来，先学 enolate 与 Aldol；只有这样才能判断是否真的存在第二条路线。',
-    10: '六个月前被否决的旧路线重新出现。它的核心就是怎样系统造 C—C 键；先把 Claisen、Michael 和 β-二羰基工具串起来，才能重建隐藏路线。',
+    9: '六个月前的匿名路线片段里多出一根新的 C—C 键。先学 enolate 与 Aldol，才能读懂这份旧档案的构碳指纹；注意，这一步只是在辨认 Route-B 家族，还不能证明当晚已经执行了它。',
+    10: 'Route-B 的旧评审档案继续展开，其中保存了 Claisen、Michael 和 β-二羰基等代表性构碳片段。读懂这些片段，是为了确认档案身份与路线知识来源，不是把它们硬塞成当晚补救尾段。',
     11: '备用路线在芳环上留下了位置“指纹”。想判断这个取代位置是否吻合旧路线，必须先理解芳香取代为什么有方向性。',
     12: 'B3 即将打开，而样品编号里出现了含氮转化线索。先掌握重氮盐和腈这些关键桥梁，才能判断路线是否可能在这里发生过改写。',
     13: 'X-17 终于摆到你面前。现在不允许猜结构；先从分子式、DBE、IR 和化学检验逐条排除，让证据自己缩小范围。',

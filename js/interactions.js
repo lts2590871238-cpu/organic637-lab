@@ -12,6 +12,37 @@
     return typeof option === 'object' ? option.label ?? option.formula ?? option.id : option;
   }
 
+
+  function stableHash(text) {
+    let hash = 2166136261 >>> 0;
+    for (const char of String(text || '')) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619) >>> 0;
+    }
+    return hash >>> 0;
+  }
+
+  function seededRandom(seed) {
+    let value = (Number(seed) >>> 0) || 1;
+    return () => {
+      value ^= value << 13;
+      value ^= value >>> 17;
+      value ^= value << 5;
+      return (value >>> 0) / 4294967296;
+    };
+  }
+
+  function orderedOptions(question) {
+    const options = [...(question.options || [])];
+    if (options.length < 2) return options;
+    const random = seededRandom(stableHash(`${question.day || ''}|${question.id || question.prompt || ''}`));
+    for (let i = options.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    return options;
+  }
+
   function expectedChoice(question) {
     if (typeof question.answer === 'object' && question.answer !== null) return String(question.answer.id ?? question.answer.optionId ?? question.answer.value ?? '');
     if (typeof question.answer === 'number') return optionId((question.options || [])[question.answer], question.answer);
@@ -141,8 +172,10 @@
   }
 
   function renderOptions(question, multi = false) {
-    return `<div class="options structure-options">${(question.options || []).map((option, index) => {
-      const id = optionId(option, index);
+    const displayed = orderedOptions(question);
+    return `<div class="options structure-options">${displayed.map((option, index) => {
+      const originalIndex = (question.options || []).indexOf(option);
+      const id = optionId(option, originalIndex >= 0 ? originalIndex : index);
       const formula = typeof option === 'object' && option.formula ? `<span class="option-formula">${esc(option.formula)}</span>` : '';
       const svg = typeof option === 'object' && option.svg ? `<span class="option-svg trusted-svg">${option.svg}</span>` : '';
       return `<button type="button" class="option" data-option="${esc(id)}" aria-pressed="false"><span class="option-letter">${String.fromCharCode(65 + index)}</span><span>${svg}${formula}<span>${esc(optionLabel(option))}</span></span>${multi ? '<span class="multi-mark" aria-hidden="true">✓</span>' : ''}</button>`;
@@ -391,5 +424,5 @@
     render();
   }
 
-  NS.Interactions = { mount, evaluate, rankingEvaluation, pathEvaluation, arrowEvaluation };
+  NS.Interactions = { mount, evaluate, rankingEvaluation, pathEvaluation, arrowEvaluation, orderedOptions };
 })();
