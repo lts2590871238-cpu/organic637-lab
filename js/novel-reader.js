@@ -32,7 +32,7 @@
     const visual = pickVisual(sceneId);
     const main = visual.evidence || visual.background || assets().keyart?.castLab?.path || '';
     if (!main && !visual.portrait) return '';
-    return `<figure class="v16-novel-visual">${main ? `<img data-v16-novel-img class="v16-novel-scene-img" src="${esc(main)}" alt="案件场景插图">` : ''}${visual.portrait ? `<img data-v16-novel-img class="v16-novel-portrait" src="${esc(visual.portrait)}" alt="${esc(visual.characterName || '人物')}立绘">` : ''}<figcaption>插图只帮助你进入现场；事实以正文、证物和后续化学验证为准。</figcaption></figure>`;
+    return `<figure class="v16-novel-visual ${visual.evidence ? 'is-evidence' : 'is-scene'}">${main ? `<img data-v16-novel-img class="v16-novel-scene-img" src="${esc(main)}" alt="${visual.evidence ? '案件证物插图' : '案件场景插图'}">` : ''}${visual.portrait ? `<img data-v16-novel-img class="v16-novel-portrait" src="${esc(visual.portrait)}" alt="${esc(visual.characterName || '人物')}立绘">` : ''}<figcaption>插图只帮助你进入现场；事实以正文、证物和后续化学验证为准。</figcaption></figure>`;
   }
 
   function render(sceneId, { day, learningHook = '', state = null } = {}) {
