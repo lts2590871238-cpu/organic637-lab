@@ -11,6 +11,7 @@ on:
       - 'js/original-chem-graph.js'
       - 'js/original-reaction-solutions.js'
       - 'js/original-spectra.js'
+      - 'js/original-iodoform.js'
       - 'scripts/tests/test-original-paper-review.cjs'
       - 'scripts/tests/test-original-paper-browser.cjs'
       - 'scripts/tests/test-original-full-journey.cjs'
@@ -38,6 +39,7 @@ jobs:
           node --check js/original-chem-graph.js
           node --check js/original-reaction-solutions.js
           node --check js/original-spectra.js
+          node --check js/original-iodoform.js
       - name: Validate original paper source and answer scoring
         run: node scripts/tests/test-original-paper.cjs
       - name: Verify original paper review interaction controls
