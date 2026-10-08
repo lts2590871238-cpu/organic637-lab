@@ -1244,15 +1244,30 @@
     v16.stepState[step.id] = state;
     const bossIds = runtime.groups.map(group => group.bossId).filter(Boolean);
     const questionId = bossIds[Math.max(0, Number(state.index) || 0)];
-    if (!questionId) return advanceDirectorStep(day, step.id);
+    if (!questionId) {
+      const rows=state.responses||[];
+      Store.state.examResults.day20Boss={completedAt:Date.now(),responses:JSON.parse(JSON.stringify(rows)),percent:rows.length?Math.round(rows.reduce((sum,r)=>sum+Number(r.partialScore||0),0)/rows.length*100):0,responseCount:rows.length};
+      Store.save();return advanceDirectorStep(day,step.id);
+    }
     const question = QMAP.get(questionId);
     if (!question) { state.index += 1; Store.save(); return dayPage(day); }
     return studyQuestionPage(question, {
       mode:'boss', day:20, isTransfer:true,
       positionLabel:`修复后独立验证 · ${Number(state.index) + 1}/${bossIds.length}`,
       onPrev:() => { state.index = Math.max(0, Number(state.index) - 1); Store.save(); dayPage(day); },
-      onNext(){ state.index += 1; Store.save(); if (state.index >= bossIds.length) advanceDirectorStep(day, step.id); else dayPage(day); },
-      onSubmitted(){ Store.save(); }
+      onNext(){
+        state.index += 1;
+        if (state.index >= bossIds.length) {
+          const rows=state.responses||[];
+          Store.state.examResults.day20Boss={completedAt:Date.now(),responses:JSON.parse(JSON.stringify(rows)),percent:rows.length?Math.round(rows.reduce((sum,r)=>sum+Number(r.partialScore||0),0)/rows.length*100):0,responseCount:rows.length};
+          Store.save();advanceDirectorStep(day, step.id);
+        } else {Store.save();dayPage(day);}
+      },
+      onSubmitted(submission){
+        state.responses ||= [];
+        if(!state.responses.some(r=>r.questionId===question.id))state.responses.push({questionId:question.id,payload:submission.payload,correct:submission.correct,partialScore:Number(submission.partialScore||0)});
+        Store.save();
+      }
     });
   }
 
@@ -1539,9 +1554,11 @@
       : fullBoss
         ? '已经有完整150分卷证据，但目前还不能把“学完20天”直接等同于120分。继续修低 mastery 和迁移薄弱处。'
         : '20天核心审核已经完成，但还没有完整150分卷证据；在做完“考前正式模拟”前，不给出120分达成判断。';
-    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。Day19核心审核负责诊断；只有完整150分卷才用于判断是否接近120分目标线。</p><div class="score-box"><div><span class="tiny">Day19 核心审核</span><strong>${coreAudit ? `${Number(coreAudit.percent || 0)}%` : '未完成'}</strong></div><div><span class="tiny">完整150分模拟</span><strong>${fullBoss ? `${Number(fullBoss.score150 || 0)} / 150` : '未做'}</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${targetEvidenceReady ? 'good' : 'note'}">${targetMessage}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button>${!fullBoss ? '<button class="btn soft" id="fullExam">考前正式模拟 · 150分</button>' : ''}<button class="btn ghost" id="review">继续到期复习</button></div></section>`);
+    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。Day19核心审核负责诊断；只有完整150分卷才用于判断是否接近120分目标线。</p><div class="score-box"><div><span class="tiny">Day19 核心审核</span><strong>${coreAudit ? `${Number(coreAudit.percent || 0)}%` : '未完成'}</strong></div><div><span class="tiny">完整150分模拟</span><strong>${fullBoss ? `${Number(fullBoss.score150 || 0)} / 150` : '未做'}</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${targetEvidenceReady ? 'good' : 'note'}">${targetMessage}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button>${!fullBoss ? '<button class="btn soft" id="fullExam">考前正式模拟 · 150分</button>' : ''}<button class="btn soft" id="finalDay19Review">返回 Day19 原卷解析</button><button class="btn soft" id="finalDay20Review">返回 Day20 Boss 原卷解析</button><button class="btn ghost" id="review">继续到期复习</button></div></section>`);
     $('#home').onclick = () => { location.hash = '#abilities'; };
     $('#fullExam')?.addEventListener('click', () => { location.hash = '#full-exam/19'; });
+    $('#finalDay19Review').onclick=()=>{const k=Store.state.examResults?.full150?'full':Store.state.examResults?.v16Day19Core?'core':'legacy';location.hash='#exam-review/'+k;};
+    $('#finalDay20Review').onclick=()=>{location.hash='#exam-review/day20';};
     $('#review').onclick = () => { location.hash = '#review'; };
   }
 
