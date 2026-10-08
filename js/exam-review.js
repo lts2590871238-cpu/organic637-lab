@@ -105,6 +105,38 @@
     const back=()=>config.onBack?.(),retry=()=>{if(window.confirm('重新作答会开始一次新的练习；原来的分数和答案将保留在历史记录中。确认继续？'))config.onRetry?.();};
     for(const id of ['paperBack','paperBackBottom'])root.querySelector('#'+id).onclick=back;
     for(const id of ['paperRetry','paperRetryBottom'])root.querySelector('#'+id).onclick=retry;
+    // The original paper often uses complex skeletal structures and spectra.
+    // Make each independently redrawn vector figure inspectable at readable
+    // size without replacing it with a blurry screenshot or losing the review.
+    const zoomables=root.querySelectorAll('.original-molecule-grid figure, .original-spectrum, .paper-electron-diagram');
+    if(zoomables.length && root.ownerDocument){
+      const doc=root.ownerDocument,modal=doc.createElement('dialog');
+      modal.className='paper-zoom-dialog';
+      modal.setAttribute('aria-label','放大查看化学结构或机理图');
+      modal.innerHTML='<div class="paper-zoom-head"><strong id="paperZoomTitle">结构放大</strong><button type="button" class="btn soft" id="paperZoomClose">← 返回答卷</button></div><div class="paper-zoom-art" id="paperZoomArt"></div>';
+      root.appendChild(modal);
+      const close=()=>modal.close();
+      modal.querySelector('#paperZoomClose').addEventListener('click',close);
+      modal.addEventListener('click',event=>{if(event.target===modal)close();});
+      zoomables.forEach((figure,index)=>{
+        const original=figure.querySelector('svg');if(!original)return;
+        const button=doc.createElement('button');
+        button.type='button';button.className='paper-zoom-trigger';
+        button.textContent='↗ 放大图解';
+        button.setAttribute('aria-label','放大第'+(index+1)+'幅化学图并可返回答卷');
+        figure.appendChild(button);
+        button.addEventListener('click',()=>{
+          const title=figure.querySelector('figcaption, strong, h4')?.textContent?.trim()||
+            original.getAttribute('aria-label')||'化学结构或机理示意';
+          modal.querySelector('#paperZoomTitle').textContent=title;
+          const art=modal.querySelector('#paperZoomArt');
+          art.classList.toggle('is-wide',Boolean(figure.matches('.original-spectrum, .paper-electron-diagram')));
+          art.replaceChildren(original.cloneNode(true));
+          if(typeof modal.showModal==='function')modal.showModal();
+        });
+      });
+    }
+
   }
   NS.ExamReview={render,verdict,rightAnswer,guideFor};
 })();
