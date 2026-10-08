@@ -1357,7 +1357,7 @@
     const started=performance.now();
     NS.Interactions.mount($('#interactionRoot'),q,{
       examMode:true,
-      onSubmit(submission){
+      onSubmit(submission,feedback){
         if(draft.responses.some(row=>row.questionId===q.id))return;
         draft.responses.push({questionId:q.id,payload:submission.payload,correct:submission.correct,
           partialScore:Number(submission.partialScore||0),submittedAt:Date.now()});
@@ -1367,6 +1367,21 @@
           responseTimeMs:Math.round(performance.now()-started),isTransfer:true,
           answerPayload:submission.payload,partialScore:submission.partialScore,errorType:submission.errorType});
         Store.save();
+        // The interaction engine deliberately hides solutions in examMode and does not
+        // automatically provide navigation. Without this explicit button students
+        // would be stranded after submitting their first answer.
+        if(feedback && !feedback.querySelector('#originalNextQuestion')){
+          const button=document.createElement('button');
+          button.type='button';button.id='originalNextQuestion';button.className='btn primary';
+          button.textContent=draft.responses.length>=bank.length?'交卷并查看成绩':'确认提交 · 下一题 →';
+          button.addEventListener('click',()=>{
+            button.disabled=true;
+            draft.index=draft.responses.length;
+            Store.save();
+            originalDayExamPage(day);
+          },{once:true});
+          feedback.appendChild(button);
+        }
       },
       onNext(){draft.index=draft.responses.length;Store.save();originalDayExamPage(day);}
     });
