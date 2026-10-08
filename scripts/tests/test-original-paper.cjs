@@ -95,7 +95,7 @@ for(const q of questions){
    const k=Object.keys(all)[1];
    assert.equal(check.evaluate(q,{fields:{...all,[k]:'错误结构'}}).partialScore,(Object.keys(all).length-1)/Object.keys(all).length,'partial score must match the number of correct subparts');
    assert.equal(check.evaluate(q,{fields:Object.fromEntries(Object.keys(all).map(k=>[k,'错误']))}).partialScore,0,'all invalid should score zero');
-   if(q.type==='structure-deduction')assert.equal(check.evaluate(q,{fields:{A:'2-picoline',B:'2-styrylpyridine',C:'picolinaldehyde'}}).correct,true,'accepted nomenclature synonyms should grade correctly');
+   if(q.id==='orig-2020-iv-1-picoline-structure')assert.equal(check.evaluate(q,{fields:{A:'2-picoline',B:'2-styrylpyridine',C:'picolinaldehyde'}}).correct,true,'accepted nomenclature synonyms should grade correctly');
  }else{
    assert.equal(check.evaluate(q,{selected:q.answer}).correct,true,'correct multiple-choice answer not full mark');
    for(const other of q.options.filter(o=>o.id!==q.answer))assert.equal(check.evaluate(q,{selected:other.id}).correct,false,'distractor wrongfully full scored');
