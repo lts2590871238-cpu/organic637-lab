@@ -8,7 +8,7 @@
   // Match the deterministic option shuffle in js/interactions.js, so paper letters remain unchanged.
   function displayedOptions(q) {
     const opts=[...(q.options||[])];
-    if(opts.length<2)return opts;
+    if(q.examSource||opts.length<2)return opts;
     let hash=2166136261>>>0;
     for(const ch of String((q.day||'')+'|'+(q.id||q.prompt||''))){hash ^= ch.charCodeAt(0);hash=Math.imul(hash,16777619)>>>0;}
     let value=hash||1;
