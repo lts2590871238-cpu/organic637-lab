@@ -118,8 +118,17 @@ async function run(){
     localStorage.setItem(key,JSON.stringify(state));
   });
   await page.reload({waitUntil:'domcontentloaded'});
-  await page.evaluate(()=>{location.hash='#welcome';location.hash='#day/20';});
-  await page.locator('.original-exam-question').waitFor({timeout:20000});
+  await page.locator('.app.cozy-app').waitFor({timeout:25000});
+  await page.waitForTimeout(350);
+  await page.evaluate(()=>{location.hash='#welcome';});
+  await page.waitForTimeout(150);
+  await page.evaluate(()=>{location.hash='#day/20';});
+  try{
+    await page.locator('.original-exam-question').waitFor({timeout:12000});
+  }catch(err){
+    console.error('Migration recovery diagnostic',await page.evaluate(()=>({hash:location.hash,main:document.body.innerText.slice(0,1600)})));
+    throw err;
+  }
   const migrated=await page.evaluate(()=>{
     const st=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
     return {draft:st.originalExamDrafts.originalDay20,archive:st.examReviewHistory};
