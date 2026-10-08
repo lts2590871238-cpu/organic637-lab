@@ -1169,7 +1169,7 @@
         "printedSubjectCode": "816",
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 50,
-        "originalQuestion": "三、按指定性质排序7",
+        "originalQuestion": "二、按指定性质排序7",
         "sourceType": "从历年扫描真题转录，待三轮审校",
         "scanQuality": "人工可辨",
         "originalPoints": 2,
