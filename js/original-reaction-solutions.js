@@ -16,7 +16,7 @@ function graphGallery(names,lead){
  return '<div class="paper-chem-intro"><b>'+esc(lead)+'</b><div class="original-molecule-grid">'+names.map((name,i)=>
  '<figure class="original-chem-reaction-figure"><figcaption>'+esc(lead==='三步结构推断的正确结构'?'ABC'[i]+' · '+name:name)+'</figcaption>'+C.draw(name)+'</figure>').join('')+'</div></div>';
 }
-C.figuresFor=function(q){const spec=captions[q?.id];if(!spec)return oldFigure(q);return graphGallery(spec.before,'原卷起始分子 · 独立键线重绘');};
+C.figuresFor=function(q){const spec=captions[q?.id];if(!spec)return oldFigure(q);const starting=graphGallery(spec.before,'原卷起始分子 · 独立键线重绘');return q.id==='orig-2020-vii-2-aldol-synthesis'?starting+'<div class="paper-synthesis-target">'+graphGallery(['交叉羟醛加成目标'],'原卷指定目标 · 结构题干的一部分（非路线答案）')+'</div>':starting;};
 C.answerFor=function(q){const spec=captions[q?.id];if(!spec)return oldAnswer(q);return '<section class="paper-correct-scheme">'+graphGallery(spec.after,spec.after.length>1?'三步结构推断的正确结构':'正确产物 · 独立键线重绘')+'</section>';};
 const stages={
  'orig-2020-ii-10-nabh4':[
