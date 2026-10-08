@@ -138,6 +138,30 @@ const assert=require('node:assert/strict');
    assert.ok(iodoOverflow<25,'iodoform explanation spills outside phone viewport: '+viewport.name+' '+iodoOverflow);
    await page.screenshot({path:path.join(dir,'original-paper-iodoform-'+viewport.name+'.png'),fullPage:true});
 
+   // New source/answer review for p28 reaction products and p29 A/B/C deduction:
+   // this screenshot is used for visual comparison with the uploaded pages.
+   await page.evaluate(()=>{
+     const qs=window.Organic637.OriginalExamDraft.questions;
+     const reduction=qs.find(q=>q.id==='orig-2020-ii-10-nabh4');
+     const cyclize=qs.find(q=>q.id==='orig-2020-ii-5-intramolecular-fc');
+     const deduction=qs.find(q=>q.id==='orig-2020-iv-1-picoline-structure');
+     const fields=Object.fromEntries(Object.entries(deduction.answer).map(([k,v])=>[k,v[0]]));
+     window.Organic637.ExamReview.render(document.querySelector('#paperReviewRoot'),{
+       title:'2020 原卷第28-29页反应和结构推导 · 逐键复盘',
+       scoreLabel:'用于原卷视觉审校的三道真题',
+       rows:[
+        {question:reduction,correct:true,hasEvidence:true,partialScore:1,payload:{value:reduction.answer[0]}},
+        {question:cyclize,correct:true,hasEvidence:true,partialScore:1,payload:{value:cyclize.answer[0]}},
+        {question:deduction,correct:true,hasEvidence:true,partialScore:1,payload:{fields}}
+       ],onBack(){},onRetry(){}
+     });
+   });
+   await page.locator('#paperAllOpen').click();
+   assert.equal(await page.locator('.paper-question').count(),3,'2020 p28-29 selected original questions not rendered');
+   assert.ok(await page.locator('svg.mol-graph-svg').count()>=7,'source 2020 p28-29 structures not actually redrawn');
+   const photoOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+   assert.ok(photoOverflow<25,'p28/p29 redrawn reaction study spills off phone: '+viewport.name+' '+photoOverflow);
+   await page.screenshot({path:path.join(dir,'original-paper-2020-p28-29-'+viewport.name+'.png'),fullPage:true});
    assert.deepEqual(issues,[],'browser JS errors');
    console.log('PASS '+viewport.name+': SVG, answers, toggles, wrong-only, back, retry; screenshot saved');
    await page.close();
