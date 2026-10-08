@@ -10,16 +10,26 @@ load('js/interactions.js',w);
 load('js/original-chem-diagrams.js',w);
 load('js/original-chem-graph.js',w);
 load('js/original-reaction-solutions.js',w);
+load('js/original-spectra.js',w);
 const {questions,status}=w.Organic637.OriginalExamDraft;
 const iodo=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题12');
 assert.match(iodo.options[2].label,/苯甲醚/,'iodoform option C scan mismatch');
 assert.match(iodo.options[3].label,/苯乙醛/,'iodoform option D scan mismatch');
 const fc=questions.find(q=>q.examSource.year===2022&&q.examSource.originalQuestion==='二、选择题5');
 assert.match(fc.options[2].label,/仲丁基苯/,'FC option C original scan mismatch');
+const nmr=questions.find(q=>q.id==='orig-2020-iv-2-ir-nmr');
+assert.equal(nmr.examSource.pdfPage,30);
+assert.equal(nmr.examSource.originalPoints,8);
+const fourPart=Object.fromEntries(Object.entries(nmr.answer).map(([id,accept])=>[id,accept[0]]));
+assert.equal(w.Organic637.Interactions.evaluate(nmr,{fields:fourPart}).partialScore,1);
+assert.equal(w.Organic637.Interactions.evaluate(nmr,{fields:{...fourPart,methoxy:'错误'}}).partialScore,0.75);
+const spectrumSVG=w.Organic637.OriginalChem.figuresFor(nmr);
+assert.match(spectrumSVG,/非原扫描实验曲线/);
+assert.match(spectrumSVG,/芳香环 4H/);
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 const check=w.Organic637.Interactions;
 const chem=w.Organic637.OriginalChem;
-const expectedPages=new Map([[2020,new Set([26,27,28,29,31])],[2019,new Set([35,36])],[2017,new Set([44])],[2014,new Set([59])],[2016,new Set([50])],[2018,new Set([40])],[2022,new Set([22])],[2023,new Set([16])],[2015,new Set([54])]]);
+const expectedPages=new Map([[2020,new Set([26,27,28,29,30,31])],[2019,new Set([35,36])],[2017,new Set([44])],[2014,new Set([59])],[2016,new Set([50])],[2018,new Set([40])],[2022,new Set([22])],[2023,new Set([16])],[2015,new Set([54])]]);
 assert.equal(questions.length,30,'must ship thirty distinct scanned question entries');
 assert.match(status,/pending/,'must not mistakenly mark editorial verification complete');
 assert.equal(new Set(questions.map(q=>q.id)).size,questions.length,'duplicate ID');
@@ -48,7 +58,7 @@ for(const [name,expected] of [
  ['分子内FC底物',{C:10,H:13,Cl:1}],['四氢萘',{C:10,H:12}],
  ['2-甲基吡啶',{C:6,H:7,N:1}],['2-苯乙烯基吡啶',{C:13,H:11,N:1}],
  ['吡啶-2-甲醛',{C:6,H:5,O:1,N:1}],
- ['环戊酮',{C:5,H:8,O:1}],['交叉羟醛加成目标',{C:13,H:16,O:2}]
+ ['环戊酮',{C:5,H:8,O:1}],['交叉羟醛加成目标',{C:13,H:16,O:2}],['对甲基苯甲醚',{C:8,H:10,O:1}]
  ])assert.deepEqual(elementCounts(name),expected,'structure atom/bond graph disagrees with required molecular formula for '+name);
 
 let recognizedSvg=0, recognizedAnswers=0;
