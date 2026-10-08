@@ -8,6 +8,8 @@ on:
       - 'js/original-chem-diagrams.js'
       - 'js/interactions.js'
       - 'js/exam-review.js'
+      - 'js/original-chem-graph.js'
+      - 'scripts/tests/test-original-paper-review.cjs'
       - 'app.js'
       - 'scripts/tests/test-original-paper.cjs'
       - '.github/workflows/original-paper-audit.yml'
@@ -28,5 +30,8 @@ jobs:
           node --check js/exam-review.js
           node --check js/original-chem-diagrams.js
           node --check data/original-exam-draft.js
+          node --check js/original-chem-graph.js
       - name: Validate original paper source and answer scoring
         run: node scripts/tests/test-original-paper.cjs
+      - name: Verify original paper review interaction controls
+        run: node scripts/tests/test-original-paper-review.cjs
