@@ -93,7 +93,7 @@ for(const q of questions){
    const all=Object.fromEntries(Object.entries(q.answer).map(([p,values])=>[p,values[0]]));
    assert.equal(check.evaluate(q,{fields:all}).partialScore,1,'all correct structural deductions must score fully');
    const k=Object.keys(all)[1];
-   assert.equal(check.evaluate(q,{fields:{...all,[k]:'错误结构'}}).partialScore,2/3,'two correct subparts must score two thirds');
+   assert.equal(check.evaluate(q,{fields:{...all,[k]:'错误结构'}}).partialScore,(Object.keys(all).length-1)/Object.keys(all).length,'partial score must match the number of correct subparts');
    assert.equal(check.evaluate(q,{fields:Object.fromEntries(Object.keys(all).map(k=>[k,'错误']))}).partialScore,0,'all invalid should score zero');
    if(q.type==='structure-deduction')assert.equal(check.evaluate(q,{fields:{A:'2-picoline',B:'2-styrylpyridine',C:'picolinaldehyde'}}).correct,true,'accepted nomenclature synonyms should grade correctly');
  }else{
