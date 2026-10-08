@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
    page.on('pageerror',e=>issues.push(e.message));
    await page.setContent('<!doctype html><html lang="zh"><head><meta charset="utf-8"></head><body><main id="paperReviewRoot"></main></body></html>');
    await page.addStyleTag({path:path.resolve('styles.css')});
-   for(const f of ['data/original-exam-draft.js','js/interactions.js','js/original-chem-diagrams.js','js/original-chem-graph.js','js/original-reaction-solutions.js','js/original-spectra.js','js/exam-review.js']){
+   for(const f of ['data/original-exam-draft.js','js/interactions.js','js/original-chem-diagrams.js','js/original-chem-graph.js','js/original-reaction-solutions.js','js/original-spectra.js','js/original-iodoform.js','js/exam-review.js']){
     await page.addScriptTag({path:path.resolve(f)});
    }
    await page.evaluate(()=>{
@@ -95,6 +95,30 @@ const assert=require('node:assert/strict');
    const lucasOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
    assert.ok(lucasOverflow<25,'Lucas/IR chemistry page overflow '+viewport.name+': '+lucasOverflow);
    await page.screenshot({path:path.join(dir,'original-paper-lucas-ir-'+viewport.name+'.png'),fullPage:true});
+
+   // 2020 scan p27 and 2022 scan p22: actual iodine-carbon structures, not generic formulas.
+   await page.evaluate(()=>{
+     const qs=window.Organic637.OriginalExamDraft.questions;
+     const positive=qs.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题12');
+     const negative=qs.find(q=>q.examSource.year===2022&&q.examSource.originalQuestion==='二、选择题7');
+     window.Organic637.ExamReview.render(document.querySelector('#paperReviewRoot'),{
+       title:'原卷碘仿专项：结构与机理',scoreLabel:'两题均供复盘检查',
+       rows:[
+         {question:positive,hasEvidence:true,correct:true,partialScore:1,payload:{selected:'a'}},
+         {question:negative,hasEvidence:true,correct:true,partialScore:1,payload:{selected:'b'}}
+       ],onBack(){},onRetry(){}
+     });
+   });
+   await page.locator('#paperAllOpen').click();
+   assert.equal(await page.locator('.paper-question').count(),2,'iodoform source pair not rendered');
+   assert.ok(await page.locator('.paper-iodoform-mechanism').count()>=2,'separate 2020 and 2022 mechanisms missing');
+   assert.ok(await page.locator('svg[aria-label*="碘仿反应电子对箭头"]').count()>=2,'iodoform electron-arrow figures missing');
+   assert.ok(await page.locator('.paper-iodoform-graphs svg.mol-graph-svg').count()>=8,'redrawn iodoform intermediates/products not shown');
+   assert.match(await page.locator('.paper-question').first().innerText(),/苯乙醛/,'scanned phenylacetaldehyde distractor missing');
+   assert.match(await page.locator('.paper-question').last().innerText(),/叔丁基甲醛|季碳/,'scanned pivaldehyde negative case missing');
+   const iodoOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+   assert.ok(iodoOverflow<25,'iodoform explanation spills outside phone viewport: '+viewport.name+' '+iodoOverflow);
+   await page.screenshot({path:path.join(dir,'original-paper-iodoform-'+viewport.name+'.png'),fullPage:true});
 
    assert.deepEqual(issues,[],'browser JS errors');
    console.log('PASS '+viewport.name+': SVG, answers, toggles, wrong-only, back, retry; screenshot saved');
