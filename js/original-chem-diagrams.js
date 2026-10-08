@@ -15,8 +15,8 @@ function ring(n,{center=[100,74],radius=39,db=[],hetero={},subs=[]}={}){
  for(const [k,v] of Object.entries(hetero)){const p=vertices[Number(k)];out+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="11" fill="#fff"/>'+atomText(p[0],p[1],v);}
  for(const s of subs){
    const p=vertices[s.at],dx=p[0]-center[0],dy=p[1]-center[1],k=(s.dist||30)/Math.hypot(dx,dy);
-   const q=[p[0]+dx*k,p[1]+dy*k];
-   out+=bond(p,q);out+='<rect x="'+(q[0]-30)+'" y="'+(q[1]-10)+'" width="60" height="20" fill="#fff"/>'+atomText(q[0],q[1],s.label);
+   const q=[p[0]+dx*k+(s.shiftX||0),p[1]+dy*k+(s.shiftY||0)];
+   out+=bond(p,q,Boolean(s.double));out+='<rect x="'+(q[0]-30)+'" y="'+(q[1]-10)+'" width="60" height="20" fill="#fff"/>'+atomText(q[0],q[1],s.label);
  }
  return out;
 }
@@ -29,14 +29,14 @@ function linear(segments,labels=[],doubleIndex=[]){
 const shapes={
  '环辛四烯':()=>ring(8,{radius:37,db:[0,2,4,6]}),
  '䓬鎓离子':()=>ring(7,{radius:38,db:[0,2,4]})+atomText(156,45,'⁺'),
- '四氢萘':()=>ring(6,{center:[82,74],radius:36,db:[0,2,4]})+ring(6,{center:[132,74],radius:36,db:[]}),
+ '四氢萘':()=>ring(6,{center:[70,74],radius:36,db:[0,2,4]})+ring(6,{center:[132.4,74],radius:36,db:[]}),
  '呋喃':()=>ring(5,{hetero:{0:'O'},db:[1,3]}),
  '苯':()=>ring(6,{db:[0,2,4]}),
  '吡啶':()=>ring(6,{db:[0,2,4],hetero:{0:'N'}}),
  '吡咯':()=>ring(5,{hetero:{0:'NH'},db:[1,3]}),
  '吡咯烷':()=>ring(5,{hetero:{0:'NH'}}),
  '咪唑':()=>ring(5,{hetero:{0:'NH',2:'N'},db:[1,3]}),
- '丁二酰亚胺':()=>ring(5,{hetero:{0:'NH'},subs:[{at:1,label:'=O'},{at:4,label:'=O'}]}),
+ '丁二酰亚胺':()=>ring(5,{hetero:{0:'NH'},subs:[{at:1,label:'O',double:true},{at:4,label:'O',double:true}]}),
  '苯胺':()=>ring(6,{db:[0,2,4],subs:[{at:0,label:'NH₂'}]}),
  '环己胺':()=>ring(6,{subs:[{at:0,label:'NH₂'}]}),
  '乙酰苯胺':()=>ring(6,{db:[0,2,4],subs:[{at:0,label:'NHCOCH₃',dist:43}]}),
@@ -48,20 +48,20 @@ const shapes={
  '间甲基苯甲酸':()=>ring(6,{db:[0,2,4],subs:[{at:0,label:'COOH'},{at:2,label:'CH₃'}]}),
  '对硝基苯甲酸':()=>ring(6,{db:[0,2,4],subs:[{at:0,label:'COOH'},{at:3,label:'NO₂'}]}),
  '间硝基苯甲酸':()=>ring(6,{db:[0,2,4],subs:[{at:0,label:'COOH'},{at:2,label:'NO₂'}]}),
- '2-丁醇':()=>linear([[40,45],[72,80],[110,50],[145,80]],[[2,'OH']]),
+ '2-丁醇':()=>linear([[40,45],[72,80],[110,50],[145,80]])+bond([110,50],[110,18])+atomText(110,13,'OH'),
  '正丁醇':()=>linear([[35,65],[65,42],[95,65],[125,42],[153,65]],[[4,'OH']]),
- '叔丁醇':()=>linear([[68,50],[100,76],[134,50],[100,105]],[[3,'OH']]),
+ '叔丁醇':()=>bond([100,75],[55,51])+bond([100,75],[145,51])+bond([100,75],[100,27])+bond([100,75],[100,112])+atomText(100,124,'OH'),
  '乙醚':()=>linear([[30,75],[62,47],[94,75],[125,47],[158,75]],[[2,'O']]),
  '乙醛':()=>linear([[46,79],[93,52],[138,80]],[[2,'O']],[1]),
- '丙酮':()=>linear([[40,74],[90,50],[140,74],[90,104]],[[3,'O']],[2]),
- '二苯甲酮':()=>ring(6,{center:[53,68],radius:25,db:[0,2,4]})+ring(6,{center:[146,68],radius:25,db:[0,2,4]})+linear([[77,68],[100,54],[121,68],[100,20]],[[3,'O']],[2]),
+ '丙酮':()=>bond([40,80],[90,52])+bond([90,52],[140,80])+bond([90,52],[90,112],true)+atomText(90,126,'O'),
+ '二苯甲酮':()=>ring(6,{center:[53,68],radius:25,db:[0,2,4]})+ring(6,{center:[146,68],radius:25,db:[0,2,4]})+bond([75,68],[100,54])+bond([100,54],[124,68])+bond([100,54],[100,23],true)+atomText(100,13,'O'),
  '三氯乙醛':()=>linear([[54,65],[95,65],[135,65]],[[0,'CCl₃'],[2,'O']],[1]),
  '丙醛':()=>linear([[35,80],[75,48],[117,80],[154,48]],[[3,'O']],[2]),
  '甲醛':()=>linear([[68,66],[125,66]],[[0,'H₂C'],[1,'O']],[0]),
- '氯乙酸':()=>linear([[36,65],[70,42],[108,65],[145,42]],[[0,'Cl'],[3,'COOH']]),
+ '氯乙酸':()=>linear([[45,80],[95,50],[145,80]],[[0,'Cl'],[2,'COOH']]),
  '乙酸':()=>linear([[56,78],[100,51]],[[1,'COOH']]),
  '环戊基甲醇':()=>ring(5,{subs:[{at:0,label:'CH₂OH',dist:36}]}),
- '1-甲基环戊醇':()=>ring(5,{subs:[{at:0,label:'OH'},{at:0,label:'CH₃',dist:51}]}),
+ '1-甲基环戊醇':()=>ring(5,{subs:[{at:0,label:'OH'},{at:0,label:'CH₃',dist:37,shiftX:37,shiftY:17}]}),
  '2-甲基环戊醇':()=>ring(5,{subs:[{at:0,label:'OH'},{at:1,label:'CH₃'}]})
 };
 const pictureMap={
