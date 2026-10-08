@@ -9,6 +9,7 @@ load('data/original-exam-draft.js',w);
 load('js/interactions.js',w);
 load('js/original-chem-diagrams.js',w);
 load('js/original-chem-graph.js',w);
+load('js/original-reaction-solutions.js',w);
 const {questions,status}=w.Organic637.OriginalExamDraft;
 const iodo=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题12');
 assert.match(iodo.options[2].label,/苯甲醚/,'iodoform option C scan mismatch');
@@ -45,21 +46,29 @@ for(const q of questions){
  assert.notEqual(q.hold,true,'unreviewed question must be quarantined');
  assert.ok(expectedPages.get(src.year)?.has(src.pdfPage),'out-of-bounds year/page: '+q.id);
  assert.equal(src.printedSubjectCode,'816','original year exam code must be captured, separate from compilation 637');
- assert.equal(src.originalPoints,2,'each selected original is a two-mark task');
- assert.ok(src.originalQuestion.match(/(?:选择题|排序)\d+/),'specific source exam question missing');
+ assert.ok(src.originalPoints===2 || (q.type==='structure-deduction'&&src.originalPoints===8),'original mark metadata wrong');
+ assert.ok(src.originalQuestion.match(/(?:选择题|排序|填空题|结构推导题)\d+/),'specific source exam question missing');
  assert.equal(src.scanFile,'扫描件_260725_205723(1).pdf');
  assert.ok(q.examGuide.steps.length>=4&&q.examGuide.steps.every(t=>t.length>=20),'need detailed nontrivial explanation steps');
  if(q.type==='ranking'){
    assert.deepEqual([...q.correctOrder].sort().join(','),q.items.map(i=>i.id).sort().join(','),'ranking permutation invalid');
    assert.equal(check.evaluate(q,{order:q.correctOrder}).correct,true,'correct ranking not given full mark');
    assert.equal(check.evaluate(q,{order:[...q.correctOrder].reverse()}).correct,false,'inverse ranking wrongfully accepted');
+ }else if(q.type==='text-short'){
+   assert.ok(check.evaluate(q,{value:q.answer[0]}).correct,'real reaction product must match');
+   assert.equal(check.evaluate(q,{value:'错误产物'}).correct,false,'invalid product wrongfully accepted');
+ }else if(q.type==='structure-deduction'){
+   const all=Object.fromEntries(Object.entries(q.answer).map(([p,values])=>[p,values[0]]));
+   assert.equal(check.evaluate(q,{fields:all}).partialScore,1,'all correct structural deductions must score fully');
+   assert.equal(check.evaluate(q,{fields:{...all,B:'错误结构'}}).partialScore,2/3,'correct A and C must score two thirds');
+   assert.equal(check.evaluate(q,{fields:{A:'错误',B:'错误',C:'错误'}}).partialScore,0,'all invalid should score zero');
  }else{
    assert.equal(check.evaluate(q,{selected:q.answer}).correct,true,'correct multiple-choice answer not full mark');
    for(const other of q.options.filter(o=>o.id!==q.answer))assert.equal(check.evaluate(q,{selected:other.id}).correct,false,'distractor wrongfully full scored');
  }
  const images=chem.figuresFor(q);
- assert.match(images,/<svg/,'Missing independent question/structure drawing '+q.id);
- assert.match(images,/<\/svg>/,'Broken SVG closing tag '+q.id);
+ if(q.type!=='structure-deduction')assert.match(images,/<svg/,'Missing independent question/structure drawing '+q.id);
+ if(q.type!=='structure-deduction')assert.match(images,/<\/svg>/,'Broken SVG closing tag '+q.id);
  recognizedSvg++;
  const answer=chem.answerFor(q);
  assert.match(answer,/<svg/,'Missing separately redrawn correct answer '+q.id);
@@ -69,5 +78,5 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
-console.log('PASS: '+recognizedSvg+' question diagrams and '+recognizedAnswers+' independently redrawn answer diagrams; 81 molecular templates validated');
+console.log('PASS: '+recognizedSvg+' source figures and '+recognizedAnswers+' independently redrawn answer solutions; '+Object.keys(chem.graphTemplates).length+' molecular templates validated');
 console.log('Note: this is code-level verification, NOT final chemistry double-blind review or visual browser QA.');
