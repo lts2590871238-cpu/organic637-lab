@@ -12,6 +12,7 @@ const assert=require('node:assert/strict');
    const issues=[];
    page.on('pageerror',e=>issues.push(e.message));
    await page.setContent('<!doctype html><html lang="zh"><head><meta charset="utf-8"></head><body><main id="paperReviewRoot"></main></body></html>');
+   await page.addStyleTag({path:path.resolve('styles.css')});
    for(const f of ['data/original-exam-draft.js','js/original-chem-diagrams.js','js/original-chem-graph.js','js/exam-review.js']){
     await page.addScriptTag({path:path.resolve(f)});
    }
