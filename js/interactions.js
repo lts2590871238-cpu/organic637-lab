@@ -111,7 +111,8 @@
     const key = row => `${row.source}>${row.target}:${row.arrowType || 'pair'}`;
     const exp = expected.map(key);
     const actual = arrows.map(key);
-    const matched = actual.filter(value => exp.includes(value)).length;
+    const remaining = exp.slice();
+    const matched = actual.reduce((sum,value) => { const index=remaining.indexOf(value);if(index<0)return sum;remaining.splice(index,1);return sum+1; },0);
     const exact = exp.length === actual.length && matched === exp.length;
     let errorType = null;
     if (!exact) {
@@ -134,7 +135,7 @@
       const expected = (question.answer || []).map(String).sort();
       const actual = (payload.selected || []).map(String).sort();
       const matched = actual.filter(x => expected.includes(x)).length;
-      return { correct: expected.length === actual.length && expected.every((x, i) => x === actual[i]), partialScore: expected.length ? matched / expected.length : 0, details: {}, errorType: expected.length === actual.length && expected.every((x, i) => x === actual[i]) ? null : 'unknown' };
+      return { correct: expected.length === actual.length && expected.every((x, i) => x === actual[i]), partialScore: expected.length ? Math.max(0, Math.min(1, (matched - (actual.length - matched)) / expected.length)) : 0, details: {}, errorType: expected.length === actual.length && expected.every((x, i) => x === actual[i]) ? null : 'unknown' };
     }
     if (question.type === 'numeric' || question.type === 'text-short') {
       const accepted = Array.isArray(question.answer) ? question.answer : [question.answer];
