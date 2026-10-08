@@ -589,3 +589,17 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 .paper-structure-part-scores>div span{flex:1;min-width:170px;overflow-wrap:anywhere;}
 .paper-structure-part-scores>div strong{font-size:12px;}
 @media(max-width:600px){.structure-deduction-fields label{padding:10px;}.original-chem-reaction-figure svg{height:140px;}}
+
+
+/* Scanned 2020/2022 iodoform: chemical-structure and curved-arrow teaching review */
+.paper-iodoform-mechanism{margin:16px 0;border:1px solid #a9c7ad;border-radius:14px;padding:16px;background:#f7fbf8;line-height:1.8}
+.paper-iodoform-mechanism h4{font-size:16px;color:#23593b;margin:4px 0 14px}
+.paper-iodoform-mechanism>.paper-iodoform-graphs{padding:3px 0 12px}
+.paper-iodoform-mechanism .original-molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:740px;gap:9px}
+.paper-iodoform-mechanism .original-molecule-grid figure{background:#fff;min-width:0}
+.paper-iodoform-mechanism>svg{display:block;max-width:100%;width:100%;height:auto;overflow:visible;margin:7px 0 18px;border:1px solid #d4e4d8;border-radius:12px;background:#fff}
+.paper-iodoform-mechanism .paper-mechanism-step{margin:9px 0}
+.paper-iodoform-mechanism .paper-mechanism-step>strong{display:block;color:#215337}
+.paper-iodoform-mechanism .paper-mechanism-step p{margin:4px 0;font-size:14px;line-height:1.8}
+.paper-iodoform-mechanism .paper-mechanism-formula{font-size:15px;overflow-wrap:anywhere}
+@media(max-width:580px){.paper-iodoform-mechanism{padding:10px}.paper-iodoform-mechanism .original-molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.paper-iodoform-mechanism .paper-mechanism-step{padding:10px}.paper-iodoform-mechanism>svg{min-width:540px}.paper-iodoform-mechanism{overflow-x:auto}}
