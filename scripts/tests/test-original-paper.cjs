@@ -283,8 +283,8 @@ function verifyReduction(){
  assert.equal(initial.atoms.length,7);
  assert.equal(product.atoms.length,7);
  const getDouble=(m)=>m.bonds.filter(([u,v,o])=>o===2&&m.atoms[u][2]!=='O'&&m.atoms[v][2]!=='O');
- assert.deepEqual(getDouble(initial),[[1,2,2]],'reactant original 4-hexenal contains exactly one C=C');
- assert.deepEqual(getDouble(product),[[1,2,2]],'NaBH4 must retain original C=C position');
+ assert.equal(JSON.stringify(getDouble(initial)),JSON.stringify([[1,2,2]]),'reactant original 4-hexenal contains exactly one C=C');
+ assert.equal(JSON.stringify(getDouble(product)),JSON.stringify([[1,2,2]]),'NaBH4 must retain original C=C position');
  assert.equal(bondBetween(initial,5,6),2,'reactant needs terminal C=O');
  assert.equal(initial.atoms[6][2],'O');
  assert.equal(bondBetween(product,5,6),1,'product terminal C=O reduced to C–OH');
