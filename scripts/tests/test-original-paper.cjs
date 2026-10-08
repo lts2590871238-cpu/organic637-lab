@@ -179,6 +179,76 @@ assert.deepEqual(carbonylEnvironment('乙酰氯'),{halogen:'Cl',directlyAttached
 assert.deepEqual(carbonylEnvironment('乙酰氟'),{halogen:'F',directlyAttachedVinyl:false});
 assert.deepEqual(carbonylEnvironment('甲基乙烯基酮'),{halogen:null,directlyAttachedVinyl:true});
 
+// Original 2020 p27 q13: distinguish meta/para on the MOLECULAR GRAPH,
+// including nitro substituent charges, not simply option captions.
+function substitutedBenzeneDistance(name){
+ const [atoms,bonds]=chem.graphTemplates[name];
+ const carbonRing=ringAtoms(name);
+ assert.equal(carbonRing.size,6,'expected a six-member benzene ring: '+name);
+ const adj=atoms.map(()=>[]);
+ for(const [i,j,order] of bonds){adj[i].push({to:j,order});adj[j].push({to:i,order});}
+ const external=Array.from({length:atoms.length},(_,i)=>i).filter(i=>!carbonRing.has(i));
+ let acidC=-1,other=-1,kind='';
+ for(const i of external){
+   const neighbors=adj[i].map(e=>e.to);
+   if(neighbors.some(j=>atoms[j][2]==='O')&&neighbors.some(j=>atoms[j][2]==='OH'))acidC=i;
+   if(atoms[i][2]==='N+'&&(neighbors.some(j=>atoms[j][2]==='O')||neighbors.some(j=>atoms[j][2]==='O−'))){other=i;kind='nitro'}
+ }
+ if(other<0){
+   other=external.find(i=>atoms[i][2]===''&&adj[i].length===1&&carbonRing.has(adj[i][0].to));
+   kind='methyl';
+ }
+ assert.ok(acidC>=0&&other>=0,'missing substituents '+name);
+ const carboxyRing=adj[acidC].map(e=>e.to).find(i=>carbonRing.has(i));
+ const otherRing=adj[other].map(e=>e.to).find(i=>carbonRing.has(i));
+ assert.ok(carboxyRing!==undefined&&otherRing!==undefined);
+ const queue=[[carboxyRing,0]],seen=new Set([carboxyRing]);
+ for(const [node,dist] of queue){
+   if(node===otherRing)return {distance:dist,kind};
+   for(const e of adj[node])if(carbonRing.has(e.to)&&!seen.has(e.to)){
+     seen.add(e.to);queue.push([e.to,dist+1]);
+   }
+ }
+ throw Error('substitution positions disconnected '+name);
+}
+for(const [name,expect] of [
+ ['对甲基苯甲酸',{distance:3,kind:'methyl'}],
+ ['间甲基苯甲酸',{distance:2,kind:'methyl'}],
+ ['对硝基苯甲酸',{distance:3,kind:'nitro'}],
+ ['间硝基苯甲酸',{distance:2,kind:'nitro'}]
+ ])assert.deepEqual(substitutedBenzeneDistance(name),expect,
+ '2020 p27 q13 substituent meta/para connectivity mismatch: '+name);
+const acidQ=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题13');
+assert.ok(acidQ);
+assert.equal(acidQ.answer,'a','p27 q13 weakest acid must be para-methylbenzoic acid');
+assert.deepEqual(Array.from(chem.optionStructureNames(acidQ)),
+ ['对甲基苯甲酸','间硝基苯甲酸','间甲基苯甲酸','对硝基苯甲酸'],
+ 'p27 q13 options must preserve scanned A/B/C/D positions');
+// 2020 p28 q15: identify actual saturated versus aromatic N and imide carbonyl.
+const basicityQ=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题15');
+assert.equal(basicityQ.answer,'d');
+assert.deepEqual(Array.from(chem.optionStructureNames(basicityQ)),['咪唑','吡咯','丁二酰亚胺','吡咯烷']);
+const pyrrolidine=molecule('吡咯烷'),pyrrole=molecule('吡咯'),imidazole=molecule('咪唑'),imide=molecule('丁二酰亚胺');
+assert.equal(pyrrolidine.bonds.filter(b=>b[2]===2).length,0,'pyrrolidine is saturated with accessible NH lone pair');
+assert.equal(pyrrole.bonds.filter(b=>b[2]===2).length,2,'pyrrole N lone pair participates in aromatic six pi electrons');
+assert.equal(imidazole.atoms.filter(a=>a[2]==='N'||a[2]==='NH').length,2,'imidazole has two chemically distinct nitrogens');
+assert.equal(imide.bonds.filter(b=>b[2]===2&&
+ (imide.atoms[b[0]][2]==='O'||imide.atoms[b[1]][2]==='O')).length,2,'succinimide NH next to two carbonyls');
+// 2019 p35 q7: the two phenyls in the strongest benzhydryl cation,
+// versus saturated cyclohexyl rings (which do not delocalize pi charge).
+const cationQ=questions.find(q=>q.examSource.year===2019&&q.examSource.originalQuestion==='三、单项选择题7');
+assert.equal(cationQ.answer,'d');
+const cationNames=['环己基甲基正离子','二环己基甲基正离子','苄基正离子','二苯甲基正离子'];
+assert.deepEqual(Array.from(chem.optionStructureNames(cationQ)),cationNames,'2019 p35 q7 old scanned option identities mismatched');
+for(const [name,expect] of cationNames.map((name,i)=>[name,[0,0,3,6][i]])){
+ const [atoms,bonds]=chem.graphTemplates[name];
+ assert.equal(bonds.filter(b=>b[2]===2).length,expect,
+  '2019 p35 q7 benzene-conjugated cation lost its aromatic pi bonds: '+name);
+ const pos=atoms.findIndex(x=>x[2]==='+');
+ assert.ok(pos>=0,'missing positive carbon '+name);
+ assert.equal(bonds.filter(b=>b[0]===pos||b[1]===pos).length,[1,2,1,2][cationNames.indexOf(name)]);
+}
+
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 
 
@@ -268,6 +338,7 @@ console.log('PASS: source metadata, page indexing, detailed explanation coverage
 console.log('PASS: p59 Lucas and p40 carbonyl IR molecular topology');
 console.log('PASS: 2020/2022 iodoform positive/negative original structures and redrawn triiodination/C-C cleavage');
 console.log('PASS: historical 2015 E1 electron-flow template is distinct from SN1 substitution');
+console.log('PASS: 2020 p27 acid substituent positions, p28 NH aromaticity, 2019 p35 benzyl cation resonance geometry');
 console.log('PASS: p22 SN1 bromide ring positions (allylic/homoallylic/vinylic), p31 target present before answer');
 console.log('PASS: source/product formulas audited, including the synthesis target and IR/NMR aromatic ether');
 console.log('PASS: '+recognizedSvg+' source figures and '+recognizedAnswers+' independently redrawn answer solutions; '+Object.keys(chem.graphTemplates).length+' molecular templates validated');
