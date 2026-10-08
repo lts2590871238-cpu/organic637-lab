@@ -36,10 +36,12 @@ async function run(){
     localStorage.setItem('organic637_clean_v1_auth',JSON.stringify({token:'E2E-FAKE-NOT-A-REAL-SESSION',user:u,expires_at:Date.now()+3600000}));
     window.confirm=()=>true;
   },fakeUser);
-  await page.goto('http://127.0.0.1:'+port+'/#day/19',{waitUntil:'domcontentloaded'});
+  await page.goto('http://127.0.0.1:'+port+'/#welcome',{waitUntil:'domcontentloaded'});
+  await page.locator('.app.cozy-app').waitFor({timeout:25000});
+  await page.evaluate(()=>{location.hash='#day/19';});
   await page.locator('.original-exam-question').waitFor({timeout:25000});
   for(const day of [19,20]){
-   if(day===20){await page.goto('http://127.0.0.1:'+port+'/#day/20',{waitUntil:'domcontentloaded'});await page.locator('.original-exam-question').waitFor();}
+   if(day===20){await page.evaluate(()=>{location.hash='#day/20';});await page.locator('.original-exam-question').waitFor();}
    for(let q=1;q<=15;q++){
     await page.locator('.original-exam-question').waitFor();
     const head=(await page.locator('.step-label').allTextContents()).join(' ');
