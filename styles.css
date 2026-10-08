@@ -554,3 +554,14 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 .paper-concept-scheme svg{display:block;width:100%;min-width:470px;height:auto}
 .paper-concept-scheme small{display:block;color:#506959}
 @media (max-width:600px){.mol-graph-svg{height:125px}.paper-concept-scheme svg{min-width:390px}}
+
+
+/* Chemistry mechanism reading flow: electron source → intermediate → rationale */
+.paper-mechanism{margin:16px 0 9px;border-radius:15px;padding:14px;background:#f7f9f5;border:1px solid #bbd1be}
+.paper-mechanism h4{margin:3px 0 12px;font-size:16px;line-height:1.5}
+.paper-mechanism-step{padding:12px 15px;background:#fff;border:1px solid #dce7dc;border-radius:12px;line-height:1.8}
+.paper-mechanism-step-title{font-weight:750;color:#23583d}
+.paper-mechanism-formula{font-weight:650;font-size:16px;margin:7px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.paper-mechanism-step p{color:#42574b;margin:3px 0;font-size:14px}
+.paper-mechanism-arrow{text-align:center;font-size:24px;color:#477456;line-height:1.6}
+.original-old-review{margin:15px 0 5px;border-top:1px solid #e2e9e1;padding-top:14px}
