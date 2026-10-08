@@ -520,3 +520,10 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 @media(max-width:640px){.paper-review{padding:0 10px;}.paper-review-head,.paper-question{padding:15px;border-radius:16px;}.paper-comparison{grid-template-columns:1fr;}.paper-option{align-items:flex-start;flex-wrap:wrap;}.paper-option em{margin-left:40px;}.paper-explanation{padding:12px;}}
 
 .paper-jump button{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:11px;background:#e6f5ea;color:#225b39;font-weight:700;cursor:pointer;}.paper-jump button.wrong{background:#fff0e9;color:#963e2b;}
+
+/* Scan provenance and missing legacy response states */
+.paper-source-warning{border-left:4px solid #b98448;background:#fff7e9;padding:12px 14px;border-radius:8px;color:#5b452b;}
+.paper-scheme-notice{color:#675d51;font-size:13px;line-height:1.6;}
+.paper-jump button.unknown{background:#f1f1f1;color:#666;}
+.paper-tag-unknown{background:#f0f0f0;color:#6b6b6b;}
+.paper-question.paper-unknown{border-color:#c9c9c9;}
