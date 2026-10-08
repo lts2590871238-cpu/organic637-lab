@@ -70,6 +70,32 @@ const assert=require('node:assert/strict');
    const bodyOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
    assert.ok(bodyOverflow<25,'advanced case horizontal page overflow '+viewport.name+': '+bodyOverflow);
    await page.screenshot({path:path.join(dir,'original-paper-advanced-'+viewport.name+'.png'),fullPage:true});
+   // Source-grounded Lucas reaction and IR acyl-halide comparisons:
+   // show *the scanned molecular choices* and inspect tertiary alcohol curved arrows.
+   await page.evaluate(()=>{
+     const qs=window.Organic637.OriginalExamDraft.questions;
+     const lucas=qs.find(x=>x.examSource.year===2014&&x.examSource.originalQuestion==='三、按指定性质排序8');
+     const ir=qs.find(x=>x.examSource.year===2018&&x.examSource.originalQuestion==='三、按指定性质排序3');
+     window.Organic637.ExamReview.render(document.querySelector('#paperReviewRoot'),{
+       title:'原卷来源和分子结构专项：Lucas及羰基红外排序',scoreLabel:'仅作逐题绘图验收',
+       rows:[
+         {question:lucas,correct:true,hasEvidence:true,partialScore:1,payload:{order:lucas.correctOrder}},
+         {question:ir,correct:true,hasEvidence:true,partialScore:1,payload:{order:ir.correctOrder}}
+       ],onBack(){},onRetry(){}
+     });
+   });
+   await page.locator('#paperAllOpen').click();
+   assert.equal(await page.locator('.paper-question').count(),2);
+   assert.ok(await page.locator('svg.mol-graph-svg').count()>=12,
+     'Lucus and IR 3-option molecular diagrams missing');
+   const lucasBlock=await page.locator('.paper-electron-diagram').first().innerText();
+   assert.match(lucasBlock,/ZnCl₂|C–O|Lucas/,'Lucas mechanistic explanation missing');
+   assert.ok(await page.locator('svg[aria-label*="Lucas试剂"]').count()>=1,
+     'Lucas electron-pair curved-arrow schematic missing');
+   const lucasOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+   assert.ok(lucasOverflow<25,'Lucas/IR chemistry page overflow '+viewport.name+': '+lucasOverflow);
+   await page.screenshot({path:path.join(dir,'original-paper-lucas-ir-'+viewport.name+'.png'),fullPage:true});
+
    assert.deepEqual(issues,[],'browser JS errors');
    console.log('PASS '+viewport.name+': SVG, answers, toggles, wrong-only, back, retry; screenshot saved');
    await page.close();
