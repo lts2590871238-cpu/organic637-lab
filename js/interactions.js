@@ -34,7 +34,7 @@
 
   function orderedOptions(question) {
     const options = [...(question.options || [])];
-    if (options.length < 2) return options;
+    if (question.examSource || options.length < 2) return options;
     const random = seededRandom(stableHash(`${question.day || ''}|${question.id || question.prompt || ''}`));
     for (let i = options.length - 1; i > 0; i -= 1) {
       const j = Math.floor(random() * (i + 1));
