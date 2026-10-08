@@ -1272,45 +1272,54 @@
   }
 
   function examRows(ids, responses, mode) {
-    const indexed = new Map((Array.isArray(responses)?responses:[]).map(r=>[r.questionId,r]));
+    const indexed=new Map((Array.isArray(responses)?responses:[]).map(r=>[r.questionId,r]));
     return (ids||[]).map(id=>{
-      const question=QMAP.get(id); if(!question)return null;
+      const question=QMAP.get(id);if(!question)return null;
       const row=indexed.get(id);
+      // Older records may contain only a total score. Never pretend a missing response was wrong.
       const attempt=(Store.state.attempts||[]).filter(a=>a.questionId===id&&(!mode||a.mode===mode)).at(-1);
-      const source=row||attempt||{};
-      return {question,correct:Boolean(source.correct),partialScore:Number(source.partialScore??0),payload:source.payload??source.answerPayload??attempt?.answerPayload??null};
+      const source=row||attempt;
+      return {question,hasEvidence:Boolean(source),correct:source?.correct===true,
+        partialScore:source?.partialScore==null?null:Number(source.partialScore),
+        payload:source?.payload??source?.answerPayload??attempt?.answerPayload??null};
     }).filter(Boolean);
+  }
+  function archiveExamReview(kind,result) {
+    if(!result)return;
+    Store.state.examReviewHistory ||= [];
+    Store.state.examReviewHistory.push({kind,archivedAt:Date.now(),result:JSON.parse(JSON.stringify(result))});
+    Store.state.examReviewHistory=Store.state.examReviewHistory.slice(-12);
   }
   function examReviewPage(kind) {
     let ids=[],responses=[],mode='',title='',scoreLabel='',back='',retry=null;
     if(kind==='core') {
       const config=NS.V16_EXAM?.day19Core,result=Store.state.examResults?.v16Day19Core;
       if(!result)return coreExamResultsPage();
-      ids=config?.itemIds||[];responses=result.responses||[];mode='v16-core-exam';title='DAY 19 · 核心审核原卷';scoreLabel=Number(result.percent||0)+'%';back='core';
+      ids=config?.itemIds||[];responses=result.responses||[];mode='v16-core-exam';title='DAY 19 · 核心审核答卷';scoreLabel=Number(result.percent||0)+'%';back='core';
       retry=()=>{
         const v16=NS.Learning.ensureV16DayState(Store.state,19);const step=NS.V16Director?.getDayPlan?.(19)?.sequence?.find(t=>t.type==='exam'&&t.ref==='day19-core');
         if(!step)return;
-        delete (v16.stepState||{})[step.id];delete Store.state.examResults.v16Day19Core;
+        archiveExamReview('core',Store.state.examResults.v16Day19Core);delete (v16.stepState||{})[step.id];delete Store.state.examResults.v16Day19Core;
         const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;
         v16.cursor=Math.max(0,(NS.V16Director.getDayPlan(19)?.sequence||[]).findIndex(t=>t.id===step.id));delete v16.completedSteps?.[step.id];
         Store.save();location.hash='#day/19';dayPage(19);
       };
     } else if(kind==='full') {
       const result=Store.state.examResults?.full150;if(!result)return full150ExamPage();
-      ids=NS.V16_EXAM?.full150?.itemIds||[];responses=result.responses||[];mode='full150-exam';title='DAY 19 · 150分模拟原卷';scoreLabel=Number(result.score150||0)+'/150';back='full';
-      retry=()=>{delete Store.state.examResults.full150;delete Store.state.examResults.full150Draft;Store.save();location.hash='#full-exam/19';full150ExamPage();};
+      ids=NS.V16_EXAM?.full150?.itemIds||[];responses=result.responses||[];mode='full150-exam';title='DAY 19 · 150分综合模拟答卷';scoreLabel=Number(result.score150||0)+'/150';back='full';
+      retry=()=>{archiveExamReview('full',Store.state.examResults.full150);delete Store.state.examResults.full150;delete Store.state.examResults.full150Draft;Store.save();location.hash='#full-exam/19';full150ExamPage();};
     } else if(kind==='legacy') {
       const result=Store.state.examResults?.[19];if(!result)return examResultsPage();
-      ids=(REGISTRY[19]?.questions||[]).map(q=>q.id);responses=result.responses||[];mode='exam';title='DAY 19 · Boss原卷';scoreLabel=Number(result.score150||0)+'/150';back='legacy';
-      retry=()=>{const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;p.taskIndex=0;p.examDraft={responses:[],startedAt:Date.now()};p.answered={};delete Store.state.examResults[19];Store.save();location.hash='#day/19';legacyDayPage(19);};
+      ids=(REGISTRY[19]?.questions||[]).map(q=>q.id);responses=result.responses||[];mode='exam';title='DAY 19 · Boss模拟答卷';scoreLabel=Number(result.score150||0)+'/150';back='legacy';
+      retry=()=>{const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;p.taskIndex=0;p.examDraft={responses:[],startedAt:Date.now()};p.answered={};archiveExamReview('legacy',Store.state.examResults[19]);delete Store.state.examResults[19];Store.save();location.hash='#day/19';legacyDayPage(19);};
     } else if(kind==='day20') {
       const results=Store.state.examResults?.day20Boss||{},v16=NS.Learning.ensureV16DayState(Store.state,20);
       const runtime=v16.adaptiveRuntime||ensureDay20AdaptiveRuntime();
       ids=(runtime.groups||[]).map(g=>g.bossId).filter(Boolean);
-      responses=results.responses||[];mode='boss';title='DAY 20 · 最终Boss原卷';scoreLabel=Number(results.percent||0)+'%';back='day20';
+      responses=results.responses||[];mode='boss';title='DAY 20 · 最终Boss模拟答卷';scoreLabel=Number(results.percent||0)+'%';back='day20';
       retry=()=>{const step=(NS.V16Director.getDayPlan(20)?.sequence||[]).find(x=>x.type==='final-boss');if(!step)return;
         const p=NS.Learning.ensureDayState(Store.state,20,REGISTRY);p.finished=false;
-        const v=NS.Learning.ensureV16DayState(Store.state,20);v.stepState ||= {};v.stepState[step.id]={index:0,responses:[]};v.cursor=(NS.V16Director.getDayPlan(20)?.sequence||[]).findIndex(x=>x.id===step.id);delete v.completedSteps?.[step.id];delete Store.state.examResults.day20Boss;Store.save();location.hash='#day/20';dayPage(20);
+        const v=NS.Learning.ensureV16DayState(Store.state,20);v.stepState ||= {};v.stepState[step.id]={index:0,responses:[]};v.cursor=(NS.V16Director.getDayPlan(20)?.sequence||[]).findIndex(x=>x.id===step.id);delete v.completedSteps?.[step.id];archiveExamReview('day20',Store.state.examResults.day20Boss);delete Store.state.examResults.day20Boss;Store.save();location.hash='#day/20';dayPage(20);
       };
     }
     shell('<div id="paperReviewRoot"></div>','study');
@@ -1461,6 +1470,7 @@
     $('#fullExamPaper').onclick=()=>examReviewPage('full');
     $('#fullExamHome').onclick = () => { location.hash = '#home'; };
     $('#fullExamRestart').onclick = () => {
+      archiveExamReview('full',Store.state.examResults.full150);
       delete Store.state.examResults.full150;
       delete Store.state.examResults.full150Draft;
       Store.save();
