@@ -5,7 +5,7 @@ const N=window.Organic637=window.Organic637||{},C=N.OriginalChem;if(!C)return;
 const starting=C.graphTemplates['苯乙酮'];
 if(!starting)return;
 const atoms=starting[0].map(a=>[...a]),bonds=starting[1].map(b=>[...b]);
-for(const point of [[92,42,'I'],[86,67,'I'],[75,-1,'I']]){
+for(const point of [[101,32,'I'],[57,74,'I'],[94,-7,'I']]){
  bonds.push([0,atoms.length,1]);atoms.push(point);
 }
 C.graphTemplates['三碘苯乙酮']=[atoms,bonds];
