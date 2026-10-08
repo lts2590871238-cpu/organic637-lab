@@ -265,6 +265,75 @@ for(const [name,expect] of cationNames.map((name,i)=>[name,[0,0,3,6][i]])){
  assert.equal(bonds.filter(b=>b[0]===pos||b[1]===pos).length,[1,2,1,2][cationNames.indexOf(name)]);
 }
 
+// 2020 original PDF p28 II/5,10; p29 IV/1: chemical transformations
+// checked by actual ring/bond connectivity rather than just formula totals.
+function labeledGraph(name){
+ const [atoms,bonds]=chem.graphTemplates[name];
+ assert.ok(atoms&&bonds,'missing scanned chemical graph '+name);
+ const adj=atoms.map(()=>[]);
+ for(const [i,j,order] of bonds){adj[i].push({i:j,order});adj[j].push({i,order});}
+ return {atoms,bonds,adj};
+}
+function bondBetween(m,i,j){return m.adj[i].find(b=>b.i===j)?.order||0}
+function verifyReduction(){
+ const q=questions.find(q=>q.id==='orig-2020-ii-10-nabh4');
+ assert.equal(q.examSource.pdfPage,28);
+ assert.match(q.prompt,/NaBH₄/);
+ const initial=labeledGraph('NaBH₄还原底物'),product=labeledGraph('NaBH₄还原产物');
+ assert.equal(initial.atoms.length,7);
+ assert.equal(product.atoms.length,7);
+ const getDouble=(m)=>m.bonds.filter(([u,v,o])=>o===2&&m.atoms[u][2]!=='O'&&m.atoms[v][2]!=='O');
+ assert.deepEqual(getDouble(initial),[[1,2,2]],'reactant original 4-hexenal contains exactly one C=C');
+ assert.deepEqual(getDouble(product),[[1,2,2]],'NaBH4 must retain original C=C position');
+ assert.equal(bondBetween(initial,5,6),2,'reactant needs terminal C=O');
+ assert.equal(initial.atoms[6][2],'O');
+ assert.equal(bondBetween(product,5,6),1,'product terminal C=O reduced to C–OH');
+ assert.equal(product.atoms[6][2],'OH');
+ assert.equal(product.adj[5].length,2,'terminal –CH2OH must have one carbon neighbor and one OH');
+ const picture=chem.answerFor(q);
+ assert.match(picture,/NaBH₄还原产物/,'correct redrawn primary alcohol missing');
+}
+function verifyIntramolecularRing(){
+ const q=questions.find(q=>q.id==='orig-2020-ii-5-intramolecular-fc');
+ assert.equal(q.examSource.pdfPage,28);
+ const precursor=labeledGraph('分子内FC底物'),cyclized=labeledGraph('四氢萘');
+ assert.equal(precursor.atoms.filter(a=>a[2]==='Cl').length,1,'original p28 Ph-(CH2)4-Cl requires one terminal chloride');
+ const cl=precursor.atoms.findIndex(a=>a[2]==='Cl'),attached=precursor.adj[cl][0].i;
+ assert.equal(precursor.adj[attached].length,2,'terminal chloride carbon should be -CH2Cl');
+ const path=[0,6,7,8,9,10];
+ for(let j=0;j<path.length-1;j++)assert.equal(bondBetween(precursor,path[j],path[j+1]),1,'p28 FC needs four linked methylenes in original chain');
+ const ring=cyclized.adj;
+ const countCycle=(start,target,cut)=>{const queue=[[start,1]],visited=new Set([start]);for(const [i,d]of queue){if(i===target)return d;for(const e of ring[i])if(i!==cut&& !visited.has(e.i)){visited.add(e.i);queue.push([e.i,d+1])}}return -1};
+ assert.equal(cyclized.atoms.filter(a=>a[2]==='Cl').length,0);
+ assert.equal(cyclized.atoms.length,10,'fused six-membered + benzene should have ten carbons');
+ // Graph sequence of the saturated fused six-member ring: 3-4-6-7-8-9-3.
+ for(const [i,j]of [[3,4],[4,6],[6,7],[7,8],[8,9],[9,3]])
+   assert.equal(bondBetween(cyclized,i,j),1,'wrong fused six-member-ring bond in tetralin');
+ assert.equal(cyclized.bonds.filter(b=>b[2]===2).length,3,'tetralin keeps exactly one aromatic benzene ring');
+ assert.match(chem.figuresFor(q),/原卷起始分子/);
+ assert.match(chem.answerFor(q),/四氢萘/);
+}
+function verifyPicolineDeduction(){
+ const q=questions.find(q=>q.id==='orig-2020-iv-1-picoline-structure');
+ assert.equal(q.examSource.pdfPage,29);
+ const a=labeledGraph('2-甲基吡啶'),b=labeledGraph('2-苯乙烯基吡啶'),c=labeledGraph('吡啶-2-甲醛');
+ for(const [name,m]of [['A',a],['B',b],['C',c]]){
+  const n=m.atoms.findIndex(x=>x[2]==='N');
+  assert.ok(n>=0,name+' pyridine N missing');
+  const neighbor=m.adj[n].map(e=>e.i);
+  assert.ok(neighbor.includes(1),name+' pyridine N not adjacent to 2-position');
+ }
+ assert.equal(bondBetween(a,1,6),1,'A needs 2-methyl substituent');
+ assert.equal(bondBetween(b,1,6),1,'B styryl substitution at pyridine-2');
+ assert.equal(bondBetween(b,6,7),2,'B must have side-chain C=C which ozonolyses');
+ assert.equal(bondBetween(b,7,8),1,'B side-chain second carbon connects to phenyl');
+ assert.equal(bondBetween(c,1,6),1,'C formyl substituent must attach to pyridine-2');
+ assert.equal(bondBetween(c,6,7),2,'C formyl carbon needs C=O');
+ assert.equal(c.atoms[7][2],'O');
+ assert.match(chem.answerFor(q),/2-苯乙烯基吡啶/);
+}
+verifyReduction();verifyIntramolecularRing();verifyPicolineDeduction();
+
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 
 
@@ -351,6 +420,7 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
+console.log('PASS: 2020 scanned NaBH4 alkene preserved, tetralin six-membered ring, picoline-2 ozonolysis atom connectivity');
 console.log('PASS: p59 Lucas and p40 carbonyl IR molecular topology');
 console.log('PASS: 2020/2022 iodoform positive/negative original structures and redrawn triiodination/C-C cleavage');
 console.log('PASS: historical 2015 E1 electron-flow template is distinct from SN1 substitution');
