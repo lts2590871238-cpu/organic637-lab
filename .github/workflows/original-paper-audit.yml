@@ -10,6 +10,7 @@ on:
       - 'js/exam-review.js'
       - 'js/original-chem-graph.js'
       - 'js/original-reaction-solutions.js'
+      - 'js/original-spectra.js'
       - 'scripts/tests/test-original-paper-review.cjs'
       - 'scripts/tests/test-original-paper-browser.cjs'
       - 'scripts/tests/test-original-full-journey.cjs'
@@ -36,6 +37,7 @@ jobs:
           node --check data/original-exam-draft.js
           node --check js/original-chem-graph.js
           node --check js/original-reaction-solutions.js
+          node --check js/original-spectra.js
       - name: Validate original paper source and answer scoring
         run: node scripts/tests/test-original-paper.cjs
       - name: Verify original paper review interaction controls
