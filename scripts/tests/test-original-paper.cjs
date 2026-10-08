@@ -69,6 +69,71 @@ assert.match(e1Electron,/Cα=Cβ/,'E1 mechanistic diagram must show alkene forma
 assert.match(e1Electron,/脱 β-H/,'E1 must indicate beta proton removal');
 assert.doesNotMatch(e1Electron,/<h4>SN1/,'E1 mistakenly displays SN1 title');
 
+// Two source-scan structure audits: original p59 Lucas q8, p40 carbonyl IR q3.
+// Verify the actual attached functional-group carbon and bonding patterns,
+// not just that a valid SVG happens to render.
+function molecule(name){
+ const [atoms,bonds]=chem.graphTemplates[name];
+ const adj=atoms.map(()=>[]);
+ for(const [i,j,order] of bonds){adj[i].push({to:j,order});adj[j].push({to:i,order})}
+ return {atoms,bonds,adj};
+}
+function hasRingPath(adj,start,target,skipA,skipB){
+ const todo=[start],seen=new Set([start]);
+ for(const k of todo){if(k===target)return true;
+  for(const {to} of adj[k])if(!((k===skipA&&to===skipB)||(k===skipB&&to===skipA))&&!seen.has(to)){
+   seen.add(to);todo.push(to)
+  }
+ }
+ return false;
+}
+function ringAtoms(name){
+ const {atoms,bonds,adj}=molecule(name),included=new Set();
+ for(const [i,j] of bonds)if(hasRingPath(adj,i,j,i,j)){included.add(i);included.add(j)}
+ return included;
+}
+function lucasOH(name){
+ const {atoms,adj}=molecule(name),ring=ringAtoms(name),hydroxy=atoms.findIndex(x=>x[2]==='OH');
+ assert.ok(hydroxy>=0,'Lucas source missing OH: '+name);
+ const joined=adj[hydroxy].map(x=>x.to);
+ assert.equal(joined.length,1,'Lucas OH bond degree wrong: '+name);
+ const carbon=joined[0];
+ return {ringSize:ring.size,onRing:ring.has(carbon),carbonDegree:adj[carbon].length,carbon,
+   neighbors:adj[carbon].filter(x=>x.to!==hydroxy).map(x=>x.to),
+   adj,ring};
+}
+const lucasA=lucasOH('环戊基甲醇'),lucasB=lucasOH('1-甲基环戊醇'),lucasC=lucasOH('2-甲基环戊醇');
+assert.equal(lucasA.ringSize,5);
+assert.equal(lucasB.ringSize,5);
+assert.equal(lucasC.ringSize,5);
+assert.equal(lucasA.onRing,false,'p59 Lucas A must be cyclopentyl-CH2OH, not ring alcohol');
+assert.equal(lucasA.carbonDegree,2,'p59 Lucas A CH2OH carbon should have one carbon neighbor');
+assert.equal(lucasB.onRing,true);
+assert.equal(lucasB.carbonDegree,4,'p59 Lucas B is tertiary carbinol: OH carbon has three C neighbors');
+assert.equal(lucasC.onRing,true);
+assert.equal(lucasC.carbonDegree,3,'p59 Lucas C is secondary carbinol: OH carbon has two C neighbors');
+const methylNeighborB=lucasB.neighbors.filter(x=>!lucasB.ring.has(x));
+assert.equal(methylNeighborB.length,1,'p59 Lucas B ring-OH carbon must bear methyl');
+const methylNeighborC=lucasC.neighbors.some(i=>lucasC.adj[i].some(e=>!lucasC.ring.has(e.to)));
+assert.equal(methylNeighborC,true,'p59 Lucas C ring-adjacent carbon must bear methyl');
+const lucasQ=questions.find(q=>q.examSource.year===2014&&q.examSource.originalQuestion==='三、按指定性质排序8');
+assert.deepEqual([...lucasQ.correctOrder].join(','),'b,c,a','source-grounded tertiary > secondary > primary Lucas rate ordering');
+const irQ=questions.find(q=>q.examSource.year===2018&&q.examSource.originalQuestion==='三、按指定性质排序3');
+assert.ok(irQ,'scanned p40 carbonyl IR original must be in current mixed paper');
+assert.deepEqual([...irQ.correctOrder].join(','),'b,a,c','p40 acyl fluoride > acyl chloride > conjugated methyl vinyl ketone');
+function carbonylEnvironment(name){
+ const {atoms,adj,bonds}=molecule(name);
+ const carbonyl=bonds.find(([i,j,n])=>n===2&&(atoms[i][2]==='O'||atoms[j][2]==='O'));
+ assert.ok(carbonyl,'missing C=O bond in IR original '+name);
+ const c=atoms[carbonyl[0]][2]==='O'?carbonyl[1]:carbonyl[0];
+ const halogen=adj[c].map(e=>atoms[e.to][2]).find(x=>x==='Cl'||x==='F')||null;
+ const directlyAttachedVinyl=adj[c].some(e=>adj[e.to].some(q=>q.order===2&&q.to!==c && atoms[q.to][2]!=='O'));
+ return {halogen,directlyAttachedVinyl};
+}
+assert.deepEqual(carbonylEnvironment('乙酰氯'),{halogen:'Cl',directlyAttachedVinyl:false});
+assert.deepEqual(carbonylEnvironment('乙酰氟'),{halogen:'F',directlyAttachedVinyl:false});
+assert.deepEqual(carbonylEnvironment('甲基乙烯基酮'),{halogen:null,directlyAttachedVinyl:true});
+
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 const check=w.Organic637.Interactions;
 const chem=w.Organic637.OriginalChem;
@@ -155,6 +220,7 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
+console.log('PASS: p59 Lucas ring / OH substitution topology and p40 three carbonyl IR group connections');
 console.log('PASS: historical 2015 E1 electron-flow template is distinct from SN1 substitution');
 console.log('PASS: p22 SN1 bromide ring positions (allylic/homoallylic/vinylic), p31 target present before answer');
 console.log('PASS: source/product formulas audited, including the synthesis target and IR/NMR aromatic ether');
