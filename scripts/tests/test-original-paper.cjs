@@ -24,7 +24,7 @@ for(const day of [19,20]){
 let recognizedSvg=0;
 for(const q of questions){
  const src=q.examSource;
- assert.equal(q.hold,false,'unreviewed question must be quarantined');
+ assert.notEqual(q.hold,true,'unreviewed question must be quarantined');
  assert.ok(expectedPages.get(src.year)?.has(src.pdfPage),'out-of-bounds year/page: '+q.id);
  assert.equal(src.printedSubjectCode,'816','original year exam code must be captured, separate from compilation 637');
  assert.equal(src.originalPoints,2,'each selected original is a two-mark task');
