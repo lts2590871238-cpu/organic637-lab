@@ -1277,13 +1277,25 @@
   function originalQuestions(day) {
     return (NS.OriginalExamDraft?.questions||[]).filter(q=>q.day===day&&!q.hold);
   }
+  function oldExamKind(day) {
+    const r=Store.state.examResults||{};
+    if(day===20)return r.day20Boss?'day20':null;
+    return r.full150?'full':r.v16Day19Core?'core':r[19]?'legacy':null;
+  }
+  function visitOldExam(day){
+    const kind=oldExamKind(day);
+    if(!kind)return;
+    location.hash='#exam-review/'+kind;
+    examReviewPage(kind);
+  }
   function originalExamResultPage(day) {
     const key='originalDay'+day,result=Store.state.examResults?.[key];
     if(!result)return originalDayExamPage(day);
-    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>每道题都来自扫描真题，原卷该题为2分；本混合卷每题等权折算为10分。这里是模拟成绩，并非某一年原卷的原始得分。</p><div class="btn-row"><button class="btn primary" id="originalPaper">← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div></main>`,'study');
+    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>每道题都来自扫描真题，原卷该题为2分；本混合卷每题等权折算为10分。这里是模拟成绩，并非某一年原卷的原始得分。</p><div class="btn-row"><button class="btn primary" id="originalPaper">← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div>${oldExamKind(day)?'<div class="original-old-review"><button class="btn ghost" id="oldExamPaper">查看以前做过的第'+day+'天旧版答卷与学习记录</button></div>':''}</main>`,'study');
     $('#originalPaper').onclick=()=>{location.hash='#original-review/'+day;originalReviewPage(day);};
     $('#originalRetry').onclick=()=>originalExamRetry(day);
     $('#originalHome').onclick=()=>{location.hash='#welcome';};
+    $('#oldExamPaper')?.addEventListener('click',()=>visitOldExam(day));
   }
   function originalExamRetry(day) {
     if(!confirm('确定重新作答第'+day+'天历年真题卷吗？原成绩将归档，原来的学习记录不会删除。'))return;
@@ -1338,9 +1350,10 @@
     }
     const q=bank[draft.index];
     const src=q.examSource;
-    shell(`<section class="panel question-shell original-exam-question"><div class="question-head"><div class="step-label">Day ${day} · 真题混合卷 · ${draft.index+1}/${bank.length}</div><span class="role-chip">10分（折算）</span></div><div class="paper-source-warning"><b>题源：</b>${src.year}年 · ${esc(src.originalQuestion)} · 第1份扫描PDF第${src.pdfPage}页 · 原题2分</div><div class="exam-warning">交卷前不显示答案；本题提交后锁定，不可回看修改。</div><div id="originalQuestionDiagram"></div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="originalExit">← 暂存退出</button><span class="tiny">结构图均为独立绘制的化学键线示意。</span></div></section>`,'study');
+    shell(`<section class="panel question-shell original-exam-question"><div class="question-head"><div class="step-label">Day ${day} · 真题混合卷 · ${draft.index+1}/${bank.length}</div><span class="role-chip">10分（折算）</span></div><div class="paper-source-warning"><b>题源：</b>${src.year}年 · ${esc(src.originalQuestion)} · 第1份扫描PDF第${src.pdfPage}页 · 原题2分</div><div class="exam-warning">交卷前不显示答案；本题提交后锁定，不可回看修改。</div><div id="originalQuestionDiagram"></div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="originalExit">← 暂存退出</button>${oldExamKind(day)?'<button class="link-btn" id="oldExamPaper">查看旧版已完成答卷</button>':''}<span class="tiny">结构图均为独立绘制的化学键线示意。</span></div></section>`,'study');
     $('#originalQuestionDiagram').innerHTML=NS.OriginalChem?.figuresFor(q)||'';
     $('#originalExit').onclick=()=>{Store.save();location.hash='#welcome';};
+    $('#oldExamPaper')?.addEventListener('click',()=>{Store.save();visitOldExam(day);});
     const started=performance.now();
     NS.Interactions.mount($('#interactionRoot'),q,{
       examMode:true,
@@ -1403,7 +1416,7 @@
     } else if(kind==='day20') {
       const results=Store.state.examResults?.day20Boss||{},v16=NS.Learning.ensureV16DayState(Store.state,20);
       const runtime=v16.adaptiveRuntime||ensureDay20AdaptiveRuntime();
-      ids=(runtime.groups||[]).map(g=>g.bossId).filter(Boolean);
+      ids=(results.responses?.length?results.responses.map(r=>r.questionId):(runtime.groups||[]).map(g=>g.bossId)).filter(Boolean);
       responses=results.responses||[];mode='boss';title='DAY 20 · 最终Boss模拟答卷';scoreLabel=Number(results.percent||0)+'%';back='day20';
       retry=()=>{const step=(NS.V16Director.getDayPlan(20)?.sequence||[]).find(x=>x.type==='final-boss');if(!step)return;
         const p=NS.Learning.ensureDayState(Store.state,20,REGISTRY);p.finished=false;
