@@ -52,7 +52,7 @@ async function run(){
     if(await choice.count())await choice.first().click();
     else if(await fields.count()){
       const expected=await page.evaluate(()=>{
-        const id=window.location.hash.match(/day\\/(19|20)/)?.[1]||'19';
+        const id=String(window.location.hash).split('/').at(-1)||'19';
         const state=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
         const index=state?.originalExamDrafts?.['originalDay'+id]?.responses?.length||0;
         const q=window.Organic637.OriginalExamDraft.questions.filter(q=>q.day===Number(id))[index];
@@ -61,7 +61,7 @@ async function run(){
       for(const part of ['A','B','C'])await page.locator('input[data-structure-part="'+part+'"]').fill(expected[part]?.[0]||'');
     }else if(await text.count()){
       const sample=await page.evaluate(()=>{
-        const id=Number(window.location.hash.match(/day\\/(19|20)/)?.[1]||19);
+        const id=Number(String(window.location.hash).split('/').at(-1)||19);
         const state=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
         const index=state?.originalExamDrafts?.['originalDay'+id]?.responses?.length||0;
         return window.Organic637.OriginalExamDraft.questions.filter(q=>q.day===id)[index].answer?.[0]||'';
