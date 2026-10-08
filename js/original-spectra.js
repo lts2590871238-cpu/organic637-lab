@@ -17,10 +17,10 @@ function keySpectra(){
  '<text x="30" y="36" fill="#274631" font-size="15">IR 峰群线索（重新绘制，非原扫描实验曲线）</text>'+
  '<line x1="54" y1="142" x2="719" y2="142" stroke="#607b66" stroke-width="2"/>'+
  '<text x="54" y="163" fill="#536b59" font-size="11">4000 cm⁻¹</text><text x="718" y="163" text-anchor="end" fill="#536b59" font-size="11">500 cm⁻¹</text>'+
- '<rect x="365" y="65" width="30" height="77" fill="#cee5d3"/><rect x="427" y="65" width="43" height="77" fill="#bad9c2"/>'+
- '<text x="380" y="60" text-anchor="middle" fill="#1e6840" font-size="13">芳环</text><text x="448" y="60" text-anchor="middle" fill="#1e6840" font-size="13">C–O</text>'+
+ '<rect x="498" y="65" width="53" height="77" fill="#cee5d3"/><rect x="574" y="65" width="56" height="77" fill="#bad9c2"/>'+
+ '<text x="524" y="60" text-anchor="middle" fill="#1e6840" font-size="13">芳环</text><text x="602" y="60" text-anchor="middle" fill="#1e6840" font-size="13">C–O</text>'+
  '<text x="146" y="98" text-anchor="middle" fill="#616f66" font-size="12">无明显宽 O–H 峰</text>'+
- '<text x="284" y="118" text-anchor="middle" fill="#616f66" font-size="11">无典型强羰基峰</text>';
+ '<text x="416" y="118" text-anchor="middle" fill="#616f66" font-size="11">无典型强羰基峰</text>';
  const nmr='<rect x="15" y="192" width="740" height="198" rx="12" fill="#f9fbf9" stroke="#c7d9c7"/>'+
  '<text x="30" y="218" fill="#274631" font-size="15">¹H NMR 积分和近似化学位移（非原实验数字化复刻）</text>'+
  '<line x1="58" y1="346" x2="719" y2="346" stroke="#59745f" stroke-width="2"/>'+
