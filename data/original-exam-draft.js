@@ -1,4 +1,4 @@
-/* Original questions sourced to scanned exam pages, awaiting editorial triple review. */
+/* Curated 2014–2023 originals; source-dependent draft, merge only after all audit gates. */
 (()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
   "version": "2026-10-08-a",
   "status": "partial_three_pass_pending",
@@ -14,7 +14,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列自由基中最稳定的是（ ）。",
       "options": [
         {
@@ -42,8 +42,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 26,
         "originalQuestion": "一、选择题1",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -72,7 +74,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "已知 NaNH₂ + RC≡CH → RC≡CNa + NH₃，炔钠加水又能恢复成炔烃，据此可推测酸性大小为（ ）。",
       "options": [
         {
@@ -100,8 +102,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 26,
         "originalQuestion": "一、选择题3",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -130,7 +134,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物不具有芳香性的是（ ）。",
       "options": [
         {
@@ -158,8 +162,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 27,
         "originalQuestion": "一、选择题7",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -188,7 +194,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物能进行碘仿反应的是（ ）。",
       "options": [
         {
@@ -216,8 +222,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 27,
         "originalQuestion": "一、选择题12",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -246,7 +254,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物中酸性最弱的是（ ）。",
       "options": [
         {
@@ -274,8 +282,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 27,
         "originalQuestion": "一、选择题13",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -304,7 +314,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物中碱性最强的是（ ）。",
       "options": [
         {
@@ -332,8 +342,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 28,
         "originalQuestion": "一、选择题15",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -362,7 +374,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物在同一条件下与相同试剂发生亲核加成反应最难的是（ ）。",
       "options": [
         {
@@ -390,8 +402,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 35,
         "originalQuestion": "三、单项选择题8",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -420,7 +434,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "亲核取代反应按 Sₙ1 机理进行，其特点是（ ）。",
       "options": [
         {
@@ -448,8 +462,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 35,
         "originalQuestion": "三、单项选择题9",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -478,7 +494,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "醛、酮羰基红外光谱在（ ）之间有一个非常强的伸缩振动特征吸收峰。",
       "options": [
         {
@@ -506,8 +522,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 36,
         "originalQuestion": "三、单项选择题10",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -536,7 +554,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "按碱性由强到弱排列 A、B、C。",
       "items": [
         {
@@ -569,8 +587,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 44,
         "originalQuestion": "三、按指定性质排序2",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -599,7 +619,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物与 AgNO₃/乙醇反应的速率大小次序为？",
       "items": [
         {
@@ -632,8 +652,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 44,
         "originalQuestion": "三、按指定性质排序3",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -662,7 +684,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "按亲电取代反应活性的大小次序排列。",
       "items": [
         {
@@ -695,8 +717,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 44,
         "originalQuestion": "三、按指定性质排序5",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -725,7 +749,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "按碱性由强到弱排列。",
       "items": [
         {
@@ -758,8 +782,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 59,
         "originalQuestion": "三、按指定性质排序4",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -788,7 +814,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "按酸性由强到弱排列。",
       "items": [
         {
@@ -821,8 +847,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 59,
         "originalQuestion": "三、按指定性质排序5",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -851,7 +879,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "按亲核加成活性由强到弱排列。",
       "items": [
         {
@@ -884,8 +912,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 59,
         "originalQuestion": "三、按指定性质排序6",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -914,7 +944,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下述试剂和 Lucas 试剂反应的速度大小次序。",
       "items": [
         {
@@ -947,8 +977,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 59,
         "originalQuestion": "三、按指定性质排序8",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -977,7 +1009,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物的沸点大小顺序为。",
       "items": [
         {
@@ -1010,8 +1042,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 59,
         "originalQuestion": "三、按指定性质排序9",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1040,7 +1074,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "请将下列化合物按照在水中的溶解度由大到小排序。",
       "items": [
         {
@@ -1073,8 +1107,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 50,
         "originalQuestion": "二、按指定性质排序7",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1102,7 +1138,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物中酸性最强的是（ ）。",
       "options": [
         {
@@ -1130,8 +1166,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 22,
         "originalQuestion": "二、选择题1",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1159,7 +1197,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物与金属钠反应速度最快的是（ ）。",
       "options": [
         {
@@ -1187,8 +1225,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 22,
         "originalQuestion": "二、选择题2",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1216,7 +1256,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "苯与 CH₃–CH(CH₃)–CH₂Cl 在 AlCl₃ 催化下反应的主要产物是（ ）。",
       "options": [
         {
@@ -1244,8 +1284,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 22,
         "originalQuestion": "二、选择题5",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1273,7 +1315,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物如按 Sₙ1 历程进行反应，活性最小的是（ ）。",
       "options": [
         {
@@ -1301,8 +1343,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 22,
         "originalQuestion": "二、选择题6",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1330,7 +1374,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列化合物中不能发生碘仿反应的是（ ）。",
       "options": [
         {
@@ -1358,8 +1402,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 22,
         "originalQuestion": "二、选择题7",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1387,7 +1433,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "环丁烷的真实键角是（ ）。",
       "options": [
         {
@@ -1415,8 +1461,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 16,
         "originalQuestion": "一、选择题7",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1444,7 +1492,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下列碳正离子最稳定的是（ ）。",
       "options": [
         {
@@ -1472,8 +1520,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 35,
         "originalQuestion": "三、单项选择题7",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "选 D，两个苯环的共振离域稳定二苯甲基正离子。",
@@ -1501,7 +1551,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "亲电取代反应活性由强到弱排列。",
       "items": [
         {
@@ -1540,8 +1590,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 54,
         "originalQuestion": "三、按指定性质排序1",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1569,7 +1621,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下述化合物中 CH₃ 氢的化学位移 δ 的大小次序为。",
       "items": [
         {
@@ -1602,8 +1654,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 54,
         "originalQuestion": "三、按指定性质排序3",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1631,7 +1685,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "请写出下述化合物的 pKₐ 大小次序。",
       "items": [
         {
@@ -1664,8 +1718,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 54,
         "originalQuestion": "三、按指定性质排序5",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1693,7 +1749,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "E1 反应速度大小次序。",
       "items": [
         {
@@ -1732,8 +1788,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 54,
         "originalQuestion": "三、按指定性质排序6",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
@@ -1761,7 +1819,7 @@
         "exam.original"
       ],
       "difficulty": 3,
-      "points": 5,
+      "points": 10,
       "prompt": "下述 C=O 键的 IR 伸缩振动吸收频率大小次序。",
       "items": [
         {
@@ -1794,8 +1852,10 @@
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 40,
         "originalQuestion": "三、按指定性质排序3",
-        "sourceType": "扫描真题原题",
-        "scanQuality": "人工可辨"
+        "sourceType": "从历年扫描真题转录，待三轮审校",
+        "scanQuality": "人工可辨",
+        "originalPoints": 2,
+        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
       },
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
