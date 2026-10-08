@@ -222,7 +222,7 @@ for(const [name,[atoms,bonds]] of Object.entries(chem.graphTemplates)) {
  // still requires comparison against the original scanned drawing.
  for(let atomId=0;atomId<atoms.length;atomId++){
   const label=atoms[atomId][2],total=bonds.reduce((n,e)=>n+(e[0]===atomId||e[1]===atomId?e[2]:0),0);
-  const max=['O','O−'].includes(label)?2:['OH','Br','Cl','F'].includes(label)?1:['·','+'].includes(label)?3:4;
+  const max=['O','O−'].includes(label)?2:['OH','O⁻','Br','Cl','F','I'].includes(label)?1:['·','+'].includes(label)?3:4;
   assert.ok(total<=max,'chemically impossible bond-order sum '+name+' atom '+atomId+': '+total+'/'+max);
  }
 }
