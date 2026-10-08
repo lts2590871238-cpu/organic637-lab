@@ -1,4 +1,4 @@
-/* Traced scan original question set, with point-by-point distractor diagnosis. */
+/* Original exam data: scanned transcription under review; not certified. */
 (()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
   "version": "2026-10-08-a",
   "status": "partial_three_pass_pending",
@@ -228,11 +228,11 @@
         },
         {
           "id": "c",
-          "label": "苯甲醛"
+          "label": "苯甲醚（Ph–O–CH₃）"
         },
         {
           "id": "d",
-          "label": "苯乙醚"
+          "label": "苯乙醛（Ph–CH₂–CHO）"
         }
       ],
       "answer": "a",
@@ -251,7 +251,7 @@
       "explanationLayers": {
         "short": "独立解析见 examGuide。",
         "why": "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。",
-        "full": "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。\n\n苯乙酮结构是 C₆H₅–CO–CH₃，含甲基酮部分，因此符合碘仿反应的基本结构条件。\n\n反应净产物为黄色 CHI₃ 沉淀，同时酰基另一部分转成苯甲酸盐。写出反应式：PhCOCH₃ + 3 I₂ + 4 OH⁻ → PhCOO⁻ + CHI₃↓ + 3 I⁻ + 3 H₂O。\n\n苯酚没有甲基酮；苯甲醛缺少 CO–CH₃；苯乙醚是醚，不含必需的甲基羰基片段。故选 A。\n\n原题所有选项独立核对：\nA 苯乙酮含 Ph–CO–CH₃ 甲基酮片段，可被 I₂/OH⁻ 连续 α-碘代后裂解，碘仿阳性。\nB 苯酚并非可氧化为甲基酮的仲醇，也无羰基甲基结构，不满足题设。\nC 苯甲醛是 PhCHO，缺少 CH₃CO–，不能因“有醛基”就判碘仿阳性。\nD 苯乙醚 Ph–O–CH₂CH₃ 是醚，分子没有羰基，普通碘仿试验阴性。"
+        "full": "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。\n\n苯乙酮结构是 C₆H₅–CO–CH₃，含甲基酮部分，因此符合碘仿反应的基本结构条件。\n\n反应净产物为黄色 CHI₃ 沉淀，同时酰基另一部分转成苯甲酸盐。写出反应式：PhCOCH₃ + 3 I₂ + 4 OH⁻ → PhCOO⁻ + CHI₃↓ + 3 I⁻ + 3 H₂O。\n\n苯酚没有甲基酮；苯甲醛缺少 CO–CH₃；苯乙醚是醚，不含必需的甲基羰基片段。故选 A。\n\n原题所有选项独立核对：\nA 苯乙酮含 Ph–CO–CH₃ 甲基酮片段，可被 I₂/OH⁻ 连续 α-碘代后裂解，碘仿阳性。\nB 苯酚并非可氧化为甲基酮的仲醇，也无羰基甲基结构，不满足题设。\nC 苯甲醚 Ph–O–CH₃ 是芳香醚，没有羰基和 CH₃CO– 片段，普通碘仿反应阴性。\nD 苯乙醛 Ph–CH₂–CHO 虽为醛，但不是乙醛 CH₃CHO，也不含甲基酮 CH₃CO– 片段，因此普通碘仿反应阴性。"
       },
       "examGuide": {
         "correctSummary": "苯乙酮",
@@ -260,14 +260,14 @@
           "苯乙酮结构是 C₆H₅–CO–CH₃，含甲基酮部分，因此符合碘仿反应的基本结构条件。",
           "反应净产物为黄色 CHI₃ 沉淀，同时酰基另一部分转成苯甲酸盐。写出反应式：PhCOCH₃ + 3 I₂ + 4 OH⁻ → PhCOO⁻ + CHI₃↓ + 3 I⁻ + 3 H₂O。",
           "苯酚没有甲基酮；苯甲醛缺少 CO–CH₃；苯乙醚是醚，不含必需的甲基羰基片段。故选 A。",
-          "原题所有选项独立核对：\nA 苯乙酮含 Ph–CO–CH₃ 甲基酮片段，可被 I₂/OH⁻ 连续 α-碘代后裂解，碘仿阳性。\nB 苯酚并非可氧化为甲基酮的仲醇，也无羰基甲基结构，不满足题设。\nC 苯甲醛是 PhCHO，缺少 CH₃CO–，不能因“有醛基”就判碘仿阳性。\nD 苯乙醚 Ph–O–CH₂CH₃ 是醚，分子没有羰基，普通碘仿试验阴性。"
+          "原题所有选项独立核对：\nA 苯乙酮含 Ph–CO–CH₃ 甲基酮片段，可被 I₂/OH⁻ 连续 α-碘代后裂解，碘仿阳性。\nB 苯酚并非可氧化为甲基酮的仲醇，也无羰基甲基结构，不满足题设。\nC 苯甲醚 Ph–O–CH₃ 是芳香醚，没有羰基和 CH₃CO– 片段，普通碘仿反应阴性。\nD 苯乙醛 Ph–CH₂–CHO 虽为醛，但不是乙醛 CH₃CHO，也不含甲基酮 CH₃CO– 片段，因此普通碘仿反应阴性。"
         ],
         "graphic": "iodoform",
         "optionRationales": [
           "A 苯乙酮含 Ph–CO–CH₃ 甲基酮片段，可被 I₂/OH⁻ 连续 α-碘代后裂解，碘仿阳性。",
           "B 苯酚并非可氧化为甲基酮的仲醇，也无羰基甲基结构，不满足题设。",
-          "C 苯甲醛是 PhCHO，缺少 CH₃CO–，不能因“有醛基”就判碘仿阳性。",
-          "D 苯乙醚 Ph–O–CH₂CH₃ 是醚，分子没有羰基，普通碘仿试验阴性。"
+          "C 苯甲醚 Ph–O–CH₃ 是芳香醚，没有羰基和 CH₃CO– 片段，普通碘仿反应阴性。",
+          "D 苯乙醛 Ph–CH₂–CHO 虽为醛，但不是乙醛 CH₃CHO，也不含甲基酮 CH₃CO– 片段，因此普通碘仿反应阴性。"
         ]
       }
     },
@@ -1127,7 +1127,7 @@
       }
     },
     {
-      "id": "exam-2018-7-18",
+      "id": "exam-2016-7-18",
       "questionId": "exam-2018-7-18",
       "day": 20,
       "type": "ranking",
@@ -1165,11 +1165,11 @@
       ],
       "examSource": {
         "school": "南京工业大学",
-        "year": 2018,
+        "year": 2016,
         "printedSubjectCode": "816",
         "scanFile": "扫描件_260725_205723(1).pdf",
         "pdfPage": 50,
-        "originalQuestion": "二、按指定性质排序7",
+        "originalQuestion": "三、按指定性质排序7",
         "sourceType": "从历年扫描真题转录，待三轮审校",
         "scanQuality": "人工可辨",
         "originalPoints": 2,
