@@ -1,6 +1,6 @@
-/* Indexed original-exam questions under independent editorial review. */
+/* Source-linked original mixed exam: 30 items / 15 per day. Editorial 3-pass review NOT complete. */
 (()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
-  "version": "2026-10-08-a",
+  "version": "2026-10-08-mixed-chemistry-v2",
   "status": "partial_three_pass_pending",
   "questions": [
     {
@@ -867,68 +867,52 @@
       }
     },
     {
-      "id": "exam-2014-5-14",
-      "questionId": "exam-2014-5-14",
+      "id": "orig-2020-ii-10-nabh4",
       "day": 19,
-      "type": "ranking",
+      "type": "text-short",
       "role": "exam",
-      "primarySkill": "exam.original",
+      "primarySkill": "reaction.selective_reduction",
       "skillIds": [
-        "exam.original"
+        "reaction.selective_reduction"
       ],
       "difficulty": 3,
       "points": 10,
-      "prompt": "按酸性由强到弱排列。",
-      "items": [
-        {
-          "id": "a",
-          "label": "A：苯酚 C₆H₅OH"
-        },
-        {
-          "id": "b",
-          "label": "B：乙酸 CH₃CO₂H"
-        },
-        {
-          "id": "c",
-          "label": "C：氯乙酸 ClCH₂CO₂H"
-        }
-      ],
+      "prompt": "（2020年原卷填空第10题）写出 CH₃CH=CHCH₂CH₂CHO 经 NaBH₄ 处理后的主要有机产物结构式。请写结构简式，保留双键位置。",
+      "formula": "CH₃–CH=CH–CH₂–CH₂–CHO  ⟶ [NaBH₄]  ____",
       "answer": [
-        "c",
-        "b",
-        "a"
-      ],
-      "correctOrder": [
-        "c",
-        "b",
-        "a"
+        "CH3CH=CHCH2CH2CH2OH",
+        "CH3-CH=CH-CH2-CH2-CH2OH",
+        "4-己烯-1-醇",
+        "己-4-烯-1-醇",
+        "hex-4-en-1-ol",
+        "4-hexen-1-ol"
       ],
       "examSource": {
         "school": "南京工业大学",
-        "year": 2014,
+        "year": 2020,
         "printedSubjectCode": "816",
         "scanFile": "扫描件_260725_205723(1).pdf",
-        "pdfPage": 59,
-        "originalQuestion": "三、按指定性质排序5",
-        "sourceType": "从历年扫描真题转录，待三轮审校",
-        "scanQuality": "人工可辨",
+        "pdfPage": 28,
+        "originalQuestion": "二、填空题10",
         "originalPoints": 2,
-        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
-      },
-      "explanationLayers": {
-        "short": "独立解析见 examGuide。",
-        "why": "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。",
-        "full": "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。\n\n氯乙酸的 α-Cl 强吸电子诱导效应稳定羧酸根，酸性强于乙酸。相应常见水溶液 pKₐ：氯乙酸≈2.9、乙酸≈4.8、苯酚≈10。\n\npKₐ 越小越强，故顺序 C > B > A。\n\n注意氯乙酸并非因为“分子含 Cl⁻”而强酸；氯以共价键连接，通过 σ 键诱导吸电子。"
+        "scoreNote": "历年混合训练，每题训练折算10分；原卷分值单独记录",
+        "sourceType": "扫描真题转录，逐题审校中",
+        "scanQuality": "文字与关键骨架已放大辨认"
       },
       "examGuide": {
-        "correctSummary": "C：氯乙酸 ClCH₂CO₂H > B：乙酸 CH₃CO₂H > A：苯酚 C₆H₅OH",
+        "title": "NaBH₄ 的官能团选择性与羰基还原",
+        "correctSummary": "CH₃–CH=CH–CH₂–CH₂–CH₂OH（己-4-烯-1-醇）",
         "steps": [
-          "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。",
-          "氯乙酸的 α-Cl 强吸电子诱导效应稳定羧酸根，酸性强于乙酸。相应常见水溶液 pKₐ：氯乙酸≈2.9、乙酸≈4.8、苯酚≈10。",
-          "pKₐ 越小越强，故顺序 C > B > A。",
-          "注意氯乙酸并非因为“分子含 Cl⁻”而强酸；氯以共价键连接，通过 σ 键诱导吸电子。"
-        ],
-        "graphic": "acidity"
+          "先数底物六个碳并识别两个官能团：最右端 –CHO 是醛基，链内部 CH₃–CH=CH– 是孤立的碳碳双键。题目只给 NaBH₄，并非催化加氢试剂。",
+          "NaBH₄ 中的氢化物当量向 C=O 的亲电羰基碳转移，羰基 π 电子移向氧；新形成 C–H，得到 R–CH₂–O⁻ 形式的烷氧中间体。经过质子化，羰基原来的 C=O 变为 –CH₂OH。",
+          "常规 NaBH₄ 醛酮还原条件下不直接加氢这种非共轭 C=C。因此原来的 CH₃CH=CH 片段要完整保留，不得写成饱和己醇。",
+          "按羟基优先编号，从 –CH₂OH 端为1位，双键位于4、5位，系统名己-4-烯-1-醇。原扫描未提供 E/Z 构型，答案不应自行指定。"
+        ]
+      },
+      "explanationLayers": {
+        "short": "NaBH₄选择性还原–CHO为–CH₂OH，非共轭C=C保留。",
+        "why": "羰基C具有亲电性；氢化物参与C=O加成，不是H₂催化加氢。",
+        "full": "先数底物六个碳并识别两个官能团：最右端 –CHO 是醛基，链内部 CH₃–CH=CH– 是孤立的碳碳双键。题目只给 NaBH₄，并非催化加氢试剂。\n\nNaBH₄ 中的氢化物当量向 C=O 的亲电羰基碳转移，羰基 π 电子移向氧；新形成 C–H，得到 R–CH₂–O⁻ 形式的烷氧中间体。经过质子化，羰基原来的 C=O 变为 –CH₂OH。\n\n常规 NaBH₄ 醛酮还原条件下不直接加氢这种非共轭 C=C。因此原来的 CH₃CH=CH 片段要完整保留，不得写成饱和己醇。\n\n按羟基优先编号，从 –CH₂OH 端为1位，双键位于4、5位，系统名己-4-烯-1-醇。原扫描未提供 E/Z 构型，答案不应自行指定。"
       }
     },
     {
@@ -1724,132 +1708,134 @@
       "hold": false
     },
     {
-      "id": "exam-2015-extra-09",
+      "id": "orig-2020-ii-5-intramolecular-fc",
       "day": 20,
-      "type": "ranking",
+      "type": "text-short",
       "role": "exam",
-      "primarySkill": "exam.original",
+      "primarySkill": "synthesis.intramolecular_friedel_crafts",
       "skillIds": [
-        "exam.original"
+        "synthesis.intramolecular_friedel_crafts"
       ],
-      "difficulty": 3,
+      "difficulty": 4,
       "points": 10,
-      "prompt": "下述化合物中 CH₃ 氢的化学位移 δ 的大小次序为。",
-      "items": [
-        {
-          "id": "a",
-          "label": "A：CH₃CH₃"
-        },
-        {
-          "id": "b",
-          "label": "B：CH₃Br"
-        },
-        {
-          "id": "c",
-          "label": "C：CH₃F"
-        }
-      ],
+      "prompt": "（2020年原卷填空第5题）苯环连有 –CH₂CH₂CH₂CH₂Cl 侧链，在 AlCl₃ 作用下主要发生哪种分子内环化？请填写主要有机产物名称（并在答案中核对结构图）。",
+      "formula": "C₆H₅–CH₂–CH₂–CH₂–CH₂–Cl  ⟶ [AlCl₃]  ____",
       "answer": [
-        "c",
-        "b",
-        "a"
-      ],
-      "correctOrder": [
-        "c",
-        "b",
-        "a"
+        "四氢萘",
+        "1,2,3,4-四氢萘",
+        "tetralin",
+        "1,2,3,4-tetrahydronaphthalene",
+        "1,2,3,4-tetrahydronaphthalen"
       ],
       "examSource": {
         "school": "南京工业大学",
-        "year": 2015,
+        "year": 2020,
         "printedSubjectCode": "816",
         "scanFile": "扫描件_260725_205723(1).pdf",
-        "pdfPage": 54,
-        "originalQuestion": "三、按指定性质排序3",
-        "sourceType": "从历年扫描真题转录，待三轮审校",
-        "scanQuality": "人工可辨",
+        "pdfPage": 28,
+        "originalQuestion": "二、填空题5",
         "originalPoints": 2,
-        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
-      },
-      "explanationLayers": {
-        "short": "独立解析见 examGuide。",
-        "why": "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。",
-        "full": "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。\n\n乙烷甲基的 H 环境较富电子，δ 约 0.9；溴甲烷受到 Br 的去屏蔽，δ 约 2.7；氟甲烷受 F 强诱导吸电子，δ 约 4.2。\n\n本题比较的是化学位移 δ，从高到低为 C（氟甲烷） > B（溴甲烷） > A（乙烷）；强电负性 F 的去屏蔽效应最大。\n\n不能直接把卤素质量大等同于核磁位移高；关键是局域电子环境与屏蔽效应，重原子也可能有复杂贡献。"
+        "scoreNote": "历年混合训练，每题训练折算10分；原卷分值单独记录",
+        "sourceType": "扫描真题转录，逐题审校中",
+        "scanQuality": "文字与关键骨架已放大辨认"
       },
       "examGuide": {
-        "correctSummary": "C：CH₃F > B：CH₃Br > A：CH₃CH₃",
+        "title": "分子内Friedel–Crafts烷基化与六元并环构筑",
+        "correctSummary": "1,2,3,4-四氢萘（tetralin）",
         "steps": [
-          "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。",
-          "乙烷甲基的 H 环境较富电子，δ 约 0.9；溴甲烷受到 Br 的去屏蔽，δ 约 2.7；氟甲烷受 F 强诱导吸电子，δ 约 4.2。",
-          "本题比较的是化学位移 δ，从高到低为 C（氟甲烷） > B（溴甲烷） > A（乙烷）；强电负性 F 的去屏蔽效应最大。",
-          "不能直接把卤素质量大等同于核磁位移高；关键是局域电子环境与屏蔽效应，重原子也可能有复杂贡献。"
+          "先把底物画成 Ph–(CH₂)₄–Cl：苯环上有四个连续的亚甲基，最远端的 –CH₂Cl 在 AlCl₃（Lewis酸）作用下可形成强亲电中心或相关紧密离子对。",
+          "再从空间和环大小看可能的分子内进攻位置：苯环上靠近原侧链的邻位碳通过 π 电子进攻末端亲电碳，形成新的 Ar(邻位)–CH₂  σ 键。",
+          "数新环大小：原苯环上相邻两个碳加侧链的四个 CH₂，总共六个环原子；因此形成与苯环稠合的饱和六元环，得到四氢萘骨架而非五元茚满骨架。",
+          "芳香亲电取代过程中，进攻先暂时失去局域芳香性并形成 σ-络合物，随后脱去环上 H⁺，恢复芳香六 π 电子结构。重要教学限定：真实反应可能存在副反应和离子对行为，原卷要求主要环化结构。"
         ]
       },
-      "hold": false
+      "explanationLayers": {
+        "short": "末端氯代烷受AlCl₃活化，苯环邻位分子内进攻，成六元并环得到四氢萘。",
+        "why": "环计数：2个芳环邻位碳+4个CH₂=6元环。",
+        "full": "先把底物画成 Ph–(CH₂)₄–Cl：苯环上有四个连续的亚甲基，最远端的 –CH₂Cl 在 AlCl₃（Lewis酸）作用下可形成强亲电中心或相关紧密离子对。\n\n再从空间和环大小看可能的分子内进攻位置：苯环上靠近原侧链的邻位碳通过 π 电子进攻末端亲电碳，形成新的 Ar(邻位)–CH₂  σ 键。\n\n数新环大小：原苯环上相邻两个碳加侧链的四个 CH₂，总共六个环原子；因此形成与苯环稠合的饱和六元环，得到四氢萘骨架而非五元茚满骨架。\n\n芳香亲电取代过程中，进攻先暂时失去局域芳香性并形成 σ-络合物，随后脱去环上 H⁺，恢复芳香六 π 电子结构。重要教学限定：真实反应可能存在副反应和离子对行为，原卷要求主要环化结构。"
+      }
     },
     {
-      "id": "exam-2015-extra-10",
+      "id": "orig-2020-iv-1-picoline-structure",
       "day": 20,
-      "type": "ranking",
+      "type": "structure-deduction",
       "role": "exam",
-      "primarySkill": "exam.original",
+      "primarySkill": "structure.multistep_deduction",
       "skillIds": [
-        "exam.original"
+        "structure.multistep_deduction"
       ],
-      "difficulty": 3,
+      "difficulty": 5,
       "points": 10,
-      "prompt": "请写出下述化合物的 pKₐ 大小次序。",
-      "items": [
+      "prompt": "（2020年原卷结构推导第1题）A（C₆H₇N）在ZnCl₂存在下与苯甲醛缩合脱水得B（C₁₃H₁₁N）；B臭氧分解得到C（C₆H₅NO）与苯甲醛；C在浓NaOH作用下生成2-羟甲基吡啶与2-羧基吡啶。请分别写出A、B、C结构对应名称。",
+      "formula": "A(C₆H₇N) + PhCHO ⟶[ZnCl₂, –H₂O] B(C₁₃H₁₁N) ⟶[O₃] C(C₆H₅NO)+PhCHO",
+      "parts": [
         {
-          "id": "a",
-          "label": "A：苯甲酸"
+          "id": "A",
+          "label": "A（C₆H₇N）"
         },
         {
-          "id": "b",
-          "label": "B：对甲基苯甲酸"
+          "id": "B",
+          "label": "B（C₁₃H₁₁N）"
         },
         {
-          "id": "c",
-          "label": "C：对硝基苯甲酸"
+          "id": "C",
+          "label": "C（C₆H₅NO）"
         }
       ],
-      "answer": [
-        "b",
-        "a",
-        "c"
-      ],
-      "correctOrder": [
-        "b",
-        "a",
-        "c"
-      ],
-      "examSource": {
-        "school": "南京工业大学",
-        "year": 2015,
-        "printedSubjectCode": "816",
-        "scanFile": "扫描件_260725_205723(1).pdf",
-        "pdfPage": 54,
-        "originalQuestion": "三、按指定性质排序5",
-        "sourceType": "从历年扫描真题转录，待三轮审校",
-        "scanQuality": "人工可辨",
-        "originalPoints": 2,
-        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
-      },
-      "explanationLayers": {
-        "short": "独立解析见 examGuide。",
-        "why": "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。",
-        "full": "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。\n\n对硝基 –NO₂ 是强吸电子基，稳定羧酸根，增强酸性，使 pKₐ 显著降低。\n\n典型水溶液 pKₐ 约为 B 4.37、A 4.20、C 3.44，因此题目要求的 pKₐ 从大到小为 B > A > C。\n\n题目问的是 pKₐ 而非酸强度；两种排序方向互相相反，必须先读清题干。"
-      },
-      "examGuide": {
-        "correctSummary": "B：对甲基苯甲酸 > A：苯甲酸 > C：对硝基苯甲酸",
-        "steps": [
-          "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。",
-          "对硝基 –NO₂ 是强吸电子基，稳定羧酸根，增强酸性，使 pKₐ 显著降低。",
-          "典型水溶液 pKₐ 约为 B 4.37、A 4.20、C 3.44，因此题目要求的 pKₐ 从大到小为 B > A > C。",
-          "题目问的是 pKₐ 而非酸强度；两种排序方向互相相反，必须先读清题干。"
+      "answer": {
+        "A": [
+          "2-甲基吡啶",
+          "α-甲基吡啶",
+          "邻甲基吡啶",
+          "2-皮考啉",
+          "2-picoline",
+          "2-methylpyridine"
+        ],
+        "B": [
+          "2-苯乙烯基吡啶",
+          "2-(2-苯乙烯基)吡啶",
+          "2-(2-苯基乙烯基)吡啶",
+          "2-反式苯乙烯基吡啶",
+          "2-styrylpyridine",
+          "2-(2-phenylethenyl)pyridine"
+        ],
+        "C": [
+          "吡啶-2-甲醛",
+          "2-吡啶甲醛",
+          "2-甲酰基吡啶",
+          "pyridine-2-carbaldehyde",
+          "picolinaldehyde",
+          "2-formylpyridine"
         ]
       },
-      "hold": false
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 29,
+        "originalQuestion": "四、结构推导题1",
+        "originalPoints": 8,
+        "scoreNote": "历年混合训练，每题训练折算10分；原卷分值单独记录",
+        "sourceType": "扫描真题转录，逐题审校中",
+        "scanQuality": "文字与关键骨架已放大辨认"
+      },
+      "examGuide": {
+        "title": "结构推导：苄位活性氢缩合、烯键氧化断裂与Cannizzaro歧化",
+        "correctSummary": "A＝2-甲基吡啶；B＝2-(2-苯基乙烯基)吡啶；C＝吡啶-2-甲醛",
+        "steps": [
+          "第一步倒推C：原卷明确C在浓NaOH中生成2-羟甲基吡啶与2-羧基吡啶，这一对“醇+羧酸盐”产物提示无α-H醛的Cannizzaro歧化。推得C为吡啶-2-甲醛（picolinaldehyde），其羰基CHO直接连吡啶2位。",
+          "第二步由臭氧裂解确定B：B分裂得到苯甲醛PhCHO与吡啶-2-甲醛，说明B具有连接苯基与2-吡啶基的碳碳双键 Ph–CH=CH–(2-pyridyl)。双键氧化断裂的两端分别变成PhCHO与2-pyridyl-CHO。题目未说明双键几何构型，不宜强行指定纯E或Z。",
+          "第三步反推A：A分子式C₆H₇N，与2-甲基吡啶一致；2位甲基受邻近吡啶N影响，其苄位性质的甲基H在活化条件下参与与苯甲醛的缩合、脱水，构筑B的–CH=CH–桥连。",
+          "核对分子式：A C₆H₇N + PhCHO C₇H₆O – H₂O = B C₁₃H₁₁N；臭氧断裂B还原性后处理对应C C₆H₅NO与苯甲醛。题目只写臭氧分解，实际产物氧化态受臭氧后处理影响；本题以原卷提供的产物为已知条件。",
+          "完整机理要区分：缩合形成新C–C键、脱水形成新C=C键；臭氧与双键反应并断裂成两个C=O；Cannizzaro反应经OH⁻加到CHO、随后氢负离子等效转移发生分子间歧化，最终一分子变醇、一分子变羧酸盐。"
+        ]
+      },
+      "explanationLayers": {
+        "short": "从C的Cannizzaro反应反推，再利用臭氧裂解还原B，最后从缩合反推A。",
+        "why": "三个观测相互约束，并逐一核对元素守恒。",
+        "full": "第一步倒推C：原卷明确C在浓NaOH中生成2-羟甲基吡啶与2-羧基吡啶，这一对“醇+羧酸盐”产物提示无α-H醛的Cannizzaro歧化。推得C为吡啶-2-甲醛（picolinaldehyde），其羰基CHO直接连吡啶2位。\n\n第二步由臭氧裂解确定B：B分裂得到苯甲醛PhCHO与吡啶-2-甲醛，说明B具有连接苯基与2-吡啶基的碳碳双键 Ph–CH=CH–(2-pyridyl)。双键氧化断裂的两端分别变成PhCHO与2-pyridyl-CHO。题目未说明双键几何构型，不宜强行指定纯E或Z。\n\n第三步反推A：A分子式C₆H₇N，与2-甲基吡啶一致；2位甲基受邻近吡啶N影响，其苄位性质的甲基H在活化条件下参与与苯甲醛的缩合、脱水，构筑B的–CH=CH–桥连。\n\n核对分子式：A C₆H₇N + PhCHO C₇H₆O – H₂O = B C₁₃H₁₁N；臭氧断裂B还原性后处理对应C C₆H₅NO与苯甲醛。题目只写臭氧分解，实际产物氧化态受臭氧后处理影响；本题以原卷提供的产物为已知条件。\n\n完整机理要区分：缩合形成新C–C键、脱水形成新C=C键；臭氧与双键反应并断裂成两个C=O；Cannizzaro反应经OH⁻加到CHO、随后氢负离子等效转移发生分子间歧化，最终一分子变醇、一分子变羧酸盐。"
+      }
     },
     {
       "id": "exam-2015-extra-11",
