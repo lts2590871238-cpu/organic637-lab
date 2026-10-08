@@ -117,7 +117,7 @@ async function run(){
       responses:[{questionId:'removed-old-question',partialScore:1,correct:true,payload:{selected:'a'}}]};
     state.updatedAt=Date.now()+10000;
     localStorage.setItem(key,JSON.stringify(state));
-    localStorage.removeItem(key+'_backup');
+    localStorage.removeItem(key+':backup');
   });
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('.app.cozy-app').waitFor({timeout:25000});
