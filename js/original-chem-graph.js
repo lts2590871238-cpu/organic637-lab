@@ -37,6 +37,15 @@ function conceptSvg(q){
  return '<div class="paper-concept-scheme"><strong>'+escape(example.title)+'</strong><svg viewBox="0 0 755 158" role="img" aria-label="'+escape(example.title)+'的独立机理和判断逻辑图">'+nodes+arrows+'</svg><small>示意图是机理／判断路径，用于解释原题；并非未给出结构的选项。</small></div>';
 }
 
+
+const PROCESSES={"2022:二、选择题5":{"title":"Friedel–Crafts 烷基化：为什么生成叔丁基苯？","stages":[["① 亲电中心形成","(CH₃)₂CH–CH₂Cl + AlCl₃","C–Cl 键电子向 Cl–AlCl₃ 体系转移，形成高活性一级亲电中心／紧密离子对"],["② 1,2-氢迁移","(CH₃)₂CH–CH₂⁺ → (CH₃)₃C⁺","相邻 CH 上的 C–H σ 键电子随氢迁至 CH₂⁺；正电荷转移到更稳定的三级碳"],["③ 芳环恢复芳香性","Ph–H + (CH₃)₃C⁺ → Ph–C(CH₃)₃","苯 π 键提供电子进攻三级亲电中心，形成 σ 络合物，再脱 H⁺ 复原 6π 芳香性"]]},"2020:一、选择题12":{"title":"碘仿反应：α 位碘代 → 亲核酰基取代 → 裂解","stages":[["① 先判结构","Ph–C(=O)–CH₃","要有甲基酮片段，才能连续形成 α-碳的卤代中间体"],["② 三次 α 位碘化","Ph–C(=O)–CI₃","在 I₂/OH⁻ 下经烯醇／烯醇盐参与的 α 位卤化，把甲基上的三个 H 依次替换为 I"],["③ 羟基进攻及裂解","PhCOO⁻ + CHI₃↓","OH⁻ 加到羰基 C，四面体中间体塌陷并发生 C–C 键断裂；生成 CI₃⁻ 后质子化给黄色 CHI₃"]]},"2022:二、选择题7":{"title":"碘仿反应的必要骨架与醇的先氧化","stages":[["① 判定前体","CH₃–C(=O)–R 或 CH₃–CH(OH)–R","含甲基酮或能被碘／碱氧化成甲基酮的二级醇；乙醛 CH₃CHO 亦为阳性"],["② α 位连续碘化","CH₃COR → CI₃COR","在碱性条件下形成烯醇负离子并逐次引入碘；无相应 α-H 的叔丁基甲醛无法走这条路"],["③ 裂解成碘仿","RCOO⁻ + CHI₃↓","羰基亲核酰基取代后断 C–C 键，生成黄色三碘甲烷沉淀"]]},"2014:三、按指定性质排序8":{"title":"Lucas 试剂：重点看与 OH 直接成键的碳","stages":[["① 活化羟基","R–OH + ZnCl₂/HCl","ZnCl₂ 是 Lewis 酸，与氧配位使 C–O 键更易断裂；强酸也有利于转为易离去物种"],["② 判断可能的限速环节","3° R⁺ > 2° R⁺ ≫ 1° R⁺","叔醇容易离子化形成稳定的三级正离子；二级较慢，普通一级通常不走快速的 SN1"],["③ 捕获与浑浊","R⁺ + Cl⁻ → R–Cl","氯离子捕获产物；通常三级反应最快、二级次之，一级醇转化缓慢且可采用不同路径"]]},"2019:三、单项选择题8":{"title":"羰基亲核加成：两个电子对箭头","stages":[["① 羰基极化","R₂Cδ⁺=Oδ⁻","氧电负性大使羰基碳亲电，亲核试剂应攻击羰基 C，不是 O"],["② 协同电子移动","Nu: → C=O；π(C=O) → O","亲核体的孤对用于构建 C–Nu 键，π 电子推向 O，暂时得到四面体烷氧负离子"],["③ 位阻和电子效应","醛常快于相近的酮","甲基供电子降低 Cδ⁺，两侧烷基还增加位阻；因此本题丙酮通常最难"]]},"2017:三、按指定性质排序3":{"title":"AgNO₃/乙醇溶剂解：不是普通 SN2 排序","stages":[["① 卤离子离去","R–Br + Ag⁺ → R⁺（溶剂化） + AgBr↓","银离子与溴离子结合促进电离，乙醇极性质子环境能溶剂化离子"],["② 判断正电荷稳定性","烯丙位 R–CH=CH–CH₂⁺","烯丙位正离子可通过 π 共振离域电荷，比普通二级／一级碳正离子易形成"],["③ 比较速率","C（烯丙位）> B（二级）> A（一级）","比较的是给定溶剂解条件下的形成正离子难易，不可照搬 SN2 位阻规则"]]},"2015:三、按指定性质排序6":{"title":"E1 消除：先有碳正离子，随后脱 β-H","stages":[["① 速控离子化","R–Br → R⁺ + Br⁻","离去基先断裂，一级／乙烯基碳正离子尤其难形成"],["② 共振或超共轭稳定","3° R⁺ > 2° R⁺ > 1° R⁺ ≫ 乙烯基 R⁺","碳正离子的相对稳定性主导常见 E1 速率，重排有时可能发生"],["③ 形成烯烃","Base: → Hβ；Cβ–H → Cβ=Cα","弱碱／溶剂夺取 β-H，键电子建立 C=C；不可把此步和 E2 协同过程混同"]]},"2022:二、选择题6":{"title":"SN1：烯丙位共振与乙烯基碳正离子的差异","stages":[["① 判离去基位置","Br–C(sp³) 与 Br–C(sp²)","Br 直接连在 C=C 的碳属于乙烯基卤代物，并不是烯丙位卤代物"],["② 看电离中间体","烯丙位正离子可 π 共振","烯丙基正离子电荷可离域；普通二级环己基正离子仅受超共轭等稳定"],["③ 最难 SN1 的原因","烯基 C⁺ 极不稳定","直接从乙烯基 C–Br 离去需形成不利的乙烯基正离子，因此 D 通常最难"]]},"2023:一、选择题7":{"title":"环丁烷为什么不是纸面上一个90°的正方形？","stages":[["① 平面模型","环上四个 C 画成正方形 → 90°","简单线稿仅是连接关系的二维示意，不是分子真实最低能构象"],["② 减少扭转张力","环丁烷沿一对角轻微折叠","微折叠使部分 C–H 键相互错开，降低重叠排斥"],["③ 得到真实角度","环内 C–C–C 约88°","折叠构象真实键角略小于90°；不是 sp³ 理想四面体109.5°"]]}};
+function reasoningFor(q){
+ const k=q?.examSource?.year+':'+q?.examSource?.originalQuestion,p=PROCESSES[k];
+ if(!p)return '';
+ const stages=p.stages.map(([title,formula,why],i)=>'<div class="paper-mechanism-step"><div class="paper-mechanism-step-title">'+escape(title)+'</div><div class="paper-mechanism-formula">'+escape(formula)+'</div><p>'+escape(why)+'</p></div>').join('<div class="paper-mechanism-arrow" aria-hidden="true">↓</div>');
+ return '<section class="paper-mechanism"><h4>电子流动与反应性：'+escape(p.title)+'</h4>'+stages+'</section>';
+}
+
 function optionsFor(q){
  const k=q?.examSource?.year+':'+q?.examSource?.originalQuestion;
  return MAP[k]||[];
@@ -54,5 +63,5 @@ function answerFor(q){
  if(!chosen.length)return '';
  return '<div class="paper-correct-scheme"><b>正确答案 · 独立键线结构图</b><div class="original-molecule-grid">'+chosen.map((i,rank)=>'<figure class="is-correct-structure"><figcaption>'+(q.type==='ranking'?(rank+1)+'. ':'')+String.fromCharCode(65+i)+' · '+escape(arr[i])+'</figcaption>'+draw(arr[i])+'</figure>').join('')+'</div></div>';
 }
-NS.OriginalChem=Object.assign(NS.OriginalChem||{}, {draw, figuresFor,answerFor,graphTemplates:G,optionStructureNames:optionsFor,conceptSvg});
+NS.OriginalChem=Object.assign(NS.OriginalChem||{}, {draw, figuresFor,answerFor,graphTemplates:G,optionStructureNames:optionsFor,conceptSvg,reasoningFor});
 })();
