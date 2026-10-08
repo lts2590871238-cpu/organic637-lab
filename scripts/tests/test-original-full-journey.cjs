@@ -115,7 +115,9 @@ async function run(){
     const key='organic637_clean_v1_state:test-original-journey',state=JSON.parse(localStorage.getItem(key));
     state.originalExamDrafts.originalDay20={paperVersion:'obsolete-paper-v1',index:1,startedAt:1,
       responses:[{questionId:'removed-old-question',partialScore:1,correct:true,payload:{selected:'a'}}]};
+    state.updatedAt=Date.now()+10000;
     localStorage.setItem(key,JSON.stringify(state));
+    localStorage.removeItem(key+'_backup');
   });
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('.app.cozy-app').waitFor({timeout:25000});
