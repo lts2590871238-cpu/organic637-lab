@@ -1,4 +1,4 @@
-/* Exam-only source-verified seed bank: do not relabel as 150-point original single-year paper. */
+/* Work-in-progress scanned original question bank. Do not publish until triple reviewed. */
 (()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
   "version": "2026-10-08-a",
   "status": "partial_three_pass_pending",
@@ -528,7 +528,7 @@
     {
       "id": "exam-2017-2-10",
       "questionId": "exam-2017-2-10",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -591,7 +591,7 @@
     {
       "id": "exam-2017-3-11",
       "questionId": "exam-2017-3-11",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -654,7 +654,7 @@
     {
       "id": "exam-2017-5-12",
       "questionId": "exam-2017-5-12",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -717,7 +717,7 @@
     {
       "id": "exam-2014-4-13",
       "questionId": "exam-2014-4-13",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -780,7 +780,7 @@
     {
       "id": "exam-2014-5-14",
       "questionId": "exam-2014-5-14",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -843,7 +843,7 @@
     {
       "id": "exam-2014-6-15",
       "questionId": "exam-2014-6-15",
-      "day": 20,
+      "day": 19,
       "type": "ranking",
       "role": "exam",
       "primarySkill": "exam.original",
@@ -1091,6 +1091,727 @@
         ],
         "graphic": "alcohols"
       }
+    },
+    {
+      "id": "exam-2022-extra-01",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物中酸性最强的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "乙酸"
+        },
+        {
+          "id": "b",
+          "label": "三氟乙酸"
+        },
+        {
+          "id": "c",
+          "label": "溴乙酸"
+        },
+        {
+          "id": "d",
+          "label": "丙酸"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2022,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 22,
+        "originalQuestion": "二、选择题1",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "题中四项皆为羧酸，酸性关键在羧酸根的共振稳定程度，以及邻近基团经 σ 键施加的诱导吸电子影响。",
+        "full": "题中四项皆为羧酸，酸性关键在羧酸根的共振稳定程度，以及邻近基团经 σ 键施加的诱导吸电子影响。\n\nCF₃ 强吸电子，可以显著稳定 CF₃COO⁻；BrCH₂– 也吸电子，但总体弱于三氟甲基。乙酸和丙酸中的烷基略给电子，通常弱于卤代乙酸。\n\n典型水溶液 pKₐ 约为三氟乙酸 0.2、溴乙酸 2.9、乙酸 4.8、丙酸 4.9；因此四者最强的是 B。\n\n注意“氟多所以酸性强”的记忆仅是现象；根本原因是去质子后的阴离子受到强 −I 效应稳定。"
+      },
+      "examGuide": {
+        "correctSummary": "三氟乙酸",
+        "steps": [
+          "题中四项皆为羧酸，酸性关键在羧酸根的共振稳定程度，以及邻近基团经 σ 键施加的诱导吸电子影响。",
+          "CF₃ 强吸电子，可以显著稳定 CF₃COO⁻；BrCH₂– 也吸电子，但总体弱于三氟甲基。乙酸和丙酸中的烷基略给电子，通常弱于卤代乙酸。",
+          "典型水溶液 pKₐ 约为三氟乙酸 0.2、溴乙酸 2.9、乙酸 4.8、丙酸 4.9；因此四者最强的是 B。",
+          "注意“氟多所以酸性强”的记忆仅是现象；根本原因是去质子后的阴离子受到强 −I 效应稳定。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2022-extra-02",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物与金属钠反应速度最快的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "CH₃CHOHCH₃"
+        },
+        {
+          "id": "b",
+          "label": "CH₃CH₂OH"
+        },
+        {
+          "id": "c",
+          "label": "CH₃OH"
+        },
+        {
+          "id": "d",
+          "label": "CH₃CH₂CH₂OH"
+        }
+      ],
+      "answer": "c",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2022,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 22,
+        "originalQuestion": "二、选择题2",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "钠与醇作用的一般净反应为 2 ROH + 2 Na → 2 RONa + H₂↑；本题比较相同条件下几种脂肪醇的反应倾向。",
+        "full": "钠与醇作用的一般净反应为 2 ROH + 2 Na → 2 RONa + H₂↑；本题比较相同条件下几种脂肪醇的反应倾向。\n\n甲醇的 O–H 酸性在这些简单醇中通常最强，甲氧基的位阻最小，有利于接触钠表面并释放氢气。\n\n异丙醇是二级醇，乙醇和丙醇是一级醇，烷基给电子/空间效应使反应倾向相对低于甲醇，选 C。\n\n必须固定纯度、温度、钠表面状态；实验测得瞬时速度还受钠表面氧化膜影响，本题只考通常的定性规律。"
+      },
+      "examGuide": {
+        "correctSummary": "CH₃OH",
+        "steps": [
+          "钠与醇作用的一般净反应为 2 ROH + 2 Na → 2 RONa + H₂↑；本题比较相同条件下几种脂肪醇的反应倾向。",
+          "甲醇的 O–H 酸性在这些简单醇中通常最强，甲氧基的位阻最小，有利于接触钠表面并释放氢气。",
+          "异丙醇是二级醇，乙醇和丙醇是一级醇，烷基给电子/空间效应使反应倾向相对低于甲醇，选 C。",
+          "必须固定纯度、温度、钠表面状态；实验测得瞬时速度还受钠表面氧化膜影响，本题只考通常的定性规律。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2022-extra-03",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "苯与 CH₃–CH(CH₃)–CH₂Cl 在 AlCl₃ 催化下反应的主要产物是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "异丁基苯 PhCH₂CH(CH₃)₂"
+        },
+        {
+          "id": "b",
+          "label": "叔丁基苯 PhC(CH₃)₃"
+        },
+        {
+          "id": "c",
+          "label": "2-甲基-2-苯基丁烷"
+        },
+        {
+          "id": "d",
+          "label": "正丁基苯 PhCH₂CH₂CH₂CH₃"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2022,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 22,
+        "originalQuestion": "二、选择题5",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "底物是异丁基氯，属于一级卤代烷，但在 Friedel–Crafts 烷基化的强 Lewis 酸条件下，可发生类似碳正离子的重排。",
+        "full": "底物是异丁基氯，属于一级卤代烷，但在 Friedel–Crafts 烷基化的强 Lewis 酸条件下，可发生类似碳正离子的重排。\n\n从 CH₃–CH(CH₃)–CH₂⁺ 出发，邻位三级碳可迁移一个氢至原端位碳，形成更稳定的叔丁基碳正离子 (CH₃)₃C⁺。\n\n苯作为 π 亲核体攻击叔丁基活性电中间体，失去 H⁺ 恢复芳香性，主产物是 PhC(CH₃)₃，选 B。\n\n这说明 Friedel–Crafts 直接烷基化可能发生重排；若要选择性合成直链苯烷基，常可先 Friedel–Crafts 酰基化，再对羰基脱氧还原。"
+      },
+      "examGuide": {
+        "correctSummary": "叔丁基苯 PhC(CH₃)₃",
+        "steps": [
+          "底物是异丁基氯，属于一级卤代烷，但在 Friedel–Crafts 烷基化的强 Lewis 酸条件下，可发生类似碳正离子的重排。",
+          "从 CH₃–CH(CH₃)–CH₂⁺ 出发，邻位三级碳可迁移一个氢至原端位碳，形成更稳定的叔丁基碳正离子 (CH₃)₃C⁺。",
+          "苯作为 π 亲核体攻击叔丁基活性电中间体，失去 H⁺ 恢复芳香性，主产物是 PhC(CH₃)₃，选 B。",
+          "这说明 Friedel–Crafts 直接烷基化可能发生重排；若要选择性合成直链苯烷基，常可先 Friedel–Crafts 酰基化，再对羰基脱氧还原。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2022-extra-04",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物如按 Sₙ1 历程进行反应，活性最小的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "3-溴环己烯（烯丙位溴）"
+        },
+        {
+          "id": "b",
+          "label": "4-溴环己烯（非烯丙位溴）"
+        },
+        {
+          "id": "c",
+          "label": "溴代环己烷"
+        },
+        {
+          "id": "d",
+          "label": "1-溴环己烯（乙烯基溴）"
+        }
+      ],
+      "answer": "d",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2022,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 22,
+        "originalQuestion": "二、选择题6",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "SN1 的速控阶段是 C–Br 离解、形成相应碳正离子。烯丙位碳正离子可通过 π 共振稳定，普通二级环己基碳正离子相对不稳定。",
+        "full": "SN1 的速控阶段是 C–Br 离解、形成相应碳正离子。烯丙位碳正离子可通过 π 共振稳定，普通二级环己基碳正离子相对不稳定。\n\n选项 D 的 Br 直接连在 C=C 双键碳上，若按 SN1 需要形成乙烯基碳正离子，这通常非常不稳定，导致普通溶剂解型 SN1 极难进行。\n\n因此活性最小的是 D。其余位置的溴可以形成普通或烯丙位碳正离子，不会像乙烯基卤代物这样极端不利。\n\n需要根据原图核对 Br 的连结碳是否为双键碳，不能把“邻近烯烃”与“直接连在烯烃碳”混为一谈。"
+      },
+      "examGuide": {
+        "correctSummary": "1-溴环己烯（乙烯基溴）",
+        "steps": [
+          "SN1 的速控阶段是 C–Br 离解、形成相应碳正离子。烯丙位碳正离子可通过 π 共振稳定，普通二级环己基碳正离子相对不稳定。",
+          "选项 D 的 Br 直接连在 C=C 双键碳上，若按 SN1 需要形成乙烯基碳正离子，这通常非常不稳定，导致普通溶剂解型 SN1 极难进行。",
+          "因此活性最小的是 D。其余位置的溴可以形成普通或烯丙位碳正离子，不会像乙烯基卤代物这样极端不利。",
+          "需要根据原图核对 Br 的连结碳是否为双键碳，不能把“邻近烯烃”与“直接连在烯烃碳”混为一谈。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2022-extra-05",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物中不能发生碘仿反应的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "CH₃CHOHCH₃"
+        },
+        {
+          "id": "b",
+          "label": "(CH₃)₃CCHO"
+        },
+        {
+          "id": "c",
+          "label": "CH₃CHO"
+        },
+        {
+          "id": "d",
+          "label": "CH₃COCH₃"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2022,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 22,
+        "originalQuestion": "二、选择题7",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "碘仿反应要求底物本身含 CH₃CO– 或能氧化成 CH₃CO–；乙醛 CH₃CHO 也是典型阳性例外。",
+        "full": "碘仿反应要求底物本身含 CH₃CO– 或能氧化成 CH₃CO–；乙醛 CH₃CHO 也是典型阳性例外。\n\n异丙醇 CH₃CH(OH)CH₃ 可被氧化为丙酮 CH₃COCH₃，因此 A、D 阳性；乙醛 C 能进行对应碘仿反应。\n\n(CH₃)₃CCHO 是叔丁基甲醛，虽有醛基，但其羰基 α-C 是季碳，没有羰基相邻甲基可供连续 α-碘代，不能发生普通碘仿反应，故 B。\n\n不要把所有醛都判为碘仿阳性；必须检查甲基羰基结构或可氧化形成该结构的醇。"
+      },
+      "examGuide": {
+        "correctSummary": "(CH₃)₃CCHO",
+        "steps": [
+          "碘仿反应要求底物本身含 CH₃CO– 或能氧化成 CH₃CO–；乙醛 CH₃CHO 也是典型阳性例外。",
+          "异丙醇 CH₃CH(OH)CH₃ 可被氧化为丙酮 CH₃COCH₃，因此 A、D 阳性；乙醛 C 能进行对应碘仿反应。",
+          "(CH₃)₃CCHO 是叔丁基甲醛，虽有醛基，但其羰基 α-C 是季碳，没有羰基相邻甲基可供连续 α-碘代，不能发生普通碘仿反应，故 B。",
+          "不要把所有醛都判为碘仿阳性；必须检查甲基羰基结构或可氧化形成该结构的醇。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2023-extra-06",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "环丁烷的真实键角是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "90°"
+        },
+        {
+          "id": "b",
+          "label": ">90°"
+        },
+        {
+          "id": "c",
+          "label": "<90°"
+        },
+        {
+          "id": "d",
+          "label": "120°"
+        }
+      ],
+      "answer": "c",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2023,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 16,
+        "originalQuestion": "一、选择题7",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "若把环丁烷画作平面正方形，几何内角恰为 90°，但这只是平面示意，不是分子的实际最低能量构象。",
+        "full": "若把环丁烷画作平面正方形，几何内角恰为 90°，但这只是平面示意，不是分子的实际最低能量构象。\n\n环丁烷的碳原子通常采取轻微折叠的非平面构象，以减少邻近 C–H 键的重叠张力；真实 C–C–C 键角略偏离 90°。\n\n通常实测/计算的环内 C–C–C 键角约 88°，故小于 90°，选 C。\n\n既不要按普通四面体碳理想角 109.5° 直接代入，也不要把纸上正方形的 90° 视作真实结构。"
+      },
+      "examGuide": {
+        "correctSummary": "<90°",
+        "steps": [
+          "若把环丁烷画作平面正方形，几何内角恰为 90°，但这只是平面示意，不是分子的实际最低能量构象。",
+          "环丁烷的碳原子通常采取轻微折叠的非平面构象，以减少邻近 C–H 键的重叠张力；真实 C–C–C 键角略偏离 90°。",
+          "通常实测/计算的环内 C–C–C 键角约 88°，故小于 90°，选 C。",
+          "既不要按普通四面体碳理想角 109.5° 直接代入，也不要把纸上正方形的 90° 视作真实结构。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2023-extra-07",
+      "day": 20,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "1,1-氯丙烷分子中，不存在的电子效应是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "诱导作用"
+        },
+        {
+          "id": "b",
+          "label": "p–π 共轭"
+        },
+        {
+          "id": "c",
+          "label": "σ–π 超共轭"
+        },
+        {
+          "id": "d",
+          "label": "π–π 共轭"
+        }
+      ],
+      "answer": "d",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2023,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 16,
+        "originalQuestion": "一、选择题10",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "从原卷的“1,1-氯丙烯”与“1,1-氯丙烷”字形必须仔细辨认；本题若为饱和烷烃，则不存在 π 键，不能有任何 π–π 共轭。",
+        "full": "从原卷的“1,1-氯丙烯”与“1,1-氯丙烷”字形必须仔细辨认；本题若为饱和烷烃，则不存在 π 键，不能有任何 π–π 共轭。\n\n原卷本页题干的字形需要高倍扫描核实。初稿谨慎只使用‘π–π 共轭不存在’这一明确判断，不把其他效应选项当成已终核。\n\n在无两个可连续相互作用的 π 系统时不能出现 π–π 共轭；但是否存在 σ–π、p–π 要先确定确切结构。\n\n该题尚待原文字形及分子结构二次确认，不允许进入可自动评分的正式题库。"
+      },
+      "examGuide": {
+        "correctSummary": "π–π 共轭",
+        "steps": [
+          "从原卷的“1,1-氯丙烯”与“1,1-氯丙烷”字形必须仔细辨认；本题若为饱和烷烃，则不存在 π 键，不能有任何 π–π 共轭。",
+          "原卷本页题干的字形需要高倍扫描核实。初稿谨慎只使用‘π–π 共轭不存在’这一明确判断，不把其他效应选项当成已终核。",
+          "在无两个可连续相互作用的 π 系统时不能出现 π–π 共轭；但是否存在 σ–π、p–π 要先确定确切结构。",
+          "该题尚待原文字形及分子结构二次确认，不允许进入可自动评分的正式题库。"
+        ]
+      },
+      "hold": true
+    },
+    {
+      "id": "exam-2015-extra-08",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "亲电取代反应活性由强到弱排列。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：苯"
+        },
+        {
+          "id": "b",
+          "label": "B：吡啶"
+        },
+        {
+          "id": "c",
+          "label": "C：甲苯"
+        },
+        {
+          "id": "d",
+          "label": "D：苯酚"
+        }
+      ],
+      "answer": [
+        "d",
+        "c",
+        "a",
+        "b"
+      ],
+      "correctOrder": [
+        "d",
+        "c",
+        "a",
+        "b"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2015,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 54,
+        "originalQuestion": "三、按指定性质排序1",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。",
+        "full": "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。\n\n苯酚的 –OH 通过孤对共振供电子显著活化芳环；甲苯的 –CH₃ 通过超共轭弱致活化；苯处于中间。\n\n吡啶环氮吸电子，使芳环亲电取代明显困难，通常是四者中最慢。\n\n因此 D（苯酚） > C（甲苯） > A（苯） > B（吡啶）。"
+      },
+      "examGuide": {
+        "correctSummary": "D：苯酚 > C：甲苯 > A：苯 > B：吡啶",
+        "steps": [
+          "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。",
+          "苯酚的 –OH 通过孤对共振供电子显著活化芳环；甲苯的 –CH₃ 通过超共轭弱致活化；苯处于中间。",
+          "吡啶环氮吸电子，使芳环亲电取代明显困难，通常是四者中最慢。",
+          "因此 D（苯酚） > C（甲苯） > A（苯） > B（吡啶）。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2015-extra-09",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下述化合物中 CH₃ 氢的化学位移 δ 的大小次序为。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：CH₃CH₃"
+        },
+        {
+          "id": "b",
+          "label": "B：CH₃Br"
+        },
+        {
+          "id": "c",
+          "label": "C：CH₃F"
+        }
+      ],
+      "answer": [
+        "c",
+        "b",
+        "a"
+      ],
+      "correctOrder": [
+        "c",
+        "b",
+        "a"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2015,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 54,
+        "originalQuestion": "三、按指定性质排序3",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。",
+        "full": "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。\n\n乙烷甲基的 H 环境较富电子，δ 约 0.9；溴甲烷受到 Br 的去屏蔽，δ 约 2.7；氟甲烷受 F 强诱导吸电子，δ 约 4.2。\n\n因此 C > B > A。\n\n不能直接把卤素质量大等同于核磁位移高；关键是局域电子环境与屏蔽效应，重原子也可能有复杂贡献。"
+      },
+      "examGuide": {
+        "correctSummary": "C：CH₃F > B：CH₃Br > A：CH₃CH₃",
+        "steps": [
+          "¹H NMR 化学位移由质子周围的电子屏蔽程度决定。邻近强电负性基团一般降低质子电子屏蔽，使其向低场移动，δ 增大。",
+          "乙烷甲基的 H 环境较富电子，δ 约 0.9；溴甲烷受到 Br 的去屏蔽，δ 约 2.7；氟甲烷受 F 强诱导吸电子，δ 约 4.2。",
+          "因此 C > B > A。",
+          "不能直接把卤素质量大等同于核磁位移高；关键是局域电子环境与屏蔽效应，重原子也可能有复杂贡献。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2015-extra-10",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "请写出下述化合物的 pKₐ 大小次序。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：苯甲酸"
+        },
+        {
+          "id": "b",
+          "label": "B：对甲基苯甲酸"
+        },
+        {
+          "id": "c",
+          "label": "C：对硝基苯甲酸"
+        }
+      ],
+      "answer": [
+        "b",
+        "a",
+        "c"
+      ],
+      "correctOrder": [
+        "b",
+        "a",
+        "c"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2015,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 54,
+        "originalQuestion": "三、按指定性质排序5",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。",
+        "full": "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。\n\n对硝基 –NO₂ 是强吸电子基，稳定羧酸根，增强酸性，使 pKₐ 显著降低。\n\n典型水溶液 pKₐ 约为 B 4.37、A 4.20、C 3.44，因此题目要求的 pKₐ 从大到小为 B > A > C。\n\n题目问的是 pKₐ 而非酸强度；两种排序方向互相相反，必须先读清题干。"
+      },
+      "examGuide": {
+        "correctSummary": "B：对甲基苯甲酸 > A：苯甲酸 > C：对硝基苯甲酸",
+        "steps": [
+          "甲基对芳环弱供电子，可略微降低苯甲酸去质子后羧酸根的稳定性，因此对甲基苯甲酸相对更弱酸，pKₐ 更高。",
+          "对硝基 –NO₂ 是强吸电子基，稳定羧酸根，增强酸性，使 pKₐ 显著降低。",
+          "典型水溶液 pKₐ 约为 B 4.37、A 4.20、C 3.44，因此题目要求的 pKₐ 从大到小为 B > A > C。",
+          "题目问的是 pKₐ 而非酸强度；两种排序方向互相相反，必须先读清题干。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2015-extra-11",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "E1 反应速度大小次序。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：3-甲基-2-溴丁烷（二级）"
+        },
+        {
+          "id": "b",
+          "label": "B：1-溴-3-甲基丁烷（一级）"
+        },
+        {
+          "id": "c",
+          "label": "C：2-溴-2-甲基丁烷（三级）"
+        },
+        {
+          "id": "d",
+          "label": "D：2-溴-1-丁烯（乙烯基溴）"
+        }
+      ],
+      "answer": [
+        "c",
+        "a",
+        "b",
+        "d"
+      ],
+      "correctOrder": [
+        "c",
+        "a",
+        "b",
+        "d"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2015,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 54,
+        "originalQuestion": "三、按指定性质排序6",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "E1 的离去基先断裂生成碳正离子，反应速率通常受碳正离子形成难易支配。",
+        "full": "E1 的离去基先断裂生成碳正离子，反应速率通常受碳正离子形成难易支配。\n\n普通烷基卤代物的趋势为三级 > 二级 > 一级，三级碳正离子能受更多超共轭稳定。\n\n乙烯基溴中 Br 直接连双键碳；E1 离去需要形成不稳定乙烯基正离子，在这些底物中最慢。\n\n所以顺序 C > A > B > D。应区别 E1 与 E2：E2 不需要先产生碳正离子。"
+      },
+      "examGuide": {
+        "correctSummary": "C：2-溴-2-甲基丁烷（三级） > A：3-甲基-2-溴丁烷（二级） > B：1-溴-3-甲基丁烷（一级） > D：2-溴-1-丁烯（乙烯基溴）",
+        "steps": [
+          "E1 的离去基先断裂生成碳正离子，反应速率通常受碳正离子形成难易支配。",
+          "普通烷基卤代物的趋势为三级 > 二级 > 一级，三级碳正离子能受更多超共轭稳定。",
+          "乙烯基溴中 Br 直接连双键碳；E1 离去需要形成不稳定乙烯基正离子，在这些底物中最慢。",
+          "所以顺序 C > A > B > D。应区别 E1 与 E2：E2 不需要先产生碳正离子。"
+        ]
+      },
+      "hold": false
+    },
+    {
+      "id": "exam-2018-extra-12",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下述 C=O 键的 IR 伸缩振动吸收频率大小次序。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：乙酰氯 CH₃COCl"
+        },
+        {
+          "id": "b",
+          "label": "B：乙酰氟 CH₃COF"
+        },
+        {
+          "id": "c",
+          "label": "C：甲基乙烯基酮 CH₃COCH=CH₂"
+        }
+      ],
+      "answer": [
+        "b",
+        "a",
+        "c"
+      ],
+      "correctOrder": [
+        "b",
+        "a",
+        "c"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2018,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 40,
+        "originalQuestion": "三、按指定性质排序3",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "羰基 IR 伸缩频率受取代基吸电子、共振供电子和共轭影响。酸卤化物一般比普通酮具有更高的 ν(C=O)。",
+        "full": "羰基 IR 伸缩频率受取代基吸电子、共振供电子和共轭影响。酸卤化物一般比普通酮具有更高的 ν(C=O)。\n\n酰氟的强 −I 效应与较弱的有效共振供电子综合使其羰基伸缩常明显高于酰氯；乙酰氟可在约 1840 cm⁻¹，乙酰氯约 1800 cm⁻¹ 附近。\n\nα,β-不饱和酮的 C=O 与 C=C 共轭，降低 C=O 有效键级，使伸缩频率约 1685 cm⁻¹ 左右，低于简单酰卤。\n\n故 B > A > C；具体波数受相态和实验环境影响，比较重点是机理上的方向。"
+      },
+      "examGuide": {
+        "correctSummary": "B：乙酰氟 CH₃COF > A：乙酰氯 CH₃COCl > C：甲基乙烯基酮 CH₃COCH=CH₂",
+        "steps": [
+          "羰基 IR 伸缩频率受取代基吸电子、共振供电子和共轭影响。酸卤化物一般比普通酮具有更高的 ν(C=O)。",
+          "酰氟的强 −I 效应与较弱的有效共振供电子综合使其羰基伸缩常明显高于酰氯；乙酰氟可在约 1840 cm⁻¹，乙酰氯约 1800 cm⁻¹ 附近。",
+          "α,β-不饱和酮的 C=O 与 C=C 共轭，降低 C=O 有效键级，使伸缩频率约 1685 cm⁻¹ 左右，低于简单酰卤。",
+          "故 B > A > C；具体波数受相态和实验环境影响，比较重点是机理上的方向。"
+        ]
+      },
+      "hold": false
     }
   ]
 };})();
