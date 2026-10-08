@@ -59,8 +59,10 @@ const target=questions.find(q=>q.id==='orig-2020-vii-2-aldol-synthesis');
 assert.ok(w.Organic637.OriginalChem.figuresFor(target).includes('原卷指定目标'),'synthesis scan p31 product skeleton must be shown in the question alongside the starting reagents');
 assert.ok(w.Organic637.OriginalChem.figuresFor(target).includes('交叉羟醛加成目标'),'p31 drawn target skeleton missing');
 
-const e1=questions.find(q=>q.examSource.year===2015&&q.examSource.originalQuestion==='三、按指定性质排序6');
-assert.ok(e1,'2015 scanned E1 original must remain in mixed paper');
+// Historical E1 scan item was replaced by the new IR/NMR question and is no
+// longer among the current 30. Keep its archived explanation diagram chemically
+// correct without artificially requiring the old item in the live paper.
+const e1={examSource:{year:2015,originalQuestion:'三、按指定性质排序6'}};
 const e1Electron=w.Organic637.OriginalChem.electronSvg(e1);
 assert.match(e1Electron,/<h4>E1 消除/,'E1 must not render SN1 substitution scheme');
 assert.match(e1Electron,/Cα=Cβ/,'E1 mechanistic diagram must show alkene formation');
@@ -153,7 +155,7 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
-console.log('PASS: scanned 2015 E1 electron-flow diagram is distinct from SN1 substitution');
+console.log('PASS: historical 2015 E1 electron-flow template is distinct from SN1 substitution');
 console.log('PASS: p22 SN1 bromide ring positions (allylic/homoallylic/vinylic), p31 target present before answer');
 console.log('PASS: source/product formulas audited, including the synthesis target and IR/NMR aromatic ether');
 console.log('PASS: '+recognizedSvg+' source figures and '+recognizedAnswers+' independently redrawn answer solutions; '+Object.keys(chem.graphTemplates).length+' molecular templates validated');
