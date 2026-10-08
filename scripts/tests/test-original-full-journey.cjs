@@ -47,7 +47,27 @@ async function run(){
     const head=(await page.locator('.step-label').allTextContents()).join(' ');
     assert.match(head,new RegExp(q+'/15'),'wrong current question: '+head);
     const choice=page.locator('button[data-option]');
+    const fields=page.locator('input[data-structure-part]');
+    const text=page.locator('#shortAnswer');
     if(await choice.count())await choice.first().click();
+    else if(await fields.count()){
+      const expected=await page.evaluate(()=>{
+        const id=window.location.hash.match(/day\\/(19|20)/)?.[1]||'19';
+        const state=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
+        const index=state?.originalExamDrafts?.['originalDay'+id]?.responses?.length||0;
+        const q=window.Organic637.OriginalExamDraft.questions.filter(q=>q.day===Number(id))[index];
+        return q?.answer||{};
+      });
+      for(const part of ['A','B','C'])await page.locator('input[data-structure-part="'+part+'"]').fill(expected[part]?.[0]||'');
+    }else if(await text.count()){
+      const sample=await page.evaluate(()=>{
+        const id=Number(window.location.hash.match(/day\\/(19|20)/)?.[1]||19);
+        const state=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
+        const index=state?.originalExamDrafts?.['originalDay'+id]?.responses?.length||0;
+        return window.Organic637.OriginalExamDraft.questions.filter(q=>q.day===id)[index].answer?.[0]||'';
+      });
+      await text.fill(sample);
+    }
     const submit=page.locator('#submitAnswer');
     await submit.waitFor();
     assert.equal(await submit.isDisabled(),false,'submit disabled at day '+day+' q'+q);
