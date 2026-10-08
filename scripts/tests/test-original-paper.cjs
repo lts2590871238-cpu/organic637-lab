@@ -11,12 +11,50 @@ load('js/original-chem-diagrams.js',w);
 load('js/original-chem-graph.js',w);
 load('js/original-reaction-solutions.js',w);
 load('js/original-spectra.js',w);
+load('js/original-iodoform.js',w);
 const {questions,status}=w.Organic637.OriginalExamDraft;
 const check=w.Organic637.Interactions;
 const chem=w.Organic637.OriginalChem;
 const iodo=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题12');
 assert.match(iodo.options[2].label,/苯甲醚/,'iodoform option C scan mismatch');
 assert.match(iodo.options[3].label,/苯乙醛/,'iodoform option D scan mismatch');
+// 2020 p27 Q12 must depict the *real four scanned chemical structures*.
+// Phenylacetaldehyde (Ph-CH2-CHO) is NOT acetaldehyde or a methyl ketone.
+function graphInfo(name){
+ const [atoms,bonds]=chem.graphTemplates[name];assert.ok(atoms&&bonds,'missing molecule graph '+name);
+ const adj=atoms.map(()=>[]);
+ for(const [a,b,order]of bonds){adj[a].push([b,order]);adj[b].push([a,order]);}
+ const carbonyl=bonds.find(([a,b,k])=>k===2&&
+  ((atoms[a][2]==='O'&&!atoms[b][2])||(atoms[b][2]==='O'&&!atoms[a][2])));
+ const carbonylC=carbonyl?(atoms[carbonyl[0]][2]==='O'?carbonyl[1]:carbonyl[0]):-1;
+ return {atoms,bonds,adj,carbonylC};
+}
+const origStructures=chem.optionStructureNames(iodo);
+assert.deepEqual(Array.from(origStructures),['苯乙酮','苯酚','苯甲醚','苯乙醛'],
+ '2020 scanned iodoform option labels must retain original molecular identities');
+const ketone=graphInfo('苯乙酮'),aldehyde=graphInfo('苯乙醛'),ether=graphInfo('苯甲醚'),phenol=graphInfo('苯酚');
+assert.ok(ketone.carbonylC>=0);
+assert.equal(ketone.adj[ketone.carbonylC].length,3,'PhCOCH3 must be ketone with two carbon substituents');
+assert.ok(aldehyde.carbonylC>=0);
+assert.equal(aldehyde.adj[aldehyde.carbonylC].length,2,'PhCH2CHO must be aldehyde with implicit formyl H');
+const formylCarbon=aldehyde.adj[aldehyde.carbonylC].find(([n,ord])=>ord===1)?.[0];
+assert.equal(aldehyde.adj[formylCarbon].length,2,'phenylacetaldehyde is Ph-CH2-CHO, not benzaldehyde Ph-CHO');
+assert.equal(ether.carbonylC,-1,'Ph-O-CH3 ether has no C=O');
+assert.equal(phenol.carbonylC,-1,'Ph-OH phenol has no C=O');
+const notIodo=questions.find(q=>q.examSource.year===2022&&q.examSource.originalQuestion==='二、选择题7');
+assert.equal(notIodo.answer,'b','2022 original p22 q7 negative iodoform choice must be B pivaldehyde');
+const pivaldehyde=graphInfo('叔丁基甲醛');
+const carbonylSide=pivaldehyde.adj[pivaldehyde.carbonylC].find(([n,order])=>order===1)[0];
+assert.equal(pivaldehyde.adj[carbonylSide].length,4,'pivaldehyde alpha-carbon must have four C-C bonds and zero alpha-H');
+const triiodo=graphInfo('三碘苯乙酮'),alpha=triiodo.adj[triiodo.carbonylC].find(([n,order])=>
+ order===1&&triiodo.adj[n].filter(([i])=>triiodo.atoms[i][2]==='I').length===3)?.[0];
+assert.notEqual(alpha,undefined,'triiodo ketone redraw must attach three I to the former methyl carbon');
+const chi3=graphInfo('碘仿CHI3');
+assert.equal(chi3.atoms.filter(a=>a[2]==='I').length,3,'iodoform must have three iodine atoms');
+assert.match(chem.electronSvg(iodo),/α-碘代/,'missing stepwise source-specific iodoform mechanism');
+assert.match(chem.electronSvg(iodo),/C–C σ 键断裂/,'iodoform C-C cleavage and electron destination missing');
+assert.match(chem.electronSvg(notIodo),/不能形成碘仿/,'2022 scan negative iodoform exception unexplained');
+
 const fc=questions.find(q=>q.examSource.year===2022&&q.examSource.originalQuestion==='二、选择题5');
 assert.match(fc.options[2].label,/仲丁基苯/,'FC option C original scan mismatch');
 const nmr=questions.find(q=>q.id==='orig-2020-iv-2-ir-nmr');
@@ -227,7 +265,8 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
-console.log('PASS: p59 Lucas ring / OH substitution topology and p40 three carbonyl IR group connections');
+console.log('PASS: p59 Lucas and p40 carbonyl IR molecular topology');
+console.log('PASS: 2020/2022 iodoform positive/negative original structures and redrawn triiodination/C-C cleavage');
 console.log('PASS: historical 2015 E1 electron-flow template is distinct from SN1 substitution');
 console.log('PASS: p22 SN1 bromide ring positions (allylic/homoallylic/vinylic), p31 target present before answer');
 console.log('PASS: source/product formulas audited, including the synthesis target and IR/NMR aromatic ether');
