@@ -1288,10 +1288,21 @@
     location.hash='#exam-review/'+kind;
     examReviewPage(kind);
   }
+  function originalPaperVersion(){return NS.OriginalExamDraft?.version||'unspecified';}
+  function originalPaperSnapshot(bank){
+    return bank.map(q=>({
+      id:q.id,day:q.day,type:q.type,role:q.role,prompt:q.prompt,formula:q.formula,
+      parts:q.parts,options:q.options,items:q.items,answer:q.answer,
+      correctOrder:q.correctOrder,points:q.points,examSource:q.examSource,
+      examGuide:q.examGuide,explanationLayers:q.explanationLayers
+    }));
+  }
   function originalExamResultPage(day) {
     const key='originalDay'+day,result=Store.state.examResults?.[key];
     if(!result)return originalDayExamPage(day);
-    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>各道题保留其真实的原卷分值（如填空题2分、结构推导题8分）；本混合卷每题统一折算10分，总分150分。这是训练折算成绩，并非某一年完整原卷的原始得分。</p><div class="btn-row"><button class="btn primary" id="originalPaper">← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div>${oldExamKind(day)?'<div class="original-old-review"><button class="btn ghost" id="oldExamPaper">查看以前做过的第'+day+'天旧版答卷与学习记录</button></div>':''}</main>`,'study');
+    const olderVersion=result.paperVersion!==originalPaperVersion();
+    const readable=Array.isArray(result.paperSnapshot)&&result.paperSnapshot.length>0;
+    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>各道题保留其真实的原卷分值（如填空题2分、结构推导题8分）；本混合卷每题统一折算10分，总分150分。这是训练折算成绩，并非某一年完整原卷的原始得分。</p>${olderVersion?'<p class="paper-source-warning">这是旧题库版本的历史成绩，已与新版题库隔离。'+(readable?'可根据交卷时保存的题目快照复盘。':'当时未存储完整题目快照，不能用新版题目冒充旧答卷。')+'</p>':''}<div class="btn-row"><button class="btn primary" id="originalPaper" ${olderVersion&&!readable?'disabled title="旧版本没有存储题目快照"':''}>← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div>${oldExamKind(day)?'<div class="original-old-review"><button class="btn ghost" id="oldExamPaper">查看以前做过的第'+day+'天旧版答卷与学习记录</button></div>':''}</main>`,'study');
     $('#originalPaper').onclick=()=>{location.hash='#original-review/'+day;originalReviewPage(day);};
     $('#originalRetry').onclick=()=>originalExamRetry(day);
     $('#originalHome').onclick=()=>{location.hash='#welcome';};
@@ -1303,15 +1314,21 @@
     archiveExamReview('original-'+day,Store.state.examResults?.[key]);
     delete Store.state.examResults[key];
     Store.state.originalExamDrafts ||= {};
-    Store.state.originalExamDrafts[key]={index:0,responses:[],startedAt:Date.now()};
+    Store.state.originalExamDrafts[key]={index:0,responses:[],startedAt:Date.now(),paperVersion:originalPaperVersion()};
     Store.save();
     location.hash='#day/'+day;originalDayExamPage(day);
   }
   function originalReviewPage(day) {
     const key='originalDay'+day,result=Store.state.examResults?.[key];
     if(!result)return originalDayExamPage(day);
+    const isCurrent=result.paperVersion===originalPaperVersion();
+    const recorded=Array.isArray(result.paperSnapshot)&&result.paperSnapshot.length?result.paperSnapshot:(isCurrent?originalQuestions(day):[]);
+    if(!recorded.length){
+      shell('<section class="panel"><h2>旧版完整原题未保存</h2><p>已保留当时的成绩与历史作答记录，但不能用现在的新题目拼凑成旧试卷。请从成绩页选择重做新版真题。</p><button class="btn ghost" id="originalOldBack">返回成绩页</button></section>','study');
+      $('#originalOldBack').onclick=()=>originalExamResultPage(day);return;
+    }
     const byId=new Map((result.responses||[]).map(x=>[x.questionId,x]));
-    const rows=originalQuestions(day).map(question=>{
+    const rows=recorded.map(question=>{
       const r=byId.get(question.id);
       return {question,hasEvidence:Boolean(r),correct:r?.correct===true,partialScore:r?.partialScore??null,payload:r?.payload??null};
     });
@@ -1331,7 +1348,12 @@
     if(Store.state.examResults[key])return originalExamResultPage(day);
     Store.state.originalExamDrafts ||= {};
     let draft=Store.state.originalExamDrafts[key];
-    if(!draft||!Array.isArray(draft.responses))draft={index:0,responses:[],startedAt:Date.now()};
+    if(draft&&Array.isArray(draft.responses)&&draft.responses.length&&draft.paperVersion!==originalPaperVersion()){
+      archiveExamReview('original-incomplete-'+day,{...draft,reason:'paper version changed'});
+      draft=null;
+    }
+    if(!draft||!Array.isArray(draft.responses))draft={index:0,responses:[],startedAt:Date.now(),paperVersion:originalPaperVersion()};
+    draft.paperVersion=originalPaperVersion();
     Store.state.originalExamDrafts[key]=draft;
     draft.index=Math.max(Number(draft.index)||0,draft.responses.length);
     if(draft.index>=bank.length) {
@@ -1340,7 +1362,7 @@
       const raw=draft.responses.reduce((sum,r)=>sum+(Number(r.partialScore||0)*Number(bank.find(q=>q.id===r.questionId)?.points||0)),0);
       const score=Math.round(raw/total*150*10)/10,percent=Math.round(raw/total*100);
       Store.state.examResults[key]={score150:score,percent,responseCount:draft.responses.length,
-        completedAt:Date.now(),paperVersion:NS.OriginalExamDraft?.version,responses:JSON.parse(JSON.stringify(draft.responses))};
+        completedAt:Date.now(),paperVersion:originalPaperVersion(),paperSnapshot:originalPaperSnapshot(bank),responses:JSON.parse(JSON.stringify(draft.responses))};
       const progress=NS.Learning.ensureDayState(Store.state,day,REGISTRY);
       progress.finished=true;progress.completedAt=Date.now();
       Store.state.completedDays=[...new Set([...(Store.state.completedDays||[]),day])].sort((a,b)=>a-b);
