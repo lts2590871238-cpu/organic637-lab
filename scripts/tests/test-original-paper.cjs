@@ -12,6 +12,8 @@ load('js/original-chem-graph.js',w);
 load('js/original-reaction-solutions.js',w);
 load('js/original-spectra.js',w);
 const {questions,status}=w.Organic637.OriginalExamDraft;
+const check=w.Organic637.Interactions;
+const chem=w.Organic637.OriginalChem;
 const iodo=questions.find(q=>q.examSource.year===2020&&q.examSource.originalQuestion==='一、选择题12');
 assert.match(iodo.options[2].label,/苯甲醚/,'iodoform option C scan mismatch');
 assert.match(iodo.options[3].label,/苯乙醛/,'iodoform option D scan mismatch');
@@ -135,8 +137,8 @@ assert.deepEqual(carbonylEnvironment('乙酰氟'),{halogen:'F',directlyAttachedV
 assert.deepEqual(carbonylEnvironment('甲基乙烯基酮'),{halogen:null,directlyAttachedVinyl:true});
 
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
-const check=w.Organic637.Interactions;
-const chem=w.Organic637.OriginalChem;
+
+
 const expectedPages=new Map([[2020,new Set([26,27,28,29,30,31])],[2019,new Set([35,36])],[2017,new Set([44])],[2014,new Set([59])],[2016,new Set([50])],[2018,new Set([40])],[2022,new Set([22])],[2023,new Set([16])],[2015,new Set([54])]]);
 assert.equal(questions.length,30,'must ship thirty distinct scanned question entries');
 assert.match(status,/pending/,'must not mistakenly mark editorial verification complete');
