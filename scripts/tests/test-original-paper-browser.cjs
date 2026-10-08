@@ -67,6 +67,24 @@ const assert=require('node:assert/strict');
    assert.ok(await page.locator('.original-spectrum svg').count()>=1,'redrawn IR/NMR trace explanation missing');
    assert.ok(await page.locator('.original-molecule-grid svg').count()>=4,'synthetic precursors and exact products not drawn');
    assert.ok((await page.locator('.paper-comparison').first().innerText()).includes('我的自由路线'),'student-written synthesis plan missing from review');
+   // Open the actual SVG enlargement view and use the return button.
+   const zoom=page.locator('.paper-question').first().locator('.paper-zoom-trigger').first();
+   await zoom.waitFor();
+   await zoom.click();
+   await page.locator('.paper-zoom-dialog[open]').waitFor();
+   assert.ok(await page.locator('.paper-zoom-art svg').count()>=1,'zoom did not clone the original vector chemical structure');
+   await page.locator('#paperZoomClose').click();
+   assert.equal(await page.locator('.paper-zoom-dialog[open]').count(),0,'return-to-paper did not close the enlargement');
+   const single=await page.evaluate(()=>{
+     const f=document.querySelector('.paper-correct-scheme .original-molecule-grid > figure:only-child');
+     return f?{figure:f.getBoundingClientRect().width,grid:f.parentElement.getBoundingClientRect().width}:null;
+   });
+   assert.ok(single&&single.figure/single.grid>0.85,'single correct-answer molecular SVG wastes half of phone width');
+   const spectrumZoom=page.locator('.original-spectrum .paper-zoom-trigger');
+   await spectrumZoom.click();
+   await page.locator('.paper-zoom-dialog[open]').waitFor();
+   assert.ok(await page.locator('.paper-zoom-art.is-wide svg').count()>0,'spectrum needs scrollable readable enlargement');
+   await page.locator('#paperZoomClose').click();
    const bodyOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
    assert.ok(bodyOverflow<25,'advanced case horizontal page overflow '+viewport.name+': '+bodyOverflow);
    await page.screenshot({path:path.join(dir,'original-paper-advanced-'+viewport.name+'.png'),fullPage:true});
