@@ -122,7 +122,23 @@
     return { correct: exact, partialScore: exp.length ? matched / exp.length : 0, details: { expected, arrows }, errorType };
   }
 
+  function normalizeExamStructuralText(value) {
+    return String(value ?? '').trim().toLowerCase().replace(/[‐‑–—－]/g,'-')
+      .replace(/[（]/g,'(').replace(/[）]/g,')').replace(/\\s+/g,'')
+      .replace(/[₀₁₂₃₄₅₆₇₈₉]/g,d=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(d))
+      .replace(/-/g,'');
+  }
+  function correctStructuralPart(candidates,value){
+    return (Array.isArray(candidates)?candidates:[candidates]).some(c=>
+      normalizeExamStructuralText(c)===normalizeExamStructuralText(value));
+  }
   function evaluate(question, payload) {
+    if(question.type === 'structure-deduction'){
+      const parts=question.parts||[],details={};let matched=0;
+      for(const part of parts){const yes=correctStructuralPart(question.answer?.[part.id]||[],payload?.fields?.[part.id]||'');details[part.id]=yes;if(yes)matched++;}
+      const correct=parts.length>0&&matched===parts.length;
+      return {correct,partialScore:parts.length?matched/parts.length:0,details:{parts:details,matched,total:parts.length},errorType:correct?null:'structure_deduction_error'};
+    }
     if (question.type === 'ranking') return rankingEvaluation(question, payload.order || []);
     if (isPathQuestion(question)) return pathEvaluation(question, payload.path || []);
     if (question.type === 'electron-arrow') return arrowEvaluation(question, payload.arrows || []);
@@ -140,7 +156,7 @@
     if (question.type === 'numeric' || question.type === 'text-short') {
       const accepted = Array.isArray(question.answer) ? question.answer : [question.answer];
       const value = String(payload.value || '').trim().toLowerCase();
-      const correct = accepted.some(x => String(x).trim().toLowerCase() === value);
+      const correct = accepted.some(x => normalizeExamStructuralText(x) === normalizeExamStructuralText(value));
       return { correct, partialScore: correct ? 1 : 0, details: {}, errorType: correct ? null : (question.errorType || 'unknown') };
     }
     const correct = String(payload.selected) === expectedChoice(question);
@@ -241,6 +257,8 @@
     else if (type === 'ranking') body = renderRanking(question);
     else if (isPathQuestion(question)) body = renderPath(question);
     else if (type === 'electron-arrow') body = renderArrow(question);
+    else if(type==='structure-deduction')body='<div class="structure-deduction-fields"><p>本题原卷要求画出A、B、C结构。网页提供分项填写结构名称的作答方式；交卷后显示各结构的独立键线图。</p>'+
+      (question.parts||[]).map(part=>'<label><span>'+esc(part.label||part.id)+'</span><input type="text" data-structure-part="'+esc(part.id)+'" autocomplete="off" placeholder="填写结构对应的化合物名称"></label>').join('')+'</div>';
     else if (type === 'numeric' || type === 'text-short') body = `<label class="short-answer"><span>你的答案</span><input id="shortAnswer" autocomplete="off" inputmode="${type === 'numeric' ? 'decimal' : 'text'}"></label>`;
 
     root.innerHTML = `<div class="question-prompt">${esc(question.prompt)}</div>${renderRepresentation(question)}${body}${commonFooter(question, settings)}`;
@@ -250,6 +268,7 @@
       if (isChoiceQuestion(question) || type === 'detective') return state.selected !== null;
       if (type === 'multi-choice') return state.selectedMany.size > 0;
       if (type === 'ranking') return state.order.length > 1;
+      if(type==='structure-deduction')return [...root.querySelectorAll('[data-structure-part]')].every(input=>input.value.trim().length>0);
       if (type === 'electron-arrow') return state.arrows.length > 0;
       if (isPathQuestion(question)) return state.path.length > 0;
       return Boolean(root.querySelector('#shortAnswer')?.value.trim());
@@ -277,6 +296,7 @@
     }));
 
     if (type === 'ranking') bindRanking(root, state, refreshSubmit);
+    if(type==='structure-deduction')root.querySelectorAll('[data-structure-part]').forEach(input=>input.addEventListener('input',refreshSubmit));
     if (type === 'electron-arrow') bindArrows(root, question, state, refreshSubmit);
     if (isPathQuestion(question)) bindPath(root, question, state, refreshSubmit);
     root.querySelector('#shortAnswer')?.addEventListener('input', refreshSubmit);
@@ -296,6 +316,7 @@
       const payload = type === 'multi-choice' ? { selected: [...state.selectedMany] } :
         (isChoiceQuestion(question) || type === 'detective') ? { selected: state.selected } :
         type === 'ranking' ? { order: state.order.slice() } :
+        type === 'structure-deduction' ? { fields:Object.fromEntries([...root.querySelectorAll('[data-structure-part]')].map(input=>[input.dataset.structurePart,input.value.trim()])) } :
         type === 'electron-arrow' ? { arrows: clone(state.arrows) } :
         isPathQuestion(question) ? { path: state.path.slice() } :
         { value: root.querySelector('#shortAnswer')?.value || '' };
