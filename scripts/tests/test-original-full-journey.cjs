@@ -98,6 +98,8 @@ async function run(){
    },day);
    assert.ok(old.attempts>=15,'attempts not persisted');
    assert.equal(old.result.responses.length,15,'responses not persisted');
+   assert.equal(old.result.paperSnapshot?.length,15,'immutable source paper snapshot not persisted');
+   assert.equal(old.result.paperVersion,'2026-10-08-mixed-spectrum-v4','wrong answer key version attached');
    console.log('PASS full day '+day+': 15 completed, final mark, answer sheet, detailed SVGs, cloud/local progress preserved');
   }
   await page.locator('#originalRetry').click();
@@ -107,6 +109,26 @@ async function run(){
     return {previous:s.examReviewHistory?.filter(a=>a.kind==='original-20').length,attempts:s.attempts.length};
   });
   assert.ok(saved.previous>=1&&saved.attempts>=30,'retry failed to archive grade or deleted prior work');
+  // Simulate a previously started different-version paper and verify that its
+  // responses are archived rather than being interpreted as answers to today's questions.
+  await page.evaluate(()=>{
+    const key='organic637_clean_v1_state:test-original-journey',state=JSON.parse(localStorage.getItem(key));
+    state.originalExamDrafts.originalDay20={paperVersion:'obsolete-paper-v1',index:1,startedAt:1,
+      responses:[{questionId:'removed-old-question',partialScore:1,correct:true,payload:{selected:'a'}}]};
+    localStorage.setItem(key,JSON.stringify(state));
+  });
+  await page.reload({waitUntil:'domcontentloaded'});
+  await page.evaluate(()=>{location.hash='#welcome';location.hash='#day/20';});
+  await page.locator('.original-exam-question').waitFor({timeout:20000});
+  const migrated=await page.evaluate(()=>{
+    const st=JSON.parse(localStorage.getItem('organic637_clean_v1_state:test-original-journey'));
+    return {draft:st.originalExamDrafts.originalDay20,archive:st.examReviewHistory};
+  });
+  assert.equal(migrated.draft.responses.length,0,'obsolete draft answers mixed with new test');
+  assert.equal(migrated.draft.paperVersion,'2026-10-08-mixed-spectrum-v4');
+  assert.ok(migrated.archive.some(r=>r.kind==='original-incomplete-20'),'obsolete draft not preserved in audit archive');
+  console.log('PASS version migration: obsolete partial answers archived; new exam not mixed with old IDs');
+
   assert.deepEqual(errs,[],'browser emitted JavaScript exceptions');
   console.log('PASS full learner journey: 30 questions, both papers, navigation, results, redo archives old scores');
   await page.close();
