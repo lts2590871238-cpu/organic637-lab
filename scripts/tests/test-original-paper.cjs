@@ -19,7 +19,7 @@ assert.match(fc.options[2].label,/仲丁基苯/,'FC option C original scan misma
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 const check=w.Organic637.Interactions;
 const chem=w.Organic637.OriginalChem;
-const expectedPages=new Map([[2020,new Set([26,27,28])],[2019,new Set([35,36])],[2017,new Set([44])],[2014,new Set([59])],[2016,new Set([50])],[2018,new Set([40])],[2022,new Set([22])],[2023,new Set([16])],[2015,new Set([54])]]);
+const expectedPages=new Map([[2020,new Set([26,27,28,29])],[2019,new Set([35,36])],[2017,new Set([44])],[2014,new Set([59])],[2016,new Set([50])],[2018,new Set([40])],[2022,new Set([22])],[2023,new Set([16])],[2015,new Set([54])]]);
 assert.equal(questions.length,30,'must ship thirty distinct scanned question entries');
 assert.match(status,/pending/,'must not mistakenly mark editorial verification complete');
 assert.equal(new Set(questions.map(q=>q.id)).size,questions.length,'duplicate ID');
