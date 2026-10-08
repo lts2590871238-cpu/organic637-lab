@@ -1,0 +1,1096 @@
+/* Exam-only source-verified seed bank: do not relabel as 150-point original single-year paper. */
+(()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
+  "version": "2026-10-08-a",
+  "status": "partial_three_pass_pending",
+  "questions": [
+    {
+      "id": "exam-2020-1-01",
+      "questionId": "exam-2020-1-01",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列自由基中最稳定的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "·CH₃"
+        },
+        {
+          "id": "b",
+          "label": "(CH₃)₃C·"
+        },
+        {
+          "id": "c",
+          "label": "(CH₃)₂CH·"
+        },
+        {
+          "id": "d",
+          "label": "CH₃CH₂·"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 26,
+        "originalQuestion": "一、选择题1",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "自由基碳通常近似为 sp² 杂化，未成对电子位于 p 轨道。烷基可通过超共轭和给电子诱导效应稳定自由基中心。",
+        "full": "自由基碳通常近似为 sp² 杂化，未成对电子位于 p 轨道。烷基可通过超共轭和给电子诱导效应稳定自由基中心。\n\n题目四项分别是甲基自由基、叔丁基自由基、异丙基自由基和乙基自由基。在同类烷基自由基中，通常三级 > 二级 > 一级 > 甲基。\n\n叔丁基自由基 ·C(CH₃)₃ 是三级，连接三个甲基，能形成最丰富的超共轭作用。因此选 B。\n\n甲基自由基无烷基超共轭；乙基是一级；异丙基是二级，它们的稳定性均低于叔丁基自由基。"
+      },
+      "examGuide": {
+        "correctSummary": "(CH₃)₃C·",
+        "steps": [
+          "自由基碳通常近似为 sp² 杂化，未成对电子位于 p 轨道。烷基可通过超共轭和给电子诱导效应稳定自由基中心。",
+          "题目四项分别是甲基自由基、叔丁基自由基、异丙基自由基和乙基自由基。在同类烷基自由基中，通常三级 > 二级 > 一级 > 甲基。",
+          "叔丁基自由基 ·C(CH₃)₃ 是三级，连接三个甲基，能形成最丰富的超共轭作用。因此选 B。",
+          "甲基自由基无烷基超共轭；乙基是一级；异丙基是二级，它们的稳定性均低于叔丁基自由基。"
+        ],
+        "graphic": "radicals"
+      }
+    },
+    {
+      "id": "exam-2020-3-02",
+      "questionId": "exam-2020-3-02",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "已知 NaNH₂ + RC≡CH → RC≡CNa + NH₃，炔钠加水又能恢复成炔烃，据此可推测酸性大小为（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "NH₃ > RC≡CH > H₂O"
+        },
+        {
+          "id": "b",
+          "label": "H₂O > RC≡CH > NH₃"
+        },
+        {
+          "id": "c",
+          "label": "H₂O > NH₃ > RC≡CH"
+        },
+        {
+          "id": "d",
+          "label": "NH₃ > H₂O > RC≡CH"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 26,
+        "originalQuestion": "一、选择题3",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "反应 RC≡CH + NH₂⁻ → RC≡C⁻ + NH₃ 向右，意味着 NH₂⁻ 能从端炔夺质子；端炔比 NH₃ 酸性强。",
+        "full": "反应 RC≡CH + NH₂⁻ → RC≡C⁻ + NH₃ 向右，意味着 NH₂⁻ 能从端炔夺质子；端炔比 NH₃ 酸性强。\n\n炔钠加水恢复 RC≡CH：RC≡C⁻ + H₂O → RC≡CH + OH⁻，说明 H₂O 的酸性高于端炔。\n\n结合两项平衡，酸性 H₂O > RC≡CH > NH₃，选 B。常用近似 pKₐ 值分别约为 15.7、25、38。\n\n比较酸性看同一溶剂/可比条件下共轭碱稳定性，不能把“NaNH₂ 强碱”直接误当成“NH₃ 强酸”。"
+      },
+      "examGuide": {
+        "correctSummary": "H₂O > RC≡CH > NH₃",
+        "steps": [
+          "反应 RC≡CH + NH₂⁻ → RC≡C⁻ + NH₃ 向右，意味着 NH₂⁻ 能从端炔夺质子；端炔比 NH₃ 酸性强。",
+          "炔钠加水恢复 RC≡CH：RC≡C⁻ + H₂O → RC≡CH + OH⁻，说明 H₂O 的酸性高于端炔。",
+          "结合两项平衡，酸性 H₂O > RC≡CH > NH₃，选 B。常用近似 pKₐ 值分别约为 15.7、25、38。",
+          "比较酸性看同一溶剂/可比条件下共轭碱稳定性，不能把“NaNH₂ 强碱”直接误当成“NH₃ 强酸”。"
+        ],
+        "graphic": "acidity"
+      }
+    },
+    {
+      "id": "exam-2020-7-03",
+      "questionId": "exam-2020-7-03",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物不具有芳香性的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "环辛四烯"
+        },
+        {
+          "id": "b",
+          "label": "䓬鎓离子（环庚三烯基正离子）"
+        },
+        {
+          "id": "c",
+          "label": "苯环稠合环己烷"
+        },
+        {
+          "id": "d",
+          "label": "呋喃"
+        }
+      ],
+      "answer": "a",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 27,
+        "originalQuestion": "一、选择题7",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "芳香性要求环状、连续共轭、近平面并满足 4n+2 π 电子规律。四项分别为环辛四烯、䓬鎓阳离子、含苯环的并环化合物与呋喃。",
+        "full": "芳香性要求环状、连续共轭、近平面并满足 4n+2 π 电子规律。四项分别为环辛四烯、䓬鎓阳离子、含苯环的并环化合物与呋喃。\n\n环辛四烯为 8π 电子体系，为避开平面 4n π 电子的反芳香性而采取浴盆状非平面构象，因此不具芳香性。\n\n䓬鎓离子有 6π 电子且连续共轭，是芳香性离子；并环结构保留苯环芳香性；呋喃借助氧的一对孤对电子参加 6π 共轭。\n\n因此 A 是唯一典型非芳香性选项。不要仅凭画出多个双键就判断芳香性。"
+      },
+      "examGuide": {
+        "correctSummary": "环辛四烯",
+        "steps": [
+          "芳香性要求环状、连续共轭、近平面并满足 4n+2 π 电子规律。四项分别为环辛四烯、䓬鎓阳离子、含苯环的并环化合物与呋喃。",
+          "环辛四烯为 8π 电子体系，为避开平面 4n π 电子的反芳香性而采取浴盆状非平面构象，因此不具芳香性。",
+          "䓬鎓离子有 6π 电子且连续共轭，是芳香性离子；并环结构保留苯环芳香性；呋喃借助氧的一对孤对电子参加 6π 共轭。",
+          "因此 A 是唯一典型非芳香性选项。不要仅凭画出多个双键就判断芳香性。"
+        ],
+        "graphic": "aromatic"
+      }
+    },
+    {
+      "id": "exam-2020-12-04",
+      "questionId": "exam-2020-12-04",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物能进行碘仿反应的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "苯乙酮"
+        },
+        {
+          "id": "b",
+          "label": "苯酚"
+        },
+        {
+          "id": "c",
+          "label": "苯甲醛"
+        },
+        {
+          "id": "d",
+          "label": "苯乙醚"
+        }
+      ],
+      "answer": "a",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 27,
+        "originalQuestion": "一、选择题12",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。",
+        "full": "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。\n\n苯乙酮结构是 C₆H₅–CO–CH₃，含甲基酮部分，因此符合碘仿反应的基本结构条件。\n\n反应净产物为黄色 CHI₃ 沉淀，同时酰基另一部分转成苯甲酸盐。写出反应式：PhCOCH₃ + 3 I₂ + 4 OH⁻ → PhCOO⁻ + CHI₃↓ + 3 I⁻ + 3 H₂O。\n\n苯酚没有甲基酮；苯甲醛缺少 CO–CH₃；苯乙醚是醚，不含必需的甲基羰基片段。故选 A。"
+      },
+      "examGuide": {
+        "correctSummary": "苯乙酮",
+        "steps": [
+          "典型碘仿反应需要 CH₃–CO– 基团（或可氧化成该结构的乙醇/CH₃–CH(OH)–），在 I₂/OH⁻ 下发生 α 位连续碘代再碱裂解。",
+          "苯乙酮结构是 C₆H₅–CO–CH₃，含甲基酮部分，因此符合碘仿反应的基本结构条件。",
+          "反应净产物为黄色 CHI₃ 沉淀，同时酰基另一部分转成苯甲酸盐。写出反应式：PhCOCH₃ + 3 I₂ + 4 OH⁻ → PhCOO⁻ + CHI₃↓ + 3 I⁻ + 3 H₂O。",
+          "苯酚没有甲基酮；苯甲醛缺少 CO–CH₃；苯乙醚是醚，不含必需的甲基羰基片段。故选 A。"
+        ],
+        "graphic": "iodoform"
+      }
+    },
+    {
+      "id": "exam-2020-13-05",
+      "questionId": "exam-2020-13-05",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物中酸性最弱的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "对甲基苯甲酸"
+        },
+        {
+          "id": "b",
+          "label": "间硝基苯甲酸"
+        },
+        {
+          "id": "c",
+          "label": "间甲基苯甲酸"
+        },
+        {
+          "id": "d",
+          "label": "对硝基苯甲酸"
+        }
+      ],
+      "answer": "a",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 27,
+        "originalQuestion": "一、选择题13",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "比较苯甲酸衍生物的酸性，关键是 COOH 去质子后羧酸根的稳定性：吸电子取代基一般稳定负电荷、增强酸性；给电子取代基相反。",
+        "full": "比较苯甲酸衍生物的酸性，关键是 COOH 去质子后羧酸根的稳定性：吸电子取代基一般稳定负电荷、增强酸性；给电子取代基相反。\n\n硝基 –NO₂ 是强吸电子基，间位与对位硝基苯甲酸均比甲基取代苯甲酸酸性强。\n\n甲基是弱给电子基；对位甲基可以通过超共轭给电子参与芳环电子效应，通常对甲基苯甲酸比间甲基苯甲酸略弱酸，故 A 最弱。\n\n这是非常接近的两个弱酸比较，必须区分取代位置与诱导/共振效应，不能仅凭“都有 CH₃”判为完全相同。"
+      },
+      "examGuide": {
+        "correctSummary": "对甲基苯甲酸",
+        "steps": [
+          "比较苯甲酸衍生物的酸性，关键是 COOH 去质子后羧酸根的稳定性：吸电子取代基一般稳定负电荷、增强酸性；给电子取代基相反。",
+          "硝基 –NO₂ 是强吸电子基，间位与对位硝基苯甲酸均比甲基取代苯甲酸酸性强。",
+          "甲基是弱给电子基；对位甲基可以通过超共轭给电子参与芳环电子效应，通常对甲基苯甲酸比间甲基苯甲酸略弱酸，故 A 最弱。",
+          "这是非常接近的两个弱酸比较，必须区分取代位置与诱导/共振效应，不能仅凭“都有 CH₃”判为完全相同。"
+        ],
+        "graphic": "benzoates"
+      }
+    },
+    {
+      "id": "exam-2020-15-06",
+      "questionId": "exam-2020-15-06",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物中碱性最强的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "咪唑"
+        },
+        {
+          "id": "b",
+          "label": "吡咯"
+        },
+        {
+          "id": "c",
+          "label": "丁二酰亚胺"
+        },
+        {
+          "id": "d",
+          "label": "吡咯烷"
+        }
+      ],
+      "answer": "d",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 28,
+        "originalQuestion": "一、选择题15",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "胺/杂环碱性取决于氮上可用于结合 H⁺ 的电子对是否局域，以及所得共轭酸的稳定性。",
+        "full": "胺/杂环碱性取决于氮上可用于结合 H⁺ 的电子对是否局域，以及所得共轭酸的稳定性。\n\n吡咯烷是饱和五元含氮环，氮孤对不参与芳香 π 体系，能较容易接受质子；其共轭酸 pKₐ 常约 11。\n\n咪唑中一个吡啶型 N 可质子化，共轭酸 pKₐ 约 7；吡咯的氮孤对维持芳香性，不易作为碱；丁二酰亚胺的氮孤对与两个羰基共振而弱碱。\n\n因此 D 吡咯烷最强。不要把“带 N 的芳香环”与脂肪胺孤对可用性等同。"
+      },
+      "examGuide": {
+        "correctSummary": "吡咯烷",
+        "steps": [
+          "胺/杂环碱性取决于氮上可用于结合 H⁺ 的电子对是否局域，以及所得共轭酸的稳定性。",
+          "吡咯烷是饱和五元含氮环，氮孤对不参与芳香 π 体系，能较容易接受质子；其共轭酸 pKₐ 常约 11。",
+          "咪唑中一个吡啶型 N 可质子化，共轭酸 pKₐ 约 7；吡咯的氮孤对维持芳香性，不易作为碱；丁二酰亚胺的氮孤对与两个羰基共振而弱碱。",
+          "因此 D 吡咯烷最强。不要把“带 N 的芳香环”与脂肪胺孤对可用性等同。"
+        ],
+        "graphic": "amines"
+      }
+    },
+    {
+      "id": "exam-2019-8-07",
+      "questionId": "exam-2019-8-07",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物在同一条件下与相同试剂发生亲核加成反应最难的是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "CCl₃CHO"
+        },
+        {
+          "id": "b",
+          "label": "HCHO"
+        },
+        {
+          "id": "c",
+          "label": "CH₃COCH₃"
+        },
+        {
+          "id": "d",
+          "label": "CH₃CH₂CHO"
+        }
+      ],
+      "answer": "c",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2019,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 35,
+        "originalQuestion": "三、单项选择题8",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "醛酮的亲核加成速度一般受羰基碳亲电性与位阻共同影响。醛比相近的酮更容易被亲核进攻，甲醛没有烷基位阻通常尤其快。",
+        "full": "醛酮的亲核加成速度一般受羰基碳亲电性与位阻共同影响。醛比相近的酮更容易被亲核进攻，甲醛没有烷基位阻通常尤其快。\n\n三氯乙醛 CCl₃CHO 因强吸电子 CCl₃ 提高羰基亲电性；丙醛是醛。丙酮有两个给电子甲基，羰基碳电正性较低且位阻更大。\n\n在题目强调同一试剂、可比反应条件的前提下，四项中丙酮最难发生亲核加成，选 C。\n\n不要以“含氯原子多就位阻大”代替诱导效应；需先辨认电子作用部位和进攻位点。"
+      },
+      "examGuide": {
+        "correctSummary": "CH₃COCH₃",
+        "steps": [
+          "醛酮的亲核加成速度一般受羰基碳亲电性与位阻共同影响。醛比相近的酮更容易被亲核进攻，甲醛没有烷基位阻通常尤其快。",
+          "三氯乙醛 CCl₃CHO 因强吸电子 CCl₃ 提高羰基亲电性；丙醛是醛。丙酮有两个给电子甲基，羰基碳电正性较低且位阻更大。",
+          "在题目强调同一试剂、可比反应条件的前提下，四项中丙酮最难发生亲核加成，选 C。",
+          "不要以“含氯原子多就位阻大”代替诱导效应；需先辨认电子作用部位和进攻位点。"
+        ],
+        "graphic": "carbonyl"
+      }
+    },
+    {
+      "id": "exam-2019-9-08",
+      "questionId": "exam-2019-9-08",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "亲核取代反应按 Sₙ1 机理进行，其特点是（ ）。",
+      "options": [
+        {
+          "id": "a",
+          "label": "底物中心碳原子为手性碳的要发生构型翻转（瓦尔登转化）"
+        },
+        {
+          "id": "b",
+          "label": "反应分两步进行，有碳正离子重排现象"
+        },
+        {
+          "id": "c",
+          "label": "反应速率与底物和亲核试剂浓度有关系"
+        },
+        {
+          "id": "d",
+          "label": "底物的空间效应对反应的影响很大"
+        }
+      ],
+      "answer": "b",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2019,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 35,
+        "originalQuestion": "三、单项选择题9",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "SN1 即单分子亲核取代。速控步骤通常为离去基先解离形成碳正离子，速率在最简模型中为 k[RX]。",
+        "full": "SN1 即单分子亲核取代。速控步骤通常为离去基先解离形成碳正离子，速率在最简模型中为 k[RX]。\n\n碳正离子可发生 1,2-氢迁移或烷基迁移，部分情况下产物骨架重排；它不意味着每一次 SN1 都必然重排。\n\n选项 A 的必然完全构型反转是 SN2 特征，SN1 因平面碳正离子常趋向消旋且会受离子对影响。C 说亲核试剂浓度影响速率，是 SN2 的速率式；D 对 SN2 背面位阻更关键。\n\n本题单选 B。完整答案须区分“机理允许重排”和“必然发生重排”。"
+      },
+      "examGuide": {
+        "correctSummary": "反应分两步进行，有碳正离子重排现象",
+        "steps": [
+          "SN1 即单分子亲核取代。速控步骤通常为离去基先解离形成碳正离子，速率在最简模型中为 k[RX]。",
+          "碳正离子可发生 1,2-氢迁移或烷基迁移，部分情况下产物骨架重排；它不意味着每一次 SN1 都必然重排。",
+          "选项 A 的必然完全构型反转是 SN2 特征，SN1 因平面碳正离子常趋向消旋且会受离子对影响。C 说亲核试剂浓度影响速率，是 SN2 的速率式；D 对 SN2 背面位阻更关键。",
+          "本题单选 B。完整答案须区分“机理允许重排”和“必然发生重排”。"
+        ],
+        "graphic": "sn1"
+      }
+    },
+    {
+      "id": "exam-2019-10-09",
+      "questionId": "exam-2019-10-09",
+      "day": 19,
+      "type": "choice",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "醛、酮羰基红外光谱在（ ）之间有一个非常强的伸缩振动特征吸收峰。",
+      "options": [
+        {
+          "id": "a",
+          "label": "1750–1680 cm⁻¹"
+        },
+        {
+          "id": "b",
+          "label": "750–700 cm⁻¹"
+        },
+        {
+          "id": "c",
+          "label": "1350–1100 cm⁻¹"
+        },
+        {
+          "id": "d",
+          "label": "3650–3610 cm⁻¹"
+        }
+      ],
+      "answer": "a",
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2019,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 36,
+        "originalQuestion": "三、单项选择题10",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "醛和酮的 C=O 键具有较大的偶极矩变化，伸缩振动 IR 吸收一般明显而强；普通饱和酮常在 1715 cm⁻¹ 附近。",
+        "full": "醛和酮的 C=O 键具有较大的偶极矩变化，伸缩振动 IR 吸收一般明显而强；普通饱和酮常在 1715 cm⁻¹ 附近。\n\n醛 C=O 常在 1720–1740 cm⁻¹ 左右，共轭羰基可能因共振使频率降低，因此题目给出的 1750–1680 cm⁻¹ 可覆盖主要典型范围，选 A。\n\n750–700 cm⁻¹ 常见芳环面外 C–H 弯曲或部分 C–X 区域；1350–1100 cm⁻¹ 常有 C–O 伸缩；3650–3610 cm⁻¹ 可能是游离 O–H 区域。\n\n应结合峰强、羰基具体类型及共轭判断，不能仅凭某个峰就确定完整结构。"
+      },
+      "examGuide": {
+        "correctSummary": "1750–1680 cm⁻¹",
+        "steps": [
+          "醛和酮的 C=O 键具有较大的偶极矩变化，伸缩振动 IR 吸收一般明显而强；普通饱和酮常在 1715 cm⁻¹ 附近。",
+          "醛 C=O 常在 1720–1740 cm⁻¹ 左右，共轭羰基可能因共振使频率降低，因此题目给出的 1750–1680 cm⁻¹ 可覆盖主要典型范围，选 A。",
+          "750–700 cm⁻¹ 常见芳环面外 C–H 弯曲或部分 C–X 区域；1350–1100 cm⁻¹ 常有 C–O 伸缩；3650–3610 cm⁻¹ 可能是游离 O–H 区域。",
+          "应结合峰强、羰基具体类型及共轭判断，不能仅凭某个峰就确定完整结构。"
+        ],
+        "graphic": "ir"
+      }
+    },
+    {
+      "id": "exam-2017-2-10",
+      "questionId": "exam-2017-2-10",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "按碱性由强到弱排列 A、B、C。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：吡咯烷"
+        },
+        {
+          "id": "b",
+          "label": "B：吡咯"
+        },
+        {
+          "id": "c",
+          "label": "C：吡啶"
+        }
+      ],
+      "answer": [
+        "a",
+        "c",
+        "b"
+      ],
+      "correctOrder": [
+        "a",
+        "c",
+        "b"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2017,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 44,
+        "originalQuestion": "三、按指定性质排序2",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "吡咯烷是饱和含氮五元环，氮孤对主要局域，最容易接受 H⁺，因此碱性较强。",
+        "full": "吡咯烷是饱和含氮五元环，氮孤对主要局域，最容易接受 H⁺，因此碱性较强。\n\n吡啶的氮孤对在环平面 sp² 轨道上，不参与芳环 6π 体系，仍可作为碱，但碱性一般比饱和胺弱。\n\n吡咯的 N–H 孤对属于芳香六 π 电子的一部分，质子化氮会损失稳定的芳香性，因此碱性很弱。\n\n顺序为 A > C > B，排列使用原卷 A、B、C 的结构顺序。"
+      },
+      "examGuide": {
+        "correctSummary": "A：吡咯烷 > C：吡啶 > B：吡咯",
+        "steps": [
+          "吡咯烷是饱和含氮五元环，氮孤对主要局域，最容易接受 H⁺，因此碱性较强。",
+          "吡啶的氮孤对在环平面 sp² 轨道上，不参与芳环 6π 体系，仍可作为碱，但碱性一般比饱和胺弱。",
+          "吡咯的 N–H 孤对属于芳香六 π 电子的一部分，质子化氮会损失稳定的芳香性，因此碱性很弱。",
+          "顺序为 A > C > B，排列使用原卷 A、B、C 的结构顺序。"
+        ],
+        "graphic": "amines"
+      }
+    },
+    {
+      "id": "exam-2017-3-11",
+      "questionId": "exam-2017-3-11",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物与 AgNO₃/乙醇反应的速率大小次序为？",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：1-溴丁烷"
+        },
+        {
+          "id": "b",
+          "label": "B：2-溴丁烷"
+        },
+        {
+          "id": "c",
+          "label": "C：巴豆基溴（CH₃CH=CHCH₂Br）"
+        }
+      ],
+      "answer": [
+        "c",
+        "b",
+        "a"
+      ],
+      "correctOrder": [
+        "c",
+        "b",
+        "a"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2017,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 44,
+        "originalQuestion": "三、按指定性质排序3",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "AgNO₃/乙醇促进卤代烃离子化，银离子与卤离子形成难溶 AgBr，故常用于考查 SN1 或溶剂解型反应的难易。",
+        "full": "AgNO₃/乙醇促进卤代烃离子化，银离子与卤离子形成难溶 AgBr，故常用于考查 SN1 或溶剂解型反应的难易。\n\nC 为烯丙基溴，离去后碳正离子可以通过 C=C 共振离域，较稳定，通常反应最快。\n\nB 为二级烷基溴，可形成比一级更稳定的碳正离子。A 为普通一级溴代烷，离子化最不利，最慢。\n\n因此 C > B > A。必须注意此题是在 AgNO₃/乙醇条件，不能照搬 SN2 的甲基 > 一级 > 二级顺序。"
+      },
+      "examGuide": {
+        "correctSummary": "C：巴豆基溴（CH₃CH=CHCH₂Br） > B：2-溴丁烷 > A：1-溴丁烷",
+        "steps": [
+          "AgNO₃/乙醇促进卤代烃离子化，银离子与卤离子形成难溶 AgBr，故常用于考查 SN1 或溶剂解型反应的难易。",
+          "C 为烯丙基溴，离去后碳正离子可以通过 C=C 共振离域，较稳定，通常反应最快。",
+          "B 为二级烷基溴，可形成比一级更稳定的碳正离子。A 为普通一级溴代烷，离子化最不利，最慢。",
+          "因此 C > B > A。必须注意此题是在 AgNO₃/乙醇条件，不能照搬 SN2 的甲基 > 一级 > 二级顺序。"
+        ],
+        "graphic": "sn1"
+      }
+    },
+    {
+      "id": "exam-2017-5-12",
+      "questionId": "exam-2017-5-12",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "按亲电取代反应活性的大小次序排列。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：苯"
+        },
+        {
+          "id": "b",
+          "label": "B：吡啶"
+        },
+        {
+          "id": "c",
+          "label": "C：吡咯"
+        }
+      ],
+      "answer": [
+        "c",
+        "a",
+        "b"
+      ],
+      "correctOrder": [
+        "c",
+        "a",
+        "b"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2017,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 44,
+        "originalQuestion": "三、按指定性质排序5",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "吡咯的氮孤对参与芳香 π 体系，环富电子，能稳定亲电取代的 σ 络合物，亲电取代活性显著高于苯。",
+        "full": "吡咯的氮孤对参与芳香 π 体系，环富电子，能稳定亲电取代的 σ 络合物，亲电取代活性显著高于苯。\n\n苯是基准芳香底物，对普通亲电试剂反应性居中。\n\n吡啶因环氮吸电子，环电子密度相对低，亲电芳香取代通常比苯困难，常需更苛刻条件。\n\n顺序 C > A > B；不能把吡啶有孤对的碱性与吡啶环亲电取代的活性混为一谈。"
+      },
+      "examGuide": {
+        "correctSummary": "C：吡咯 > A：苯 > B：吡啶",
+        "steps": [
+          "吡咯的氮孤对参与芳香 π 体系，环富电子，能稳定亲电取代的 σ 络合物，亲电取代活性显著高于苯。",
+          "苯是基准芳香底物，对普通亲电试剂反应性居中。",
+          "吡啶因环氮吸电子，环电子密度相对低，亲电芳香取代通常比苯困难，常需更苛刻条件。",
+          "顺序 C > A > B；不能把吡啶有孤对的碱性与吡啶环亲电取代的活性混为一谈。"
+        ],
+        "graphic": "aromatic"
+      }
+    },
+    {
+      "id": "exam-2014-4-13",
+      "questionId": "exam-2014-4-13",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "按碱性由强到弱排列。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：苯胺"
+        },
+        {
+          "id": "b",
+          "label": "B：环己胺"
+        },
+        {
+          "id": "c",
+          "label": "C：乙酰苯胺"
+        }
+      ],
+      "answer": [
+        "b",
+        "a",
+        "c"
+      ],
+      "correctOrder": [
+        "b",
+        "a",
+        "c"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2014,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 59,
+        "originalQuestion": "三、按指定性质排序4",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "环己胺属于脂肪族伯胺，氮孤对不与苯环或羰基共轭，可接受质子，通常碱性最强。",
+        "full": "环己胺属于脂肪族伯胺，氮孤对不与苯环或羰基共轭，可接受质子，通常碱性最强。\n\n苯胺的氮孤对与苯环 π 体系共轭，质子化会减少这类共轭，因此比类似脂肪胺弱。\n\n乙酰苯胺属于酰胺，氮孤对与羰基 C=O 强烈共振，极不利于在氮上接受质子；若在强酸中质子化，通常更偏向氧位。\n\n排列 B > A > C。混淆“氮元素个数相同”与“孤对可用程度相同”是主要错因。"
+      },
+      "examGuide": {
+        "correctSummary": "B：环己胺 > A：苯胺 > C：乙酰苯胺",
+        "steps": [
+          "环己胺属于脂肪族伯胺，氮孤对不与苯环或羰基共轭，可接受质子，通常碱性最强。",
+          "苯胺的氮孤对与苯环 π 体系共轭，质子化会减少这类共轭，因此比类似脂肪胺弱。",
+          "乙酰苯胺属于酰胺，氮孤对与羰基 C=O 强烈共振，极不利于在氮上接受质子；若在强酸中质子化，通常更偏向氧位。",
+          "排列 B > A > C。混淆“氮元素个数相同”与“孤对可用程度相同”是主要错因。"
+        ],
+        "graphic": "amines"
+      }
+    },
+    {
+      "id": "exam-2014-5-14",
+      "questionId": "exam-2014-5-14",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "按酸性由强到弱排列。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：苯酚 C₆H₅OH"
+        },
+        {
+          "id": "b",
+          "label": "B：乙酸 CH₃CO₂H"
+        },
+        {
+          "id": "c",
+          "label": "C：氯乙酸 ClCH₂CO₂H"
+        }
+      ],
+      "answer": [
+        "c",
+        "b",
+        "a"
+      ],
+      "correctOrder": [
+        "c",
+        "b",
+        "a"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2014,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 59,
+        "originalQuestion": "三、按指定性质排序5",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。",
+        "full": "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。\n\n氯乙酸的 α-Cl 强吸电子诱导效应稳定羧酸根，酸性强于乙酸。相应常见水溶液 pKₐ：氯乙酸≈2.9、乙酸≈4.8、苯酚≈10。\n\npKₐ 越小越强，故顺序 C > B > A。\n\n注意氯乙酸并非因为“分子含 Cl⁻”而强酸；氯以共价键连接，通过 σ 键诱导吸电子。"
+      },
+      "examGuide": {
+        "correctSummary": "C：氯乙酸 ClCH₂CO₂H > B：乙酸 CH₃CO₂H > A：苯酚 C₆H₅OH",
+        "steps": [
+          "酸性强弱以共轭碱稳定性判断：羧酸根的负电荷在两个氧之间离域，所以羧酸明显比苯酚酸性强。",
+          "氯乙酸的 α-Cl 强吸电子诱导效应稳定羧酸根，酸性强于乙酸。相应常见水溶液 pKₐ：氯乙酸≈2.9、乙酸≈4.8、苯酚≈10。",
+          "pKₐ 越小越强，故顺序 C > B > A。",
+          "注意氯乙酸并非因为“分子含 Cl⁻”而强酸；氯以共价键连接，通过 σ 键诱导吸电子。"
+        ],
+        "graphic": "acidity"
+      }
+    },
+    {
+      "id": "exam-2014-6-15",
+      "questionId": "exam-2014-6-15",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "按亲核加成活性由强到弱排列。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：乙醛 CH₃CHO"
+        },
+        {
+          "id": "b",
+          "label": "B：丙酮 CH₃COCH₃"
+        },
+        {
+          "id": "c",
+          "label": "C：二苯甲酮 PhCOPh"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2014,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 59,
+        "originalQuestion": "三、按指定性质排序6",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "相似条件下，羰基亲核加成通常受羰基 C 的亲电性、位阻和取代基共轭作用影响。",
+        "full": "相似条件下，羰基亲核加成通常受羰基 C 的亲电性、位阻和取代基共轭作用影响。\n\n乙醛一侧连 H、位阻小，通常活性高。丙酮有两个甲基供电子和空间遮挡，反应性较低。\n\n二苯甲酮两侧连苯基，芳环与羰基共轭会分散羰基亲电性，且苯环带来显著位阻，常比简单脂肪酮更难亲核加成。\n\n因此 A > B > C。具体亲核试剂、溶剂与强度可改变速率，题目指典型本科条件的定性顺序。"
+      },
+      "examGuide": {
+        "correctSummary": "A：乙醛 CH₃CHO > B：丙酮 CH₃COCH₃ > C：二苯甲酮 PhCOPh",
+        "steps": [
+          "相似条件下，羰基亲核加成通常受羰基 C 的亲电性、位阻和取代基共轭作用影响。",
+          "乙醛一侧连 H、位阻小，通常活性高。丙酮有两个甲基供电子和空间遮挡，反应性较低。",
+          "二苯甲酮两侧连苯基，芳环与羰基共轭会分散羰基亲电性，且苯环带来显著位阻，常比简单脂肪酮更难亲核加成。",
+          "因此 A > B > C。具体亲核试剂、溶剂与强度可改变速率，题目指典型本科条件的定性顺序。"
+        ],
+        "graphic": "carbonyl"
+      }
+    },
+    {
+      "id": "exam-2014-8-16",
+      "questionId": "exam-2014-8-16",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下述试剂和 Lucas 试剂反应的速度大小次序。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：环戊基甲醇（一级醇）"
+        },
+        {
+          "id": "b",
+          "label": "B：1-甲基环戊醇（三级醇）"
+        },
+        {
+          "id": "c",
+          "label": "C：2-甲基环戊醇（二级醇）"
+        }
+      ],
+      "answer": [
+        "b",
+        "c",
+        "a"
+      ],
+      "correctOrder": [
+        "b",
+        "c",
+        "a"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2014,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 59,
+        "originalQuestion": "三、按指定性质排序8",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "Lucas 试剂通常是浓盐酸与无水 ZnCl₂，常用于按混浊出现快慢判断醇的级数。",
+        "full": "Lucas 试剂通常是浓盐酸与无水 ZnCl₂，常用于按混浊出现快慢判断醇的级数。\n\n三级醇易在酸性介质中离去形成稳定的三级碳正离子，常立即混浊；二级醇速度次之；普通一级醇反应缓慢。\n\n因此 B（三级） > C（二级） > A（一级）。题中用环戊基相关结构考的是含羟基碳的取代度。\n\n不要按整分子是否有环判断醇级数；必须从与 OH 直接相连的那个 C 出发计数。"
+      },
+      "examGuide": {
+        "correctSummary": "B：1-甲基环戊醇（三级醇） > C：2-甲基环戊醇（二级醇） > A：环戊基甲醇（一级醇）",
+        "steps": [
+          "Lucas 试剂通常是浓盐酸与无水 ZnCl₂，常用于按混浊出现快慢判断醇的级数。",
+          "三级醇易在酸性介质中离去形成稳定的三级碳正离子，常立即混浊；二级醇速度次之；普通一级醇反应缓慢。",
+          "因此 B（三级） > C（二级） > A（一级）。题中用环戊基相关结构考的是含羟基碳的取代度。",
+          "不要按整分子是否有环判断醇级数；必须从与 OH 直接相连的那个 C 出发计数。"
+        ],
+        "graphic": "alcohols"
+      }
+    },
+    {
+      "id": "exam-2014-9-17",
+      "questionId": "exam-2014-9-17",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "下列化合物的沸点大小顺序为。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：正丁醇 n-C₄H₉OH"
+        },
+        {
+          "id": "b",
+          "label": "B：叔丁醇 (CH₃)₃COH"
+        },
+        {
+          "id": "c",
+          "label": "C：乙醚 C₂H₅OC₂H₅"
+        }
+      ],
+      "answer": [
+        "a",
+        "b",
+        "c"
+      ],
+      "correctOrder": [
+        "a",
+        "b",
+        "c"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2014,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 59,
+        "originalQuestion": "三、按指定性质排序9",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "正丁醇与叔丁醇是同分异构体，均可形成分子间 O–H 氢键；正丁醇分子较伸展、表面积大，分散作用更强，因此一般沸点较高。",
+        "full": "正丁醇与叔丁醇是同分异构体，均可形成分子间 O–H 氢键；正丁醇分子较伸展、表面积大，分散作用更强，因此一般沸点较高。\n\n叔丁醇有 O–H，也能形成氢键，但高度支化降低接触面积和沸点；乙醚没有 O–H，不是氢键供体，自身分子间作用相对较弱。\n\n实验参考沸点：正丁醇约 117.7°C、叔丁醇约 82°C、乙醚约 34.6°C，因此 A > B > C。\n\n同分异构体必须同时考虑氢键和支链分子间接触，不要仅按相对分子质量排序。"
+      },
+      "examGuide": {
+        "correctSummary": "A：正丁醇 n-C₄H₉OH > B：叔丁醇 (CH₃)₃COH > C：乙醚 C₂H₅OC₂H₅",
+        "steps": [
+          "正丁醇与叔丁醇是同分异构体，均可形成分子间 O–H 氢键；正丁醇分子较伸展、表面积大，分散作用更强，因此一般沸点较高。",
+          "叔丁醇有 O–H，也能形成氢键，但高度支化降低接触面积和沸点；乙醚没有 O–H，不是氢键供体，自身分子间作用相对较弱。",
+          "实验参考沸点：正丁醇约 117.7°C、叔丁醇约 82°C、乙醚约 34.6°C，因此 A > B > C。",
+          "同分异构体必须同时考虑氢键和支链分子间接触，不要仅按相对分子质量排序。"
+        ],
+        "graphic": "alcohols"
+      }
+    },
+    {
+      "id": "exam-2018-7-18",
+      "questionId": "exam-2018-7-18",
+      "day": 20,
+      "type": "ranking",
+      "role": "exam",
+      "primarySkill": "exam.original",
+      "skillIds": [
+        "exam.original"
+      ],
+      "difficulty": 3,
+      "points": 5,
+      "prompt": "请将下列化合物按照在水中的溶解度由大到小排序。",
+      "items": [
+        {
+          "id": "a",
+          "label": "A：戊-2-醇"
+        },
+        {
+          "id": "b",
+          "label": "B：1-乙氧基丙烷"
+        },
+        {
+          "id": "c",
+          "label": "C：戊烷-2,3-二醇"
+        }
+      ],
+      "answer": [
+        "c",
+        "a",
+        "b"
+      ],
+      "correctOrder": [
+        "c",
+        "a",
+        "b"
+      ],
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2018,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 50,
+        "originalQuestion": "二、按指定性质排序7",
+        "sourceType": "扫描真题原题",
+        "scanQuality": "人工可辨"
+      },
+      "explanationLayers": {
+        "short": "独立解析见 examGuide。",
+        "why": "三者是同碳数或相近碳骨架的含氧化合物。水溶性一般取决于能与水形成氢键的能力和疏水碳链长度的竞争。",
+        "full": "三者是同碳数或相近碳骨架的含氧化合物。水溶性一般取决于能与水形成氢键的能力和疏水碳链长度的竞争。\n\nC 为邻二醇，具有两个 O–H，可作为多个氢键供体/受体，通常水溶性最高。\n\nA 为单羟基醇，既能供也能受氢键，水溶性通常高于相同碳数的一般醚。B 只有醚氧作为受体而不能提供 O–H 氢键。\n\n因此 C > A > B。需要明确这是指定三组分的定性比较，不能把“所有醚一定比所有醇更难溶”推广为绝对定律。"
+      },
+      "examGuide": {
+        "correctSummary": "C：戊烷-2,3-二醇 > A：戊-2-醇 > B：1-乙氧基丙烷",
+        "steps": [
+          "三者是同碳数或相近碳骨架的含氧化合物。水溶性一般取决于能与水形成氢键的能力和疏水碳链长度的竞争。",
+          "C 为邻二醇，具有两个 O–H，可作为多个氢键供体/受体，通常水溶性最高。",
+          "A 为单羟基醇，既能供也能受氢键，水溶性通常高于相同碳数的一般醚。B 只有醚氧作为受体而不能提供 O–H 氢键。",
+          "因此 C > A > B。需要明确这是指定三组分的定性比较，不能把“所有醚一定比所有醇更难溶”推广为绝对定律。"
+        ],
+        "graphic": "alcohols"
+      }
+    }
+  ]
+};})();
