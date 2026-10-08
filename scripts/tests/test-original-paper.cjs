@@ -29,6 +29,27 @@ for(const day of [19,20]){
  assert.equal(paper.length,15,'each paper has 15 scanned questions');
  assert.equal(paper.reduce((n,q)=>n+q.points,0),150,'each mixed paper must normalize to 150');
 }
+// Independently tally implicit hydrogens from each newly redrawn atom–bond graph.
+function elementCounts(name){
+ const graph=chem.graphTemplates[name];assert.ok(graph,'missing audited molecular graph '+name);
+ const [atoms,bonds]=graph,count={C:0,H:0,O:0,N:0,Cl:0};
+ for(let i=0;i<atoms.length;i++){
+  const label=atoms[i][2],bondSum=bonds.reduce((n,[a,b,order])=>n+(a===i||b===i?order:0),0);
+  if(label==='O'){count.O++;count.H+=Math.max(0,2-bondSum);}
+  else if(label==='OH'){count.O++;count.H++;}
+  else if(label==='N'){count.N++;count.H+=Math.max(0,3-bondSum);}
+  else if(label==='Cl'){count.Cl++;}
+  else{count.C++;count.H+=Math.max(0,4-bondSum);}
+ }
+ return Object.fromEntries(Object.entries(count).filter(([,n])=>n));
+}
+for(const [name,expected] of [
+ ['NaBH₄还原底物',{C:6,H:10,O:1}],['NaBH₄还原产物',{C:6,H:12,O:1}],
+ ['分子内FC底物',{C:10,H:13,Cl:1}],['四氢萘',{C:10,H:12}],
+ ['2-甲基吡啶',{C:6,H:7,N:1}],['2-苯乙烯基吡啶',{C:13,H:11,N:1}],
+ ['吡啶-2-甲醛',{C:6,H:5,O:1,N:1}]
+ ])assert.deepEqual(elementCounts(name),expected,'structure atom/bond graph disagrees with required molecular formula for '+name);
+
 let recognizedSvg=0, recognizedAnswers=0;
 for(const [name,[atoms,bonds]] of Object.entries(chem.graphTemplates)) {
  assert.ok(atoms.length>=1,'empty structure '+name);
@@ -62,6 +83,7 @@ for(const q of questions){
    assert.equal(check.evaluate(q,{fields:all}).partialScore,1,'all correct structural deductions must score fully');
    assert.equal(check.evaluate(q,{fields:{...all,B:'错误结构'}}).partialScore,2/3,'correct A and C must score two thirds');
    assert.equal(check.evaluate(q,{fields:{A:'错误',B:'错误',C:'错误'}}).partialScore,0,'all invalid should score zero');
+   assert.equal(check.evaluate(q,{fields:{A:'2-picoline',B:'2-styrylpyridine',C:'picolinaldehyde'}}).correct,true,'accepted nomenclature synonyms should grade correctly');
  }else{
    assert.equal(check.evaluate(q,{selected:q.answer}).correct,true,'correct multiple-choice answer not full mark');
    for(const other of q.options.filter(o=>o.id!==q.answer))assert.equal(check.evaluate(q,{selected:other.id}).correct,false,'distractor wrongfully full scored');
@@ -78,5 +100,6 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
+console.log('PASS: source/product formulas independently audited against all seven redrawn graphs');
 console.log('PASS: '+recognizedSvg+' source figures and '+recognizedAnswers+' independently redrawn answer solutions; '+Object.keys(chem.graphTemplates).length+' molecular templates validated');
 console.log('Note: this is code-level verification, NOT final chemistry double-blind review or visual browser QA.');
