@@ -58,7 +58,8 @@ async function run(){
         const q=window.Organic637.OriginalExamDraft.questions.filter(q=>q.day===Number(id))[index];
         return q?.answer||{};
       });
-      for(const part of ['A','B','C'])await page.locator('input[data-structure-part="'+part+'"]').fill(expected[part]?.[0]||'');
+      for(const [part,answers] of Object.entries(expected))await page.locator('input[data-structure-part="'+part+'"]').fill(answers[0]);
+      if(await page.locator('#openSynthesisRoute').count())await page.locator('#openSynthesisRoute').fill('我的路线：先预成苯乙酮烯醇盐，再加环戊酮，最后饱和氯化铵温和质子化。');
     }else if(await text.count()){
       const sample=await page.evaluate(()=>{
         const id=Number(String(window.location.hash).split('/').at(-1)||19);
