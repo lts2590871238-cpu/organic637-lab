@@ -1256,6 +1256,52 @@
     });
   }
 
+  function examRows(ids, responses, mode) {
+    const indexed = new Map((Array.isArray(responses)?responses:[]).map(r=>[r.questionId,r]));
+    return (ids||[]).map(id=>{
+      const question=QMAP.get(id); if(!question)return null;
+      const row=indexed.get(id);
+      const attempt=(Store.state.attempts||[]).filter(a=>a.questionId===id&&(!mode||a.mode===mode)).at(-1);
+      const source=row||attempt||{};
+      return {question,correct:Boolean(source.correct),partialScore:Number(source.partialScore??0),payload:source.payload??source.answerPayload??attempt?.answerPayload??null};
+    }).filter(Boolean);
+  }
+  function examReviewPage(kind) {
+    let ids=[],responses=[],mode='',title='',scoreLabel='',back='',retry=null;
+    if(kind==='core') {
+      const config=NS.V16_EXAM?.day19Core,result=Store.state.examResults?.v16Day19Core;
+      if(!result)return coreExamResultsPage();
+      ids=config?.itemIds||[];responses=result.responses||[];mode='v16-core-exam';title='DAY 19 · 核心审核原卷';scoreLabel=Number(result.percent||0)+'%';back='core';
+      retry=()=>{
+        const v16=NS.Learning.ensureV16DayState(Store.state,19);const step=NS.V16Director?.getDayPlan?.(19)?.sequence?.find(t=>t.type==='exam'&&t.ref==='day19-core');
+        if(!step)return;
+        delete (v16.stepState||{})[step.id];delete Store.state.examResults.v16Day19Core;
+        const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;
+        v16.cursor=Math.max(0,(NS.V16Director.getDayPlan(19)?.sequence||[]).findIndex(t=>t.id===step.id));delete v16.completedSteps?.[step.id];
+        Store.save();location.hash='#day/19';dayPage(19);
+      };
+    } else if(kind==='full') {
+      const result=Store.state.examResults?.full150;if(!result)return full150ExamPage();
+      ids=NS.V16_EXAM?.full150?.itemIds||[];responses=result.responses||[];mode='full150-exam';title='DAY 19 · 150分模拟原卷';scoreLabel=Number(result.score150||0)+'/150';back='full';
+      retry=()=>{delete Store.state.examResults.full150;delete Store.state.examResults.full150Draft;Store.save();location.hash='#full-exam/19';full150ExamPage();};
+    } else if(kind==='legacy') {
+      const result=Store.state.examResults?.[19];if(!result)return examResultsPage();
+      ids=(REGISTRY[19]?.questions||[]).map(q=>q.id);responses=result.responses||[];mode='exam';title='DAY 19 · Boss原卷';scoreLabel=Number(result.score150||0)+'/150';back='legacy';
+      retry=()=>{const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;p.taskIndex=0;p.examDraft={responses:[],startedAt:Date.now()};p.answered={};delete Store.state.examResults[19];Store.save();location.hash='#day/19';legacyDayPage(19);};
+    } else if(kind==='day20') {
+      const results=Store.state.examResults?.day20Boss||{},v16=NS.Learning.ensureV16DayState(Store.state,20);
+      const runtime=v16.adaptiveRuntime||ensureDay20AdaptiveRuntime();
+      ids=(runtime.groups||[]).map(g=>g.bossId).filter(Boolean);
+      responses=results.responses||[];mode='boss';title='DAY 20 · 最终Boss原卷';scoreLabel=Number(results.percent||0)+'%';back='day20';
+      retry=()=>{const step=(NS.V16Director.getDayPlan(20)?.sequence||[]).find(x=>x.type==='final-boss');if(!step)return;
+        const p=NS.Learning.ensureDayState(Store.state,20,REGISTRY);p.finished=false;
+        const v=NS.Learning.ensureV16DayState(Store.state,20);v.stepState ||= {};v.stepState[step.id]={index:0,responses:[]};v.cursor=(NS.V16Director.getDayPlan(20)?.sequence||[]).findIndex(x=>x.id===step.id);delete v.completedSteps?.[step.id];delete Store.state.examResults.day20Boss;Store.save();location.hash='#day/20';dayPage(20);
+      };
+    }
+    shell('<div id="paperReviewRoot"></div>','study');
+    NS.ExamReview.render($('#paperReviewRoot'),{title,scoreLabel,rows:examRows(ids,responses,mode),onBack:()=>{if(back==='core')coreExamResultsPage();else if(back==='full')full150ResultsPage();else if(back==='legacy')examResultsPage();else finalSummaryPage();},onRetry:retry});
+  }
+
   function directorCoreExamTask(day, step) {
     const config = NS.V16_EXAM?.day19Core;
     if (!config || step.ref !== config.id) return directorFallbackCard(day, step, `找不到核心审核配置：${step.ref}`);
@@ -1286,7 +1332,7 @@
         });
         if (!draft.responses.some(row => row.questionId === question.id)) {
           draft.responses.push({
-            questionId:question.id, correct:submission.correct, partialScore:Number(submission.partialScore || 0),
+            questionId:question.id, correct:submission.correct, payload:submission.payload, partialScore:Number(submission.partialScore || 0),
             confidence:submission.confidence, points:Number(question.points || 0), responseTimeMs
           });
         }
@@ -1324,7 +1370,7 @@
     const topWeakSkills = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
     Store.state.examResults.v16Day19Core = {
       mode:'core', completedAt:Date.now(), percent, rawEarned, rawTotal, domains,
-      highConfidenceWrong, topWeakSkills, responseCount:rows.length
+      highConfidenceWrong, topWeakSkills, responseCount:rows.length, responses:JSON.parse(JSON.stringify(rows))
     };
     Store.save();
     advanceDirectorStep(day, step.id);
@@ -1339,8 +1385,9 @@
       return { domain, percent:row.total ? Math.round(row.earned / row.total * 100) : 0 };
     });
     const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
-    shell(`<section class="panel finish exam-result-page"><div class="kicker">DAY 19 · 综合能力审核</div><h1>${Number(result.percent || 0)}%</h1><p class="lead">这是20天主线的核心诊断，不伪装成150分正式卷。它只负责找出 Day20 最该修的能力。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label,index) => `<div class="skill-row"><span>${index + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：Day20 会提高对应修复优先级。</div>` : '<div class="good">没有高置信错误；Top3仍按真实 mastery 与迁移证据生成。</div>'}<div class="note">如果你现在想做完整150分模拟，可以单独进入“考前正式模拟”。它不会覆盖这次核心审核结果。</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="openFull150">考前正式模拟 · 150分</button><button class="btn ghost" id="home">回首页</button></div></section>`, 'study');
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">DAY 19 · 综合能力审核</div><h1>${Number(result.percent || 0)}%</h1><p class="lead">这是20天主线的核心诊断，不伪装成150分正式卷。它只负责找出 Day20 最该修的能力。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label,index) => `<div class="skill-row"><span>${index + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：Day20 会提高对应修复优先级。</div>` : '<div class="good">没有高置信错误；Top3仍按真实 mastery 与迁移证据生成。</div>'}<div class="note">如果你现在想做完整150分模拟，可以单独进入“考前正式模拟”。它不会覆盖这次核心审核结果。</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="corePaper">返回试题卷 · 看错题和详解</button><button class="btn soft" id="openFull150">考前正式模拟 · 150分</button><button class="btn ghost" id="home">回首页</button></div></section>`, 'study');
     $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#corePaper').onclick=()=>examReviewPage('core');
     $('#openFull150').onclick = () => { location.hash = '#full-exam/19'; };
     $('#home').onclick = () => { location.hash = '#home'; };
   }
@@ -1368,7 +1415,7 @@
           answerPayload:submission.payload, partialScore:submission.partialScore, errorType:submission.errorType, reasoningState:submission.reasoningState
         });
         if (!draft.responses.some(row => row.questionId === question.id)) {
-          draft.responses.push({ questionId:question.id, partialScore:Number(submission.partialScore || 0), confidence:submission.confidence, points:Number(question.points || 0), correct:submission.correct, responseTimeMs });
+          draft.responses.push({ questionId:question.id, payload:submission.payload, partialScore:Number(submission.partialScore || 0), confidence:submission.confidence, points:Number(question.points || 0), correct:submission.correct, responseTimeMs });
         }
         draft.index += 1;
         Store.save();
@@ -1385,7 +1432,7 @@
     const earned = responses.reduce((sum,row) => sum + Number(row.points || 0) * Number(row.partialScore || 0), 0);
     Store.state.examResults.full150 = {
       completedAt:Date.now(), score150:Math.round(earned / total * 150), rawEarned:earned, rawTotal:total,
-      responseCount:responses.length
+      responseCount:responses.length, responses:JSON.parse(JSON.stringify(responses))
     };
     delete Store.state.examResults.full150Draft;
     Store.save();
@@ -1395,7 +1442,8 @@
   function full150ResultsPage() {
     const result = Store.state.examResults?.full150;
     if (!result) return full150ExamPage();
-    shell(`<section class="panel finish exam-result-page"><div class="kicker">考前正式模拟 · 完整150分卷</div><h1>${Number(result.score150 || 0)} / 150</h1><p class="lead">这是原 Day19 的完整24题正式训练卷，150分语义保持不变；它与20天主线的核心审核分开记录。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="fullExamHome">回首页</button><button class="btn ghost" id="fullExamRestart">重新做整卷</button></div></section>`, 'study');
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">考前正式模拟 · 完整150分卷</div><h1>${Number(result.score150 || 0)} / 150</h1><p class="lead">这是原 Day19 的完整24题正式训练卷，150分语义保持不变；它与20天主线的核心审核分开记录。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="fullExamHome">回首页</button><button class="btn soft" id="fullExamPaper">返回试题卷 · 看选项和详解</button><button class="btn ghost" id="fullExamRestart">重新做整卷</button></div></section>`, 'study');
+    $('#fullExamPaper').onclick=()=>examReviewPage('full');
     $('#fullExamHome').onclick = () => { location.hash = '#home'; };
     $('#fullExamRestart').onclick = () => {
       delete Store.state.examResults.full150;
@@ -1425,7 +1473,7 @@
         const current = NS.Learning.ensureDayState(Store.state, 19, REGISTRY);
         current.examDraft = current.examDraft || { responses: [], startedAt: Date.now() };
         if (!current.examDraft.responses.some(row => row.questionId === question.id)) {
-          current.examDraft.responses.push({ questionId: question.id, correct: submission.correct, partialScore: Number(submission.partialScore || 0), confidence: submission.confidence, points: Number(question.points || 0), primarySkill: question.primarySkill, responseTimeMs });
+          current.examDraft.responses.push({ questionId: question.id, correct: submission.correct, payload:submission.payload, partialScore: Number(submission.partialScore || 0), confidence: submission.confidence, points: Number(question.points || 0), primarySkill: question.primarySkill, responseTimeMs });
         }
         current.answered[question.id] = { correct: submission.correct, partialScore: submission.partialScore, at: Date.now() };
         current.taskIndex += 1;
@@ -1455,7 +1503,7 @@
     });
     const highConfidenceWrong = responses.filter(row => !row.correct && row.confidence === 'sure').map(row => row.questionId);
     const weak = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
-    Store.state.examResults[19] = { completedAt: Date.now(), rawEarned: earned, rawTotal: total, score150: scaled, domains, highConfidenceWrong, topWeakSkills: weak, responseCount: responses.length };
+    Store.state.examResults[19] = { completedAt: Date.now(), rawEarned: earned, rawTotal: total, score150: scaled, domains, highConfidenceWrong, topWeakSkills: weak, responseCount: responses.length, responses:JSON.parse(JSON.stringify(responses)) };
     progress.finished = true;
     progress.completedAt = Date.now();
     if (!Store.state.completedDays.includes(19)) Store.state.completedDays.push(19);
@@ -1470,8 +1518,9 @@
     if (!result) return homePage();
     const domainRows = Object.entries(result.domains || {}).map(([domain, row]) => ({ domain, percent: row.total ? Math.round(row.earned / row.total * 100) : 0 }));
     const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
-    shell(`<section class="panel finish exam-result-page"><div class="big">🧪</div><div class="kicker">DAY 19 · Boss 卷结果</div><h1>${result.score150} / 150</h1><p class="lead">这是一套网站内部混合未见卷，不冒充某一年完整真题。它的作用是给 Day20 暴露真实漏洞。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label, i) => `<div class="skill-row"><span>${i + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：这些会被 Day20 提高修复权重。</div>` : '<div class="good">这次没有高置信错误；仍会按低 mastery 和迁移证据选择 Top3。</div>'}<div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn ghost" id="home">回首页</button></div></section>`);
+    shell(`<section class="panel finish exam-result-page"><div class="big">🧪</div><div class="kicker">DAY 19 · Boss 卷结果</div><h1>${result.score150} / 150</h1><p class="lead">这是一套网站内部混合未见卷，不冒充某一年完整真题。它的作用是给 Day20 暴露真实漏洞。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label, i) => `<div class="skill-row"><span>${i + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：这些会被 Day20 提高修复权重。</div>` : '<div class="good">这次没有高置信错误；仍会按低 mastery 和迁移证据选择 Top3。</div>'}<div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="legacyPaper">返回试题卷 · 看错题和详解</button><button class="btn ghost" id="home">回首页</button></div></section>`);
     $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#legacyPaper').onclick=()=>examReviewPage('legacy');
     $('#home').onclick = () => { location.hash = '#welcome'; };
   }
 
@@ -2213,6 +2262,7 @@
     const synthesisMatch = hash.match(/^#synthesis\/(.+)$/);
     if (synthesisMatch) return synthesisCasePage(decodeURIComponent(synthesisMatch[1]));
     if (hash === '#full-exam/19') return full150ExamPage();
+    const reviewMatch=hash.match(/^#exam-review\/(core|full|legacy|day20)$/);if(reviewMatch)return examReviewPage(reviewMatch[1]);
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
     location.hash = '#welcome';
