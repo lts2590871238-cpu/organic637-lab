@@ -467,3 +467,54 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 }
 
 .v16-novel-visual.is-evidence .v16-novel-portrait{display:none}
+
+
+/* Day19/Day20 scored paper review */
+.paper-review{max-width:1060px;margin:20px auto 48px;padding:0 16px;}
+.paper-review-head,.paper-question{background:var(--surface,#fff);border:1px solid #e5e1da;border-radius:22px;padding:24px;margin-bottom:18px;box-shadow:0 7px 22px rgba(40,32,15,.045);}
+.paper-review-head h1{font-size:clamp(23px,4vw,34px);margin:8px 0;}
+.paper-review-head p{line-height:1.8;color:var(--muted,#555);}
+.paper-review-stats{display:flex;flex-wrap:wrap;align-items:center;gap:16px;background:#f7f4ed;border-radius:14px;padding:15px;margin-top:14px;}
+.paper-review-stats strong{font-size:26px;}
+.paper-review-actions{display:flex;flex-wrap:wrap;gap:9px;margin:15px 0 20px;}
+.paper-review-actions .btn{min-height:43px;}
+.paper-jump{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.paper-jump a{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;text-decoration:none;background:#e6f5ea;color:#225b39;font-weight:700;}
+.paper-jump a.wrong{background:#fff0e9;color:#963e2b;}
+.paper-question{scroll-margin-top:24px;}
+.paper-question-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:13px;}
+.paper-question-top b{padding:6px 10px;border-radius:30px;}
+.paper-tag-right{background:#e1f4e9;color:#17673b;}
+.paper-tag-wrong{background:#fff0e8;color:#a34432;}
+.paper-question h2{font-size:clamp(16px,2.8vw,21px);line-height:1.6;margin:16px 0;}
+.paper-question-formula{padding:12px;background:#f8f6f0;border-radius:9px;overflow-wrap:anywhere;margin-bottom:13px;}
+.paper-option{display:flex;gap:12px;align-items:center;border:1px solid #e5e1da;padding:11px 12px;border-radius:12px;margin:7px 0;}
+.paper-option span{width:28px;height:28px;display:grid;place-items:center;background:#edf0ee;border-radius:8px;flex-shrink:0;}
+.paper-option b{flex:1;min-width:0;font-weight:500;}
+.paper-option em{font-size:12px;font-style:normal;}
+.paper-option.is-answer{background:#eaf9ed;border-color:#71bd8a;}
+.paper-option.wrong-pick{background:#fff0ed;border-color:#e1a08e;}
+.paper-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.paper-comparison>div{border-radius:12px;background:#f5f4ee;padding:14px;min-width:0;}
+.paper-comparison small{display:block;margin-bottom:7px;opacity:.75;}
+.paper-comparison strong{display:block;overflow-wrap:anywhere;line-height:1.6;}
+.paper-score-detail{padding:8px 0;font-size:13px;opacity:.8;}
+.paper-details{border:1px solid #d9e4dc;border-radius:14px;margin-top:17px;overflow:hidden;}
+.paper-details>summary{cursor:pointer;font-weight:700;padding:16px;background:#f2f7f2;list-style:none;display:flex;justify-content:space-between;gap:10px;}
+.paper-details>summary::-webkit-details-marker{display:none;}
+.paper-details[open]>summary span{transform:rotate(180deg);}
+.paper-explanation{padding:20px;line-height:1.9;}
+.paper-explanation h3{font-size:20px;line-height:1.5;}
+.paper-chemical-visual{margin:15px 0;overflow:auto;}
+.paper-scheme{width:100%;min-width:380px;max-width:850px;color:#357554;background:#fcfaf5;border-radius:12px;}
+.paper-scheme .scheme-box{fill:#fff;stroke:#cbdcd0;stroke-width:2;}
+.paper-scheme .scheme-title{font-size:13px;fill:#4c7160;}
+.paper-scheme .scheme-chem{font-size:18px;fill:#283c30;font-weight:550;}
+.paper-original-figure{margin-top:12px;}
+.paper-original-figure summary{cursor:pointer;padding:10px;}
+.paper-trusted-svg svg{max-width:100%;height:auto;}
+.paper-explain-section{border-left:3px solid #9dbea7;padding:3px 15px;margin:14px 0;}
+.paper-explain-section p{margin:7px 0 10px;white-space:pre-wrap;}
+.paper-answer-note{background:#eaf5ec;border-radius:12px;padding:15px;overflow-wrap:anywhere;}
+.paper-question[hidden]{display:none;}
+@media(max-width:640px){.paper-review{padding:0 10px;}.paper-review-head,.paper-question{padding:15px;border-radius:16px;}.paper-comparison{grid-template-columns:1fr;}.paper-option{align-items:flex-start;flex-wrap:wrap;}.paper-option em{margin-left:40px;}.paper-explanation{padding:12px;}}
