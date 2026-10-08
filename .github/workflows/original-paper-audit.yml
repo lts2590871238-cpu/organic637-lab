@@ -1,0 +1,30 @@
+name: Original-paper source and scoring audit
+on:
+  pull_request:
+    paths:
+      - 'data/original-exam-draft.js'
+      - 'js/original-chem-diagrams.js'
+      - 'js/interactions.js'
+      - 'js/exam-review.js'
+      - 'app.js'
+      - 'scripts/tests/test-original-paper.cjs'
+      - '.github/workflows/original-paper-audit.yml'
+  workflow_dispatch:
+jobs:
+  original-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript syntax
+        run: |
+          node --check app.js
+          node --check js/interactions.js
+          node --check js/exam-review.js
+          node --check js/original-chem-diagrams.js
+          node --check data/original-exam-draft.js
+      - name: Validate original paper source and answer scoring
+        run: node scripts/tests/test-original-paper.cjs
