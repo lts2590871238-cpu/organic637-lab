@@ -1347,14 +1347,17 @@
     Store.state.examResults ||= {};
     if(Store.state.examResults[key])return originalExamResultPage(day);
     Store.state.originalExamDrafts ||= {};
-    let draft=Store.state.originalExamDrafts[key];
+    let draft=Store.state.originalExamDrafts[key],migrated=false;
     if(draft&&Array.isArray(draft.responses)&&draft.responses.length&&draft.paperVersion!==originalPaperVersion()){
       archiveExamReview('original-incomplete-'+day,{...draft,reason:'paper version changed'});
-      draft=null;
+      draft=null;migrated=true;
     }
     if(!draft||!Array.isArray(draft.responses))draft={index:0,responses:[],startedAt:Date.now(),paperVersion:originalPaperVersion()};
     draft.paperVersion=originalPaperVersion();
     Store.state.originalExamDrafts[key]=draft;
+    // Persist migration immediately: a student may navigate away before answering
+    // the first replacement question, and their archived old attempt must survive.
+    if(migrated)Store.save();
     draft.index=Math.max(Number(draft.index)||0,draft.responses.length);
     if(draft.index>=bank.length) {
       if(draft.responses.length!==bank.length){draft.index=draft.responses.length;Store.save();return originalDayExamPage(day);}
