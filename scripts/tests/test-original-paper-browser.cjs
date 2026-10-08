@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
    page.on('pageerror',e=>issues.push(e.message));
    await page.setContent('<!doctype html><html lang="zh"><head><meta charset="utf-8"></head><body><main id="paperReviewRoot"></main></body></html>');
    await page.addStyleTag({path:path.resolve('styles.css')});
-   for(const f of ['data/original-exam-draft.js','js/original-chem-diagrams.js','js/original-chem-graph.js','js/exam-review.js']){
+   for(const f of ['data/original-exam-draft.js','js/interactions.js','js/original-chem-diagrams.js','js/original-chem-graph.js','js/original-reaction-solutions.js','js/original-spectra.js','js/exam-review.js']){
     await page.addScriptTag({path:path.resolve(f)});
    }
    await page.evaluate(()=>{
@@ -48,6 +48,28 @@ const assert=require('node:assert/strict');
    assert.equal(await page.evaluate(()=>window.__wentBack),true);
    await page.locator('#paperRetryBottom').click();
    assert.equal(await page.evaluate(()=>window.__didRedo),true);
+   // Advanced questions: real original 2020 open synthesis and IR/NMR deduction.
+   await page.evaluate(()=>{
+     const q=window.Organic637.OriginalExamDraft.questions,
+       synth=q.find(x=>x.id==='orig-2020-vii-2-aldol-synthesis'),
+       spectra=q.find(x=>x.id==='orig-2020-iv-2-ir-nmr');
+     const payload1={fields:{base:'LDA',electrophile:'环戊酮',workup:'NH4Cl'},freeRoute:'先苯乙酮烯醇化，再加环戊酮后温和质子化'};
+     const payload2={fields:{structure:'对甲基苯甲醚',aromatic:'2H+2H',methoxy:'甲氧基',arylMethyl:'芳环甲基'}};
+     window.Organic637.ExamReview.render(document.querySelector('#paperReviewRoot'),{
+       title:'原卷高级题复盘：合成与谱图',scoreLabel:'20 / 20（仅用于截图测试）',
+       rows:[{question:synth,correct:true,hasEvidence:true,partialScore:1,payload:payload1},
+         {question:spectra,correct:true,hasEvidence:true,partialScore:1,payload:payload2}],
+       onBack(){},onRetry(){}
+     });
+   });
+   await page.locator('#paperAllOpen').click();
+   assert.equal(await page.locator('.paper-question').count(),2,'advanced q render failed');
+   assert.ok(await page.locator('.original-spectrum svg').count()>=1,'redrawn IR/NMR trace explanation missing');
+   assert.ok(await page.locator('.original-molecule-grid svg').count()>=4,'synthetic precursors and exact products not drawn');
+   assert.ok((await page.locator('.paper-comparison').first().innerText()).includes('我的自由路线'),'student-written synthesis plan missing from review');
+   const bodyOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+   assert.ok(bodyOverflow<25,'advanced case horizontal page overflow '+viewport.name+': '+bodyOverflow);
+   await page.screenshot({path:path.join(dir,'original-paper-advanced-'+viewport.name+'.png'),fullPage:true});
    assert.deepEqual(issues,[],'browser JS errors');
    console.log('PASS '+viewport.name+': SVG, answers, toggles, wrong-only, back, retry; screenshot saved');
    await page.close();
