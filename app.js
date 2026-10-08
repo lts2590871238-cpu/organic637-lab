@@ -601,6 +601,7 @@
   }
 
   function dayPage(day) {
+    if(day===19||day===20)return originalDayExamPage(day);
     const v16 = NS.Learning.ensureV16RootState(Store.state);
     const plan = NS.V16Director?.getDayPlan?.(day);
     if (v16.enabled && plan) {
@@ -1244,16 +1245,226 @@
     v16.stepState[step.id] = state;
     const bossIds = runtime.groups.map(group => group.bossId).filter(Boolean);
     const questionId = bossIds[Math.max(0, Number(state.index) || 0)];
-    if (!questionId) return advanceDirectorStep(day, step.id);
+    if (!questionId) {
+      const rows=state.responses||[];
+      Store.state.examResults.day20Boss={completedAt:Date.now(),responses:JSON.parse(JSON.stringify(rows)),percent:rows.length?Math.round(rows.reduce((sum,r)=>sum+Number(r.partialScore||0),0)/rows.length*100):0,responseCount:rows.length};
+      Store.save();return advanceDirectorStep(day,step.id);
+    }
     const question = QMAP.get(questionId);
     if (!question) { state.index += 1; Store.save(); return dayPage(day); }
     return studyQuestionPage(question, {
       mode:'boss', day:20, isTransfer:true,
       positionLabel:`修复后独立验证 · ${Number(state.index) + 1}/${bossIds.length}`,
       onPrev:() => { state.index = Math.max(0, Number(state.index) - 1); Store.save(); dayPage(day); },
-      onNext(){ state.index += 1; Store.save(); if (state.index >= bossIds.length) advanceDirectorStep(day, step.id); else dayPage(day); },
-      onSubmitted(){ Store.save(); }
+      onNext(){
+        state.index += 1;
+        if (state.index >= bossIds.length) {
+          const rows=state.responses||[];
+          Store.state.examResults.day20Boss={completedAt:Date.now(),responses:JSON.parse(JSON.stringify(rows)),percent:rows.length?Math.round(rows.reduce((sum,r)=>sum+Number(r.partialScore||0),0)/rows.length*100):0,responseCount:rows.length};
+          Store.save();advanceDirectorStep(day, step.id);
+        } else {Store.save();dayPage(day);}
+      },
+      onSubmitted(submission){
+        state.responses ||= [];
+        if(!state.responses.some(r=>r.questionId===question.id))state.responses.push({questionId:question.id,payload:submission.payload,correct:submission.correct,partialScore:Number(submission.partialScore||0)});
+        Store.save();
+      }
     });
+  }
+
+  // The two final days use traceable original-exam questions. Existing legacy results
+  // stay in their original keys; never mutate old question IDs or past attempts.
+  function originalQuestions(day) {
+    return (NS.OriginalExamDraft?.questions||[]).filter(q=>q.day===day&&!q.hold);
+  }
+  function oldExamKind(day) {
+    const r=Store.state.examResults||{};
+    if(day===20)return r.day20Boss?'day20':null;
+    return r.full150?'full':r.v16Day19Core?'core':r[19]?'legacy':null;
+  }
+  function visitOldExam(day){
+    const kind=oldExamKind(day);
+    if(!kind)return;
+    location.hash='#exam-review/'+kind;
+    examReviewPage(kind);
+  }
+  function originalPaperVersion(){return NS.OriginalExamDraft?.version||'unspecified';}
+  function originalPaperSnapshot(bank){
+    return bank.map(q=>({
+      id:q.id,day:q.day,type:q.type,role:q.role,prompt:q.prompt,formula:q.formula,
+      parts:q.parts,options:q.options,items:q.items,answer:q.answer,
+      correctOrder:q.correctOrder,points:q.points,examSource:q.examSource,
+      examGuide:q.examGuide,explanationLayers:q.explanationLayers
+    }));
+  }
+  function originalExamResultPage(day) {
+    const key='originalDay'+day,result=Store.state.examResults?.[key];
+    if(!result)return originalDayExamPage(day);
+    const olderVersion=result.paperVersion!==originalPaperVersion();
+    const readable=Array.isArray(result.paperSnapshot)&&result.paperSnapshot.length>0;
+    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>各道题保留其真实的原卷分值（如填空题2分、结构推导题8分）；本混合卷每题统一折算10分，总分150分。这是训练折算成绩，并非某一年完整原卷的原始得分。</p>${olderVersion?'<p class="paper-source-warning">这是旧题库版本的历史成绩，已与新版题库隔离。'+(readable?'可根据交卷时保存的题目快照复盘。':'当时未存储完整题目快照，不能用新版题目冒充旧答卷。')+'</p>':''}<div class="btn-row"><button class="btn primary" id="originalPaper" ${olderVersion&&!readable?'disabled title="旧版本没有存储题目快照"':''}>← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div>${oldExamKind(day)?'<div class="original-old-review"><button class="btn ghost" id="oldExamPaper">查看以前做过的第'+day+'天旧版答卷与学习记录</button></div>':''}</main>`,'study');
+    $('#originalPaper').onclick=()=>{location.hash='#original-review/'+day;originalReviewPage(day);};
+    $('#originalRetry').onclick=()=>originalExamRetry(day);
+    $('#originalHome').onclick=()=>{location.hash='#welcome';};
+    $('#oldExamPaper')?.addEventListener('click',()=>visitOldExam(day));
+  }
+  function originalExamRetry(day) {
+    if(!confirm('确定重新作答第'+day+'天历年真题卷吗？原成绩将归档，原来的学习记录不会删除。'))return;
+    const key='originalDay'+day;
+    archiveExamReview('original-'+day,Store.state.examResults?.[key]);
+    delete Store.state.examResults[key];
+    Store.state.originalExamDrafts ||= {};
+    Store.state.originalExamDrafts[key]={index:0,responses:[],startedAt:Date.now(),paperVersion:originalPaperVersion()};
+    Store.save();
+    location.hash='#day/'+day;originalDayExamPage(day);
+  }
+  function originalReviewPage(day) {
+    const key='originalDay'+day,result=Store.state.examResults?.[key];
+    if(!result)return originalDayExamPage(day);
+    const isCurrent=result.paperVersion===originalPaperVersion();
+    const recorded=Array.isArray(result.paperSnapshot)&&result.paperSnapshot.length?result.paperSnapshot:(isCurrent?originalQuestions(day):[]);
+    if(!recorded.length){
+      shell('<section class="panel"><h2>旧版完整原题未保存</h2><p>已保留当时的成绩与历史作答记录，但不能用现在的新题目拼凑成旧试卷。请从成绩页选择重做新版真题。</p><button class="btn ghost" id="originalOldBack">返回成绩页</button></section>','study');
+      $('#originalOldBack').onclick=()=>originalExamResultPage(day);return;
+    }
+    const byId=new Map((result.responses||[]).map(x=>[x.questionId,x]));
+    const rows=recorded.map(question=>{
+      const r=byId.get(question.id);
+      return {question,hasEvidence:Boolean(r),correct:r?.correct===true,partialScore:r?.partialScore??null,payload:r?.payload??null};
+    });
+    shell('<div id="paperReviewRoot"></div>','study');
+    NS.ExamReview.render($('#paperReviewRoot'),{
+      title:'DAY '+day+' · 历年真题混合卷原答卷',
+      scoreLabel:Number(result.score150||0)+' / 150（混合模拟折算）',
+      rows,
+      onBack:()=>{location.hash='#original-result/'+day;originalExamResultPage(day);},
+      onRetry:()=>originalExamRetry(day)
+    });
+  }
+  function originalDayExamPage(day) {
+    const bank=originalQuestions(day),key='originalDay'+day;
+    if(!bank.length)return shell('<section class="panel"><h1>本日真题尚未核验完成</h1><p>为了保证答案准确，暂不开放无来源试题。</p></section>');
+    Store.state.examResults ||= {};
+    if(Store.state.examResults[key])return originalExamResultPage(day);
+    Store.state.originalExamDrafts ||= {};
+    let draft=Store.state.originalExamDrafts[key],migrated=false;
+    if(draft&&Array.isArray(draft.responses)&&draft.responses.length&&draft.paperVersion!==originalPaperVersion()){
+      archiveExamReview('original-incomplete-'+day,{...draft,reason:'paper version changed'});
+      draft=null;migrated=true;
+    }
+    if(!draft||!Array.isArray(draft.responses))draft={index:0,responses:[],startedAt:Date.now(),paperVersion:originalPaperVersion()};
+    draft.paperVersion=originalPaperVersion();
+    Store.state.originalExamDrafts[key]=draft;
+    // Persist migration immediately: a student may navigate away before answering
+    // the first replacement question, and their archived old attempt must survive.
+    if(migrated)Store.save();
+    draft.index=Math.max(Number(draft.index)||0,draft.responses.length);
+    if(draft.index>=bank.length) {
+      if(draft.responses.length!==bank.length){draft.index=draft.responses.length;Store.save();return originalDayExamPage(day);}
+      const total=bank.reduce((sum,q)=>sum+Number(q.points||0),0);
+      const raw=draft.responses.reduce((sum,r)=>sum+(Number(r.partialScore||0)*Number(bank.find(q=>q.id===r.questionId)?.points||0)),0);
+      const score=Math.round(raw/total*150*10)/10,percent=Math.round(raw/total*100);
+      Store.state.examResults[key]={score150:score,percent,responseCount:draft.responses.length,
+        completedAt:Date.now(),paperVersion:originalPaperVersion(),paperSnapshot:originalPaperSnapshot(bank),responses:JSON.parse(JSON.stringify(draft.responses))};
+      const progress=NS.Learning.ensureDayState(Store.state,day,REGISTRY);
+      progress.finished=true;progress.completedAt=Date.now();
+      Store.state.completedDays=[...new Set([...(Store.state.completedDays||[]),day])].sort((a,b)=>a-b);
+      Store.state.currentDay=Math.min(20,Math.max(Number(Store.state.currentDay)||1,day+1));
+      Store.save();location.hash='#original-result/'+day;
+      return originalExamResultPage(day);
+    }
+    const q=bank[draft.index];
+    const src=q.examSource;
+    shell(`<section class="panel question-shell original-exam-question"><div class="question-head"><div class="step-label">Day ${day} · 真题混合卷 · ${draft.index+1}/${bank.length}</div><span class="role-chip">10分（折算）</span></div><div class="paper-source-warning"><b>题源：</b>${src.year}年 · ${esc(src.originalQuestion)} · 第1份扫描PDF第${src.pdfPage}页 · 原题${src.originalPoints}分</div><div class="exam-warning">交卷前不显示答案；本题提交后锁定，不可回看修改。</div><div id="originalQuestionDiagram"></div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="originalExit">← 暂存退出</button>${oldExamKind(day)?'<button class="link-btn" id="oldExamPaper">查看旧版已完成答卷</button>':''}<span class="tiny">结构图均为独立绘制的化学键线示意。</span></div></section>`,'study');
+    $('#originalQuestionDiagram').innerHTML=NS.OriginalChem?.figuresFor(q)||'';
+    $('#originalExit').onclick=()=>{Store.save();location.hash='#welcome';};
+    $('#oldExamPaper')?.addEventListener('click',()=>{Store.save();visitOldExam(day);});
+    const started=performance.now();
+    NS.Interactions.mount($('#interactionRoot'),q,{
+      examMode:true,
+      onSubmit(submission,feedback){
+        if(draft.responses.some(row=>row.questionId===q.id))return;
+        draft.responses.push({questionId:q.id,payload:submission.payload,correct:submission.correct,
+          partialScore:Number(submission.partialScore||0),submittedAt:Date.now()});
+        const previous=(Store.state.attempts||[]).filter(r=>r.questionId===q.id&&r.mode==='original-exam').length;
+        NS.Learning.recordAttempt(Store.state,q,{day,mode:'original-exam',correct:submission.correct,
+          firstAttempt:previous===0,attemptNumber:previous+1,hintsUsed:0,confidence:submission.confidence,
+          responseTimeMs:Math.round(performance.now()-started),isTransfer:true,
+          answerPayload:submission.payload,partialScore:submission.partialScore,errorType:submission.errorType});
+        Store.save();
+        // The interaction engine deliberately hides solutions in examMode and does not
+        // automatically provide navigation. Without this explicit button students
+        // would be stranded after submitting their first answer.
+        if(feedback && !feedback.querySelector('#originalNextQuestion')){
+          const button=document.createElement('button');
+          button.type='button';button.id='originalNextQuestion';button.className='btn primary';
+          button.textContent=draft.responses.length>=bank.length?'交卷并查看成绩':'确认提交 · 下一题 →';
+          button.addEventListener('click',()=>{
+            button.disabled=true;
+            draft.index=draft.responses.length;
+            Store.save();
+            originalDayExamPage(day);
+          },{once:true});
+          feedback.appendChild(button);
+        }
+      },
+      onNext(){draft.index=draft.responses.length;Store.save();originalDayExamPage(day);}
+    });
+  }
+
+  function examRows(ids, responses, mode) {
+    const indexed=new Map((Array.isArray(responses)?responses:[]).map(r=>[r.questionId,r]));
+    return (ids||[]).map(id=>{
+      const question=QMAP.get(id);if(!question)return null;
+      const row=indexed.get(id);
+      // Older records may contain only a total score. Never pretend a missing response was wrong.
+      const attempt=(Store.state.attempts||[]).filter(a=>a.questionId===id&&(!mode||a.mode===mode)).at(-1);
+      const source=row||attempt;
+      return {question,hasEvidence:Boolean(source),correct:source?.correct===true,
+        partialScore:source?.partialScore==null?null:Number(source.partialScore),
+        payload:source?.payload??source?.answerPayload??attempt?.answerPayload??null};
+    }).filter(Boolean);
+  }
+  function archiveExamReview(kind,result) {
+    if(!result)return;
+    Store.state.examReviewHistory ||= [];
+    Store.state.examReviewHistory.push({kind,archivedAt:Date.now(),result:JSON.parse(JSON.stringify(result))});
+    Store.state.examReviewHistory=Store.state.examReviewHistory.slice(-12);
+  }
+  function examReviewPage(kind) {
+    let ids=[],responses=[],mode='',title='',scoreLabel='',back='',retry=null;
+    if(kind==='core') {
+      const config=NS.V16_EXAM?.day19Core,result=Store.state.examResults?.v16Day19Core;
+      if(!result)return coreExamResultsPage();
+      ids=config?.itemIds||[];responses=result.responses||[];mode='v16-core-exam';title='DAY 19 · 核心审核答卷';scoreLabel=Number(result.percent||0)+'%';back='core';
+      retry=()=>{
+        const v16=NS.Learning.ensureV16DayState(Store.state,19);const step=NS.V16Director?.getDayPlan?.(19)?.sequence?.find(t=>t.type==='exam'&&t.ref==='day19-core');
+        if(!step)return;
+        archiveExamReview('core',Store.state.examResults.v16Day19Core);delete (v16.stepState||{})[step.id];delete Store.state.examResults.v16Day19Core;
+        const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;
+        v16.cursor=Math.max(0,(NS.V16Director.getDayPlan(19)?.sequence||[]).findIndex(t=>t.id===step.id));delete v16.completedSteps?.[step.id];
+        Store.save();location.hash='#day/19';dayPage(19);
+      };
+    } else if(kind==='full') {
+      const result=Store.state.examResults?.full150;if(!result)return full150ExamPage();
+      ids=NS.V16_EXAM?.full150?.itemIds||[];responses=result.responses||[];mode='full150-exam';title='DAY 19 · 150分综合模拟答卷';scoreLabel=Number(result.score150||0)+'/150';back='full';
+      retry=()=>{archiveExamReview('full',Store.state.examResults.full150);delete Store.state.examResults.full150;delete Store.state.examResults.full150Draft;Store.save();location.hash='#full-exam/19';full150ExamPage();};
+    } else if(kind==='legacy') {
+      const result=Store.state.examResults?.[19];if(!result)return examResultsPage();
+      ids=(REGISTRY[19]?.questions||[]).map(q=>q.id);responses=result.responses||[];mode='exam';title='DAY 19 · Boss模拟答卷';scoreLabel=Number(result.score150||0)+'/150';back='legacy';
+      retry=()=>{const p=NS.Learning.ensureDayState(Store.state,19,REGISTRY);p.finished=false;p.taskIndex=0;p.examDraft={responses:[],startedAt:Date.now()};p.answered={};archiveExamReview('legacy',Store.state.examResults[19]);delete Store.state.examResults[19];Store.save();location.hash='#day/19';legacyDayPage(19);};
+    } else if(kind==='day20') {
+      const results=Store.state.examResults?.day20Boss||{},v16=NS.Learning.ensureV16DayState(Store.state,20);
+      const runtime=v16.adaptiveRuntime||ensureDay20AdaptiveRuntime();
+      ids=(results.responses?.length?results.responses.map(r=>r.questionId):(runtime.groups||[]).map(g=>g.bossId)).filter(Boolean);
+      responses=results.responses||[];mode='boss';title='DAY 20 · 最终Boss模拟答卷';scoreLabel=Number(results.percent||0)+'%';back='day20';
+      retry=()=>{const step=(NS.V16Director.getDayPlan(20)?.sequence||[]).find(x=>x.type==='final-boss');if(!step)return;
+        const p=NS.Learning.ensureDayState(Store.state,20,REGISTRY);p.finished=false;
+        const v=NS.Learning.ensureV16DayState(Store.state,20);v.stepState ||= {};v.stepState[step.id]={index:0,responses:[]};v.cursor=(NS.V16Director.getDayPlan(20)?.sequence||[]).findIndex(x=>x.id===step.id);delete v.completedSteps?.[step.id];archiveExamReview('day20',Store.state.examResults.day20Boss);delete Store.state.examResults.day20Boss;Store.save();location.hash='#day/20';dayPage(20);
+      };
+    }
+    shell('<div id="paperReviewRoot"></div>','study');
+    NS.ExamReview.render($('#paperReviewRoot'),{title,scoreLabel,rows:examRows(ids,responses,mode),onBack:()=>{if(back==='core')coreExamResultsPage();else if(back==='full')full150ResultsPage();else if(back==='legacy')examResultsPage();else finalSummaryPage();},onRetry:retry});
   }
 
   function directorCoreExamTask(day, step) {
@@ -1286,7 +1497,7 @@
         });
         if (!draft.responses.some(row => row.questionId === question.id)) {
           draft.responses.push({
-            questionId:question.id, correct:submission.correct, partialScore:Number(submission.partialScore || 0),
+            questionId:question.id, correct:submission.correct, payload:submission.payload, partialScore:Number(submission.partialScore || 0),
             confidence:submission.confidence, points:Number(question.points || 0), responseTimeMs
           });
         }
@@ -1324,7 +1535,7 @@
     const topWeakSkills = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
     Store.state.examResults.v16Day19Core = {
       mode:'core', completedAt:Date.now(), percent, rawEarned, rawTotal, domains,
-      highConfidenceWrong, topWeakSkills, responseCount:rows.length
+      highConfidenceWrong, topWeakSkills, responseCount:rows.length, responses:JSON.parse(JSON.stringify(rows))
     };
     Store.save();
     advanceDirectorStep(day, step.id);
@@ -1339,8 +1550,9 @@
       return { domain, percent:row.total ? Math.round(row.earned / row.total * 100) : 0 };
     });
     const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
-    shell(`<section class="panel finish exam-result-page"><div class="kicker">DAY 19 · 综合能力审核</div><h1>${Number(result.percent || 0)}%</h1><p class="lead">这是20天主线的核心诊断，不伪装成150分正式卷。它只负责找出 Day20 最该修的能力。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label,index) => `<div class="skill-row"><span>${index + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：Day20 会提高对应修复优先级。</div>` : '<div class="good">没有高置信错误；Top3仍按真实 mastery 与迁移证据生成。</div>'}<div class="note">如果你现在想做完整150分模拟，可以单独进入“考前正式模拟”。它不会覆盖这次核心审核结果。</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="openFull150">考前正式模拟 · 150分</button><button class="btn ghost" id="home">回首页</button></div></section>`, 'study');
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">DAY 19 · 综合能力审核</div><h1>${Number(result.percent || 0)}%</h1><p class="lead">这是20天主线的核心诊断，不伪装成150分正式卷。它只负责找出 Day20 最该修的能力。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label,index) => `<div class="skill-row"><span>${index + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：Day20 会提高对应修复优先级。</div>` : '<div class="good">没有高置信错误；Top3仍按真实 mastery 与迁移证据生成。</div>'}<div class="note">如果你现在想做完整150分模拟，可以单独进入“考前正式模拟”。它不会覆盖这次核心审核结果。</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="corePaper">返回试题卷 · 看错题和详解</button><button class="btn soft" id="openFull150">考前正式模拟 · 150分</button><button class="btn ghost" id="home">回首页</button></div></section>`, 'study');
     $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#corePaper').onclick=()=>examReviewPage('core');
     $('#openFull150').onclick = () => { location.hash = '#full-exam/19'; };
     $('#home').onclick = () => { location.hash = '#home'; };
   }
@@ -1368,7 +1580,7 @@
           answerPayload:submission.payload, partialScore:submission.partialScore, errorType:submission.errorType, reasoningState:submission.reasoningState
         });
         if (!draft.responses.some(row => row.questionId === question.id)) {
-          draft.responses.push({ questionId:question.id, partialScore:Number(submission.partialScore || 0), confidence:submission.confidence, points:Number(question.points || 0), correct:submission.correct, responseTimeMs });
+          draft.responses.push({ questionId:question.id, payload:submission.payload, partialScore:Number(submission.partialScore || 0), confidence:submission.confidence, points:Number(question.points || 0), correct:submission.correct, responseTimeMs });
         }
         draft.index += 1;
         Store.save();
@@ -1385,7 +1597,7 @@
     const earned = responses.reduce((sum,row) => sum + Number(row.points || 0) * Number(row.partialScore || 0), 0);
     Store.state.examResults.full150 = {
       completedAt:Date.now(), score150:Math.round(earned / total * 150), rawEarned:earned, rawTotal:total,
-      responseCount:responses.length
+      responseCount:responses.length, responses:JSON.parse(JSON.stringify(responses))
     };
     delete Store.state.examResults.full150Draft;
     Store.save();
@@ -1395,9 +1607,11 @@
   function full150ResultsPage() {
     const result = Store.state.examResults?.full150;
     if (!result) return full150ExamPage();
-    shell(`<section class="panel finish exam-result-page"><div class="kicker">考前正式模拟 · 完整150分卷</div><h1>${Number(result.score150 || 0)} / 150</h1><p class="lead">这是原 Day19 的完整24题正式训练卷，150分语义保持不变；它与20天主线的核心审核分开记录。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="fullExamHome">回首页</button><button class="btn ghost" id="fullExamRestart">重新做整卷</button></div></section>`, 'study');
+    shell(`<section class="panel finish exam-result-page"><div class="kicker">考前正式模拟 · 完整150分卷</div><h1>${Number(result.score150 || 0)} / 150</h1><p class="lead">这是原 Day19 的完整24题正式训练卷，150分语义保持不变；它与20天主线的核心审核分开记录。</p><div class="btn-row" style="justify-content:center"><button class="btn primary" id="fullExamHome">回首页</button><button class="btn soft" id="fullExamPaper">返回试题卷 · 看选项和详解</button><button class="btn ghost" id="fullExamRestart">重新做整卷</button></div></section>`, 'study');
+    $('#fullExamPaper').onclick=()=>examReviewPage('full');
     $('#fullExamHome').onclick = () => { location.hash = '#home'; };
     $('#fullExamRestart').onclick = () => {
+      archiveExamReview('full',Store.state.examResults.full150);
       delete Store.state.examResults.full150;
       delete Store.state.examResults.full150Draft;
       Store.save();
@@ -1425,7 +1639,7 @@
         const current = NS.Learning.ensureDayState(Store.state, 19, REGISTRY);
         current.examDraft = current.examDraft || { responses: [], startedAt: Date.now() };
         if (!current.examDraft.responses.some(row => row.questionId === question.id)) {
-          current.examDraft.responses.push({ questionId: question.id, correct: submission.correct, partialScore: Number(submission.partialScore || 0), confidence: submission.confidence, points: Number(question.points || 0), primarySkill: question.primarySkill, responseTimeMs });
+          current.examDraft.responses.push({ questionId: question.id, correct: submission.correct, payload:submission.payload, partialScore: Number(submission.partialScore || 0), confidence: submission.confidence, points: Number(question.points || 0), primarySkill: question.primarySkill, responseTimeMs });
         }
         current.answered[question.id] = { correct: submission.correct, partialScore: submission.partialScore, at: Date.now() };
         current.taskIndex += 1;
@@ -1455,7 +1669,7 @@
     });
     const highConfidenceWrong = responses.filter(row => !row.correct && row.confidence === 'sure').map(row => row.questionId);
     const weak = NS.Learning.topWeakSkills(Store.state, NS.Learning.dateISO(), 3).map(row => row.id);
-    Store.state.examResults[19] = { completedAt: Date.now(), rawEarned: earned, rawTotal: total, score150: scaled, domains, highConfidenceWrong, topWeakSkills: weak, responseCount: responses.length };
+    Store.state.examResults[19] = { completedAt: Date.now(), rawEarned: earned, rawTotal: total, score150: scaled, domains, highConfidenceWrong, topWeakSkills: weak, responseCount: responses.length, responses:JSON.parse(JSON.stringify(responses)) };
     progress.finished = true;
     progress.completedAt = Date.now();
     if (!Store.state.completedDays.includes(19)) Store.state.completedDays.push(19);
@@ -1470,8 +1684,9 @@
     if (!result) return homePage();
     const domainRows = Object.entries(result.domains || {}).map(([domain, row]) => ({ domain, percent: row.total ? Math.round(row.earned / row.total * 100) : 0 }));
     const weak = (result.topWeakSkills || []).map(id => SKILL_META.get(id)?.label || id);
-    shell(`<section class="panel finish exam-result-page"><div class="big">🧪</div><div class="kicker">DAY 19 · Boss 卷结果</div><h1>${result.score150} / 150</h1><p class="lead">这是一套网站内部混合未见卷，不冒充某一年完整真题。它的作用是给 Day20 暴露真实漏洞。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label, i) => `<div class="skill-row"><span>${i + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：这些会被 Day20 提高修复权重。</div>` : '<div class="good">这次没有高置信错误；仍会按低 mastery 和迁移证据选择 Top3。</div>'}<div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn ghost" id="home">回首页</button></div></section>`);
+    shell(`<section class="panel finish exam-result-page"><div class="big">🧪</div><div class="kicker">DAY 19 · Boss 卷结果</div><h1>${result.score150} / 150</h1><p class="lead">这是一套网站内部混合未见卷，不冒充某一年完整真题。它的作用是给 Day20 暴露真实漏洞。</p><div class="ability-grid">${domainRows.map(row => `<div class="ability-card"><header><b>${esc(domainNames[row.domain] || row.domain)}</b><strong>${row.percent}%</strong></header><div class="meter"><i style="width:${row.percent}%"></i></div></div>`).join('')}</div><div class="section-title"><h2>Day20 优先修的三处</h2></div><div class="skills">${weak.map((label, i) => `<div class="skill-row"><span>${i + 1}. ${esc(label)}</span><b>优先</b></div>`).join('')}</div>${result.highConfidenceWrong?.length ? `<div class="error">高置信错误 ${result.highConfidenceWrong.length} 题：这些会被 Day20 提高修复权重。</div>` : '<div class="good">这次没有高置信错误；仍会按低 mastery 和迁移证据选择 Top3。</div>'}<div class="btn-row" style="justify-content:center"><button class="btn primary" id="go20">进入 Day 20 修复</button><button class="btn soft" id="legacyPaper">返回试题卷 · 看错题和详解</button><button class="btn ghost" id="home">回首页</button></div></section>`);
     $('#go20').onclick = () => { location.hash = '#day/20'; };
+    $('#legacyPaper').onclick=()=>examReviewPage('legacy');
     $('#home').onclick = () => { location.hash = '#welcome'; };
   }
 
@@ -1490,9 +1705,11 @@
       : fullBoss
         ? '已经有完整150分卷证据，但目前还不能把“学完20天”直接等同于120分。继续修低 mastery 和迁移薄弱处。'
         : '20天核心审核已经完成，但还没有完整150分卷证据；在做完“考前正式模拟”前，不给出120分达成判断。';
-    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。Day19核心审核负责诊断；只有完整150分卷才用于判断是否接近120分目标线。</p><div class="score-box"><div><span class="tiny">Day19 核心审核</span><strong>${coreAudit ? `${Number(coreAudit.percent || 0)}%` : '未完成'}</strong></div><div><span class="tiny">完整150分模拟</span><strong>${fullBoss ? `${Number(fullBoss.score150 || 0)} / 150` : '未做'}</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${targetEvidenceReady ? 'good' : 'note'}">${targetMessage}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button>${!fullBoss ? '<button class="btn soft" id="fullExam">考前正式模拟 · 150分</button>' : ''}<button class="btn ghost" id="review">继续到期复习</button></div></section>`);
+    shell(`<section class="panel finish final-summary"><div class="big">🏁</div><div class="kicker">20 DAYS · FINAL</div><h1>20 天主线完成</h1><p class="lead">这里给的是训练证据，不是正式考试保证。Day19核心审核负责诊断；只有完整150分卷才用于判断是否接近120分目标线。</p><div class="score-box"><div><span class="tiny">Day19 核心审核</span><strong>${coreAudit ? `${Number(coreAudit.percent || 0)}%` : '未完成'}</strong></div><div><span class="tiny">完整150分模拟</span><strong>${fullBoss ? `${Number(fullBoss.score150 || 0)} / 150` : '未做'}</strong></div><div><span class="tiny">训练估计区间</span><strong>${score.low}–${score.high}</strong></div><div><span class="tiny">Day20 独立迁移表现</span><strong>${transferRate}%</strong></div><div><span class="tiny">Day20 最终 Boss 得分</span><strong>${Store.state.examResults?.day20Boss ? Number(Store.state.examResults.day20Boss.percent||0)+"%" : "旧版未记录"}</strong></div><div><span class="tiny">稳定技能数</span><strong>${stable}</strong></div></div><div class="section-title"><h2>接下来最值得继续捡回的能力</h2></div><div class="skills">${weak.map(row => `<div class="skill-row"><span>${esc(SKILL_META.get(row.id)?.label || row.id)}</span><b>${row.effective}%</b></div>`).join('')}</div><div class="${targetEvidenceReady ? 'good' : 'note'}">${targetMessage}</div><div class="btn-row" style="justify-content:center"><button class="btn primary" id="home">回能力地图</button>${!fullBoss ? '<button class="btn soft" id="fullExam">考前正式模拟 · 150分</button>' : ''}<button class="btn soft" id="finalDay19Review">返回 Day19 原卷解析</button><button class="btn soft" id="finalDay20Review">返回 Day20 Boss 原卷解析</button><button class="btn ghost" id="review">继续到期复习</button></div></section>`);
     $('#home').onclick = () => { location.hash = '#abilities'; };
     $('#fullExam')?.addEventListener('click', () => { location.hash = '#full-exam/19'; });
+    $('#finalDay19Review').onclick=()=>{const k=Store.state.examResults?.full150?'full':Store.state.examResults?.v16Day19Core?'core':'legacy';location.hash='#exam-review/'+k;};
+    $('#finalDay20Review').onclick=()=>{location.hash='#exam-review/day20';};
     $('#review').onclick = () => { location.hash = '#review'; };
   }
 
@@ -2212,7 +2429,10 @@
     if (detectiveMatch) return detectiveCasePage(decodeURIComponent(detectiveMatch[1]));
     const synthesisMatch = hash.match(/^#synthesis\/(.+)$/);
     if (synthesisMatch) return synthesisCasePage(decodeURIComponent(synthesisMatch[1]));
-    if (hash === '#full-exam/19') return full150ExamPage();
+    if (hash === '#full-exam/19') return originalDayExamPage(19);
+    const originalResultMatch=hash.match(/^#original-result\/(19|20)$/);if(originalResultMatch)return originalExamResultPage(Number(originalResultMatch[1]));
+    const originalReviewMatch=hash.match(/^#original-review\/(19|20)$/);if(originalReviewMatch)return originalReviewPage(Number(originalReviewMatch[1]));
+    const reviewMatch=hash.match(/^#exam-review\/(core|full|legacy|day20)$/);if(reviewMatch)return examReviewPage(reviewMatch[1]);
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
     location.hash = '#welcome';

@@ -34,7 +34,7 @@
 
   function orderedOptions(question) {
     const options = [...(question.options || [])];
-    if (options.length < 2) return options;
+    if (question.examSource || options.length < 2) return options;
     const random = seededRandom(stableHash(`${question.day || ''}|${question.id || question.prompt || ''}`));
     for (let i = options.length - 1; i > 0; i -= 1) {
       const j = Math.floor(random() * (i + 1));
@@ -111,7 +111,8 @@
     const key = row => `${row.source}>${row.target}:${row.arrowType || 'pair'}`;
     const exp = expected.map(key);
     const actual = arrows.map(key);
-    const matched = actual.filter(value => exp.includes(value)).length;
+    const remaining = exp.slice();
+    const matched = actual.reduce((sum,value) => { const index=remaining.indexOf(value);if(index<0)return sum;remaining.splice(index,1);return sum+1; },0);
     const exact = exp.length === actual.length && matched === exp.length;
     let errorType = null;
     if (!exact) {
@@ -121,7 +122,23 @@
     return { correct: exact, partialScore: exp.length ? matched / exp.length : 0, details: { expected, arrows }, errorType };
   }
 
+  function normalizeExamStructuralText(value) {
+    return String(value ?? '').trim().toLowerCase().replace(/[‐‑–—－]/g,'-')
+      .replace(/[（]/g,'(').replace(/[）]/g,')').replace(/\\s+/g,'')
+      .replace(/[₀₁₂₃₄₅₆₇₈₉]/g,d=>'₀₁₂₃₄₅₆₇₈₉'.indexOf(d))
+      .replace(/-/g,'');
+  }
+  function correctStructuralPart(candidates,value){
+    return (Array.isArray(candidates)?candidates:[candidates]).some(c=>
+      normalizeExamStructuralText(c)===normalizeExamStructuralText(value));
+  }
   function evaluate(question, payload) {
+    if(question.type === 'structure-deduction'||question.type==='synthesis-steps'){
+      const parts=question.parts||[],details={};let matched=0;
+      for(const part of parts){const yes=correctStructuralPart(question.answer?.[part.id]||[],payload?.fields?.[part.id]||'');details[part.id]=yes;if(yes)matched++;}
+      const correct=parts.length>0&&matched===parts.length;
+      return {correct,partialScore:parts.length?matched/parts.length:0,details:{parts:details,matched,total:parts.length},errorType:correct?null:'structure_deduction_error'};
+    }
     if (question.type === 'ranking') return rankingEvaluation(question, payload.order || []);
     if (isPathQuestion(question)) return pathEvaluation(question, payload.path || []);
     if (question.type === 'electron-arrow') return arrowEvaluation(question, payload.arrows || []);
@@ -134,12 +151,12 @@
       const expected = (question.answer || []).map(String).sort();
       const actual = (payload.selected || []).map(String).sort();
       const matched = actual.filter(x => expected.includes(x)).length;
-      return { correct: expected.length === actual.length && expected.every((x, i) => x === actual[i]), partialScore: expected.length ? matched / expected.length : 0, details: {}, errorType: expected.length === actual.length && expected.every((x, i) => x === actual[i]) ? null : 'unknown' };
+      return { correct: expected.length === actual.length && expected.every((x, i) => x === actual[i]), partialScore: expected.length ? Math.max(0, Math.min(1, (matched - (actual.length - matched)) / expected.length)) : 0, details: {}, errorType: expected.length === actual.length && expected.every((x, i) => x === actual[i]) ? null : 'unknown' };
     }
     if (question.type === 'numeric' || question.type === 'text-short') {
       const accepted = Array.isArray(question.answer) ? question.answer : [question.answer];
       const value = String(payload.value || '').trim().toLowerCase();
-      const correct = accepted.some(x => String(x).trim().toLowerCase() === value);
+      const correct = accepted.some(x => normalizeExamStructuralText(x) === normalizeExamStructuralText(value));
       return { correct, partialScore: correct ? 1 : 0, details: {}, errorType: correct ? null : (question.errorType || 'unknown') };
     }
     const correct = String(payload.selected) === expectedChoice(question);
@@ -240,6 +257,8 @@
     else if (type === 'ranking') body = renderRanking(question);
     else if (isPathQuestion(question)) body = renderPath(question);
     else if (type === 'electron-arrow') body = renderArrow(question);
+    else if(type==='structure-deduction'||type==='synthesis-steps')body='<div class="structure-deduction-fields">'+(type==='synthesis-steps'?'<p>原卷为开放式合成题。先自己写一条合成路线；下面三空仅对所展示的参考路线自动评分，不表示其他合理路线错误。</p><label><span>我的自由合成路线（保存供交卷后对照，不自动判错）</span><textarea id="openSynthesisRoute" rows="4" placeholder="写出每步试剂、条件、关键中间体和你认为的选择性原因"></textarea></label>':'<p>本题原卷要求画出A、B、C结构。网页提供分项填写结构名称的作答方式；交卷后显示各结构的独立键线图。</p>')+
+      (question.parts||[]).map(part=>'<label><span>'+esc(part.label||part.id)+'</span><input type="text" data-structure-part="'+esc(part.id)+'" autocomplete="off" placeholder="填写结构对应的化合物名称"></label>').join('')+'</div>';
     else if (type === 'numeric' || type === 'text-short') body = `<label class="short-answer"><span>你的答案</span><input id="shortAnswer" autocomplete="off" inputmode="${type === 'numeric' ? 'decimal' : 'text'}"></label>`;
 
     root.innerHTML = `<div class="question-prompt">${esc(question.prompt)}</div>${renderRepresentation(question)}${body}${commonFooter(question, settings)}`;
@@ -249,6 +268,7 @@
       if (isChoiceQuestion(question) || type === 'detective') return state.selected !== null;
       if (type === 'multi-choice') return state.selectedMany.size > 0;
       if (type === 'ranking') return state.order.length > 1;
+      if(type==='structure-deduction'||type==='synthesis-steps')return [...root.querySelectorAll('[data-structure-part]')].every(input=>input.value.trim().length>0);
       if (type === 'electron-arrow') return state.arrows.length > 0;
       if (isPathQuestion(question)) return state.path.length > 0;
       return Boolean(root.querySelector('#shortAnswer')?.value.trim());
@@ -276,6 +296,7 @@
     }));
 
     if (type === 'ranking') bindRanking(root, state, refreshSubmit);
+    if(type==='structure-deduction'||type==='synthesis-steps')root.querySelectorAll('[data-structure-part]').forEach(input=>input.addEventListener('input',refreshSubmit));
     if (type === 'electron-arrow') bindArrows(root, question, state, refreshSubmit);
     if (isPathQuestion(question)) bindPath(root, question, state, refreshSubmit);
     root.querySelector('#shortAnswer')?.addEventListener('input', refreshSubmit);
@@ -295,6 +316,7 @@
       const payload = type === 'multi-choice' ? { selected: [...state.selectedMany] } :
         (isChoiceQuestion(question) || type === 'detective') ? { selected: state.selected } :
         type === 'ranking' ? { order: state.order.slice() } :
+        (type === 'structure-deduction'||type==='synthesis-steps') ? { fields:Object.fromEntries([...root.querySelectorAll('[data-structure-part]')].map(input=>[input.dataset.structurePart,input.value.trim()])), freeRoute:type==='synthesis-steps'?(root.querySelector('#openSynthesisRoute')?.value||''):undefined } :
         type === 'electron-arrow' ? { arrows: clone(state.arrows) } :
         isPathQuestion(question) ? { path: state.path.slice() } :
         { value: root.querySelector('#shortAnswer')?.value || '' };

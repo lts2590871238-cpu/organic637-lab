@@ -1,0 +1,66 @@
+name: Original-paper source and scoring audit
+on:
+  push:
+    branches: ['feature/day19-20-paper-review']
+  pull_request:
+    paths:
+      - 'data/original-exam-draft.js'
+      - 'js/original-chem-diagrams.js'
+      - 'js/interactions.js'
+      - 'js/exam-review.js'
+      - 'js/original-chem-graph.js'
+      - 'js/original-reaction-solutions.js'
+      - 'js/original-spectra.js'
+      - 'js/original-iodoform.js'
+      - 'scripts/tests/test-original-paper-review.cjs'
+      - 'scripts/tests/test-original-paper-browser.cjs'
+      - 'scripts/tests/test-original-full-journey.cjs'
+      - 'scripts/tests/test-original-30-visual.cjs'
+      - 'styles.css'
+      - 'app.js'
+      - 'scripts/tests/test-original-paper.cjs'
+      - '.github/workflows/original-paper-audit.yml'
+  workflow_dispatch:
+jobs:
+  original-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate JavaScript syntax
+        run: |
+          node --check app.js
+          node --check js/interactions.js
+          node --check js/exam-review.js
+          node --check js/original-chem-diagrams.js
+          node --check data/original-exam-draft.js
+          node --check js/original-chem-graph.js
+          node --check js/original-reaction-solutions.js
+          node --check js/original-spectra.js
+          node --check js/original-iodoform.js
+      - name: Validate original paper source and answer scoring
+        run: node scripts/tests/test-original-paper.cjs
+      - name: Verify original paper review interaction controls
+        run: node scripts/tests/test-original-paper-review.cjs
+      - name: Install headless Chromium test tools
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Visual browser verification on desktop and mobile
+        run: node scripts/tests/test-original-paper-browser.cjs
+      - name: Verify full 30-question exam flow and saving learner progress
+        run: node scripts/tests/test-original-full-journey.cjs
+      - name: Full 30-question visual check on desktop and mobile
+        run: node scripts/tests/test-original-30-visual.cjs
+      - name: Upload paper review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-paper-review-screenshots
+          path: |
+            test-results/original-paper-*.png
+            test-results/original-30/*.png
+          if-no-files-found: ignore

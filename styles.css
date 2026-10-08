@@ -467,3 +467,163 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 }
 
 .v16-novel-visual.is-evidence .v16-novel-portrait{display:none}
+
+
+/* Day19/Day20 scored paper review */
+.paper-review{max-width:1060px;margin:20px auto 48px;padding:0 16px;}
+.paper-review-head,.paper-question{background:var(--surface,#fff);border:1px solid #e5e1da;border-radius:22px;padding:24px;margin-bottom:18px;box-shadow:0 7px 22px rgba(40,32,15,.045);}
+.paper-review-head h1{font-size:clamp(23px,4vw,34px);margin:8px 0;}
+.paper-review-head p{line-height:1.8;color:var(--muted,#555);}
+.paper-review-stats{display:flex;flex-wrap:wrap;align-items:center;gap:16px;background:#f7f4ed;border-radius:14px;padding:15px;margin-top:14px;}
+.paper-review-stats strong{font-size:26px;}
+.paper-review-actions{display:flex;flex-wrap:wrap;gap:9px;margin:15px 0 20px;}
+.paper-review-actions .btn{min-height:43px;}
+.paper-jump{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.paper-jump a{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;text-decoration:none;background:#e6f5ea;color:#225b39;font-weight:700;}
+.paper-jump a.wrong{background:#fff0e9;color:#963e2b;}
+.paper-question{scroll-margin-top:24px;}
+.paper-question-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:13px;}
+.paper-question-top b{padding:6px 10px;border-radius:30px;}
+.paper-tag-right{background:#e1f4e9;color:#17673b;}
+.paper-tag-wrong{background:#fff0e8;color:#a34432;}
+.paper-question h2{font-size:clamp(16px,2.8vw,21px);line-height:1.6;margin:16px 0;}
+.paper-question-formula{padding:12px;background:#f8f6f0;border-radius:9px;overflow-wrap:anywhere;margin-bottom:13px;}
+.paper-option{display:flex;gap:12px;align-items:center;border:1px solid #e5e1da;padding:11px 12px;border-radius:12px;margin:7px 0;}
+.paper-option span{width:28px;height:28px;display:grid;place-items:center;background:#edf0ee;border-radius:8px;flex-shrink:0;}
+.paper-option b{flex:1;min-width:0;font-weight:500;}
+.paper-option em{font-size:12px;font-style:normal;}
+.paper-option.is-answer{background:#eaf9ed;border-color:#71bd8a;}
+.paper-option.wrong-pick{background:#fff0ed;border-color:#e1a08e;}
+.paper-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.paper-comparison>div{border-radius:12px;background:#f5f4ee;padding:14px;min-width:0;}
+.paper-comparison small{display:block;margin-bottom:7px;opacity:.75;}
+.paper-comparison strong{display:block;overflow-wrap:anywhere;line-height:1.6;}
+.paper-score-detail{padding:8px 0;font-size:13px;opacity:.8;}
+.paper-details{border:1px solid #d9e4dc;border-radius:14px;margin-top:17px;overflow:hidden;}
+.paper-details>summary{cursor:pointer;font-weight:700;padding:16px;background:#f2f7f2;list-style:none;display:flex;justify-content:space-between;gap:10px;}
+.paper-details>summary::-webkit-details-marker{display:none;}
+.paper-details[open]>summary span{transform:rotate(180deg);}
+.paper-explanation{padding:20px;line-height:1.9;}
+.paper-explanation h3{font-size:20px;line-height:1.5;}
+.paper-chemical-visual{margin:15px 0;overflow:auto;}
+.paper-scheme{width:100%;min-width:380px;max-width:850px;color:#357554;background:#fcfaf5;border-radius:12px;}
+.paper-scheme .scheme-box{fill:#fff;stroke:#cbdcd0;stroke-width:2;}
+.paper-scheme .scheme-title{font-size:13px;fill:#4c7160;}
+.paper-scheme .scheme-chem{font-size:18px;fill:#283c30;font-weight:550;}
+.paper-original-figure{margin-top:12px;}
+.paper-original-figure summary{cursor:pointer;padding:10px;}
+.paper-trusted-svg svg{max-width:100%;height:auto;}
+.paper-explain-section{border-left:3px solid #9dbea7;padding:3px 15px;margin:14px 0;}
+.paper-explain-section p{margin:7px 0 10px;white-space:pre-wrap;}
+.paper-answer-note{background:#eaf5ec;border-radius:12px;padding:15px;overflow-wrap:anywhere;}
+.paper-question[hidden]{display:none;}
+@media(max-width:640px){.paper-review{padding:0 10px;}.paper-review-head,.paper-question{padding:15px;border-radius:16px;}.paper-comparison{grid-template-columns:1fr;}.paper-option{align-items:flex-start;flex-wrap:wrap;}.paper-option em{margin-left:40px;}.paper-explanation{padding:12px;}}
+
+.paper-jump button{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:11px;background:#e6f5ea;color:#225b39;font-weight:700;cursor:pointer;}.paper-jump button.wrong{background:#fff0e9;color:#963e2b;}
+
+/* Scan provenance and missing legacy response states */
+.paper-source-warning{border-left:4px solid #b98448;background:#fff7e9;padding:12px 14px;border-radius:8px;color:#5b452b;}
+.paper-scheme-notice{color:#675d51;font-size:13px;line-height:1.6;}
+.paper-jump button.unknown{background:#f1f1f1;color:#666;}
+.paper-tag-unknown{background:#f0f0f0;color:#6b6b6b;}
+.paper-question.paper-unknown{border-color:#c9c9c9;}
+
+
+/* Mixed exam sourced to user's scanned historic originals: draft interface */
+.original-exam-result{max-width:780px;margin:30px auto;padding:26px;background:var(--surface,#fff);border-radius:20px;text-align:center;line-height:1.85;}
+.original-exam-score{display:flex;flex-direction:column;align-items:center;margin:20px auto;padding:25px;background:#ecf6ef;border:1px solid #9ac9a6;border-radius:18px;}
+.original-exam-score strong{font-size:clamp(32px,6vw,58px);line-height:1.3;color:#236340;}
+.original-exam-score span{font-size:15px;color:#52695b;}
+.original-exam-question{max-width:970px;margin:24px auto;}
+.original-source-label{padding:9px 13px;border-left:4px solid #6b947e;background:#f1f7f2;margin:10px 0 18px;font-size:13px;line-height:1.6;}
+.original-molecule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0;}
+.original-molecule-grid figure{margin:0;padding:10px;background:white;border:1px solid #d6dfd7;border-radius:12px;min-width:0;}
+.original-molecule-grid figcaption{font-weight:600;font-size:13px;color:#43614f;}
+.original-molecule-grid svg{width:100%;height:auto;max-height:155px;display:block;object-fit:contain;}
+@media(max-width:640px){.original-exam-result{margin:10px;padding:18px;}.original-molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}.original-molecule-grid figure{padding:6px;}}
+
+
+/* Exam redraws: chemically connected atom-bond vector drawings */
+.mol-graph-svg{display:block;width:100%;min-width:0;max-width:100%;height:150px;object-fit:contain;overflow:visible}
+.paper-correct-scheme{border:1px solid #9bc6a7;background:#eff9f1;border-radius:14px;padding:14px;margin:14px 0}
+.paper-correct-scheme>b{display:block;color:#235a39;margin-bottom:9px}
+.paper-correct-scheme .original-molecule-grid{margin:8px 0}
+.original-molecule-grid figure.is-correct-structure{border-color:#70b785;background:#fff;box-shadow:inset 0 0 0 2px #e2f6e8}
+.paper-concept-scheme{padding:13px;border-radius:12px;background:#fff;border:1px solid #d9e4dc;overflow-x:auto}
+.paper-concept-scheme>strong{display:block;margin-bottom:6px}
+.paper-concept-scheme svg{display:block;width:100%;min-width:470px;height:auto}
+.paper-concept-scheme small{display:block;color:#506959}
+@media (max-width:600px){.mol-graph-svg{height:125px}.paper-concept-scheme svg{min-width:390px}}
+
+
+/* Chemistry mechanism reading flow: electron source → intermediate → rationale */
+.paper-mechanism{margin:16px 0 9px;border-radius:15px;padding:14px;background:#f7f9f5;border:1px solid #bbd1be}
+.paper-mechanism h4{margin:3px 0 12px;font-size:16px;line-height:1.5}
+.paper-mechanism-step{padding:12px 15px;background:#fff;border:1px solid #dce7dc;border-radius:12px;line-height:1.8}
+.paper-mechanism-step-title{font-weight:750;color:#23583d}
+.paper-mechanism-formula{font-weight:650;font-size:16px;margin:7px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.paper-mechanism-step p{color:#42574b;margin:3px 0;font-size:14px}
+.paper-mechanism-arrow{text-align:center;font-size:24px;color:#477456;line-height:1.6}
+.original-old-review{margin:15px 0 5px;border-top:1px solid #e2e9e1;padding-top:14px}
+
+
+.paper-electron-diagram{background:#f8fcf8;border:1px solid #abc7ae;border-radius:14px;padding:14px;margin:15px 0}
+.paper-electron-diagram h4{margin:4px 0 12px;line-height:1.6;font-size:16px}
+.paper-electron-diagram svg{display:block;width:100%;min-width:430px;height:auto;background:white;border-radius:12px}
+.paper-electron-diagram{overflow-x:auto}
+.paper-electron-diagram ol{margin:10px 0 8px;padding-left:22px;line-height:1.9}
+.paper-electron-diagram p{color:#46634d;font-size:13px;margin-bottom:2px}
+
+
+/* Original paper: typed reaction products and three-part structural deduction */
+.structure-deduction-fields{display:grid;gap:12px;margin:17px 0;}
+.structure-deduction-fields>p{font-size:14px;color:#59685c;line-height:1.7;}
+.structure-deduction-fields label{display:grid;gap:7px;padding:12px;border:1px solid #d6e2d7;border-radius:12px;background:#fff;}
+.structure-deduction-fields label span{font-weight:700;}
+.structure-deduction-fields input{width:100%;min-height:44px;border:1px solid #acbcaf;border-radius:8px;padding:10px 12px;font:inherit;color:inherit;background:#fff;}
+.structure-deduction-fields input:focus-visible{outline:3px solid #9ac2a1;outline-offset:2px;}
+.paper-chem-intro{margin:15px 0;line-height:1.8;}
+.original-chem-reaction-figure svg{height:175px;max-height:220px;}
+.paper-structure-part-scores{display:grid;gap:9px;margin:14px 0;}
+.paper-structure-part-scores>div{display:flex;align-items:center;flex-wrap:wrap;gap:10px;background:#f4f7f5;padding:11px 13px;border-radius:9px;}
+.paper-structure-part-scores>div span{flex:1;min-width:170px;overflow-wrap:anywhere;}
+.paper-structure-part-scores>div strong{font-size:12px;}
+@media(max-width:600px){.structure-deduction-fields label{padding:10px;}.original-chem-reaction-figure svg{height:140px;}}
+
+
+/* Scanned 2020/2022 iodoform: chemical-structure and curved-arrow teaching review */
+.paper-iodoform-mechanism{margin:16px 0;border:1px solid #a9c7ad;border-radius:14px;padding:16px;background:#f7fbf8;line-height:1.8}
+.paper-iodoform-mechanism h4{font-size:16px;color:#23593b;margin:4px 0 14px}
+.paper-iodoform-mechanism>.paper-iodoform-graphs{padding:3px 0 12px}
+.paper-iodoform-mechanism .original-molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:740px;gap:9px}
+.paper-iodoform-mechanism .original-molecule-grid figure{background:#fff;min-width:0}
+.paper-iodoform-mechanism>svg{display:block;max-width:100%;width:100%;height:auto;overflow:visible;margin:7px 0 18px;border:1px solid #d4e4d8;border-radius:12px;background:#fff}
+.paper-iodoform-mechanism .paper-mechanism-step{margin:9px 0}
+.paper-iodoform-mechanism .paper-mechanism-step>strong{display:block;color:#215337}
+.paper-iodoform-mechanism .paper-mechanism-step p{margin:4px 0;font-size:14px;line-height:1.8}
+.paper-iodoform-mechanism .paper-mechanism-formula{font-size:15px;overflow-wrap:anywhere}
+@media(max-width:580px){.paper-iodoform-mechanism{padding:10px}.paper-iodoform-mechanism .original-molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.paper-iodoform-mechanism .paper-mechanism-step{padding:10px}.paper-iodoform-mechanism>svg{min-width:540px}.paper-iodoform-mechanism{overflow-x:auto}}
+
+
+/* Day19/20 source-accurate chemical SVG enlargement: single figures use full phone width. */
+.original-molecule-grid>figure:only-child{grid-column:1/-1}
+.paper-correct-scheme .original-molecule-grid>figure:only-child,
+.paper-chem-intro .original-molecule-grid>figure:only-child{max-width:100%}
+.paper-zoom-trigger{display:block;margin:10px 0 0 auto;padding:7px 12px;font:inherit;font-weight:650;font-size:12px;color:#255d3d;background:#eef8f0;border:1px solid #a5cdb0;border-radius:8px;cursor:pointer}
+.paper-zoom-trigger:hover,.paper-zoom-trigger:focus-visible{background:#dcefe1;outline:2px solid #8eb8a0;outline-offset:2px}
+.paper-zoom-dialog{width:min(940px,95vw);max-width:95vw;max-height:91vh;padding:0;border:1px solid #b4cbb9;border-radius:16px;color:#193e29;background:#fff;box-shadow:0 12px 48px #0004}
+.paper-zoom-dialog::backdrop{background:#091f14c9}
+.paper-zoom-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 17px;border-bottom:1px solid #d4e4d8;position:sticky;top:0;z-index:1;background:#fff}
+.paper-zoom-head strong{font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.paper-zoom-art{padding:16px 14px 22px;max-height:calc(91vh - 90px);overflow:auto}
+.paper-zoom-art svg,.paper-zoom-art .mol-graph-svg{display:block;width:100%;max-width:860px;height:auto;min-height:245px;max-height:70vh;margin:auto;object-fit:contain}
+.paper-zoom-art.is-wide svg{min-width:680px;min-height:260px}
+@media(max-width:640px){
+ .paper-chem-intro .original-molecule-grid,
+ .paper-correct-scheme .original-molecule-grid{grid-template-columns:minmax(0,1fr)}
+ .paper-chem-intro .original-molecule-grid svg,
+ .paper-correct-scheme .original-molecule-grid svg{max-height:220px}
+ .paper-zoom-head{align-items:start;padding:10px 12px}
+ .paper-zoom-head .btn{white-space:nowrap;font-size:12px}
+ .paper-zoom-art{padding:12px 10px 18px}
+}
