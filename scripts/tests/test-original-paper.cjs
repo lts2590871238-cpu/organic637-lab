@@ -239,6 +239,22 @@ assert.equal(imide.bonds.filter(b=>b[2]===2&&
 const cationQ=questions.find(q=>q.examSource.year===2019&&q.examSource.originalQuestion==='三、单项选择题7');
 assert.equal(cationQ.answer,'d');
 const cationNames=['环己基甲基正离子','二环己基甲基正离子','苄基正离子','二苯甲基正离子'];
+const carbocationImplicitH=['CH₂⁺','CH⁺','CH₂⁺','CH⁺'];
+for(let i=0;i<cationNames.length;i++){
+ const svg=chem.draw(cationNames[i]);
+ assert.ok(svg.includes(carbocationImplicitH[i]),
+  'scanned 2019 p35 q7 carbon-positive center has incorrect implicit H in drawn SVG: '+cationNames[i]);
+}
+for(const name of ['间硝基苯甲酸','对硝基苯甲酸']){
+ const [atoms,bonds]=chem.graphTemplates[name];
+ const nitrogen=atoms.findIndex(a=>a[2]==='N+'),anionicO=atoms.findIndex(a=>a[2]==='O−');
+ assert.ok(nitrogen>=0&&anionicO>=0);
+ assert.ok(bonds.some(([u,v,order])=>order===1&&((u===nitrogen&&v===anionicO)||(v===nitrogen&&u===anionicO))),
+  'nitro source should use formal N+–O− single bond: '+name);
+ assert.ok(bonds.some(([u,v,order])=>order===2&&((u===nitrogen&&atoms[v][2]==='O')||(v===nitrogen&&atoms[u][2]==='O'))),
+  'nitro source should also contain N=O bond: '+name);
+}
+
 assert.deepEqual(Array.from(chem.optionStructureNames(cationQ)),cationNames,'2019 p35 q7 old scanned option identities mismatched');
 for(const [name,expect] of cationNames.map((name,i)=>[name,[0,0,3,6][i]])){
  const [atoms,bonds]=chem.graphTemplates[name];
