@@ -40,7 +40,42 @@ function conceptSvg(q){
 
 
 const ELECTRON_DIAGRAMS={"carbonyl":{"title":"羰基亲核加成的两支电子对曲箭","pieces":["① :Nu⁻ 的孤对电子 → 羰基 Cδ⁺","② C=O π 键电子 → O","③ 四面体 O⁻ 中间体质子化"],"svg":"<svg viewBox=\"0 0 910 240\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"亲核试剂孤对向羰基碳进攻，同时碳氧双键π电子移向氧\">\n<defs><marker id=\"curve-head-carbonyl\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#167b59\"/></marker></defs>\n<g fill=\"#203f32\" font-family=\"Arial,sans-serif\" font-size=\"25\" text-anchor=\"middle\"><text x=\"105\" y=\"140\">:Nu⁻</text><text x=\"304\" y=\"145\">Cδ⁺</text><text x=\"304\" y=\"52\">Oδ⁻</text><text x=\"515\" y=\"136\">R₂C(Nu)–O⁻</text><text x=\"755\" y=\"136\">R₂C(Nu)–OH</text></g>\n<g stroke=\"#3e5c4a\" stroke-width=\"3\" fill=\"none\"><path d=\"M296,67 V111 M305,67 V111\"/><path d=\"M357,123 H397\"/><path d=\"M608,123 H661\"/></g>\n<g stroke=\"#167b59\" stroke-width=\"3.2\" fill=\"none\" marker-end=\"url(#curve-head-carbonyl)\"><path d=\"M145,128 Q207,70 277,124\"/><path d=\"M326,107 Q358,63 321,50\"/></g>\n<g fill=\"#576a5b\" font-family=\"Arial,sans-serif\" font-size=\"15\" text-anchor=\"middle\"><text x=\"212\" y=\"70\">孤对成 C–Nu σ 键</text><text x=\"382\" y=\"45\">π 电子转移</text><text x=\"628\" y=\"106\">H⁺</text><text x=\"296\" y=\"200\">两支曲箭在同一次加成步骤中同时发生</text></g></svg>"},"sn1":{"title":"SN1：先断 C–Br，后由孤对进攻碳正离子","pieces":["① C–Br 键电子对 → Br，形成 R⁺/Br⁻","② 正离子可发生 1,2-重排（视结构）","③ :Nu 的孤对 → R⁺，形成 C–Nu 键"],"svg":"<svg viewBox=\"0 0 910 240\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"SN1两阶段电子移动路径\"><defs><marker id=\"curve-head-sn1\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#167b59\"/></marker></defs><g fill=\"#203f32\" font-family=\"Arial,sans-serif\" font-size=\"26\" text-anchor=\"middle\"><text x=\"140\" y=\"126\">R</text><text x=\"236\" y=\"126\">Br</text><text x=\"430\" y=\"126\">R⁺ + Br⁻</text><text x=\"640\" y=\"135\">:Nu</text><text x=\"813\" y=\"126\">R–Nu</text></g><path d=\"M157,116 H210\" stroke=\"#405f4b\" stroke-width=\"3\"/><g stroke=\"#167b59\" stroke-width=\"3\" fill=\"none\" marker-end=\"url(#curve-head-sn1)\"><path d=\"M180,104 Q223,53 242,102\"/><path d=\"M678,126 Q738,57 785,106\"/></g><g fill=\"#586d61\" font-family=\"Arial,sans-serif\" font-size=\"15\" text-anchor=\"middle\"><text x=\"216\" y=\"62\">成键电子对给 Br</text><text x=\"426\" y=\"72\">慢：形成正离子</text><text x=\"737\" y=\"61\">孤对进攻 C⁺</text><text x=\"478\" y=\"204\">有重排条件时，应先检查正离子能否迁移到更稳定中心</text></g></svg>"},"hydride":{"title":"Friedel–Crafts：1,2-氢迁移的电子对曲箭","pieces":["① AlCl₃ 促进异丁基氯产生高活性亲电中心","② 邻位 C–H σ 键电子随 H 迁移至 CH₂⁺","③ 正电荷转移到原来的 CH，成为更稳定的叔丁基中心"],"svg":"<svg viewBox=\"0 0 910 240\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"氢从相邻碳连同碳氢成键电子对迁移至一级碳正离子\"><defs><marker id=\"curve-head-hydride\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"#167b59\"/></marker></defs><g fill=\"#203f32\" font-family=\"Arial,sans-serif\" font-size=\"25\" text-anchor=\"middle\"><text x=\"120\" y=\"125\">(CH₃)₂</text><text x=\"240\" y=\"125\">CH</text><text x=\"355\" y=\"125\">CH₂⁺</text><text x=\"242\" y=\"48\">H</text><text x=\"665\" y=\"125\">(CH₃)₃C⁺</text></g><g stroke=\"#3e5c4a\" stroke-width=\"3\"><path d=\"M176,116 H213 M264,116 H316 M242,60 V98\"/></g><path d=\"M260,76 Q360,15 364,104\" stroke=\"#167b59\" stroke-width=\"3.4\" fill=\"none\" marker-end=\"url(#curve-head-hydride)\"/><g fill=\"#526e5e\" text-anchor=\"middle\" font-family=\"Arial,sans-serif\" font-size=\"15\"><text x=\"351\" y=\"34\">σ(C–H) 电子对迁移</text><text x=\"475\" y=\"125\" font-size=\"30\">→</text><text x=\"666\" y=\"165\">三级碳正离子更稳定</text><text x=\"481\" y=\"213\">迁移的是带有键电子对的 H，不是自由氢原子；随后苯环 π 电子进攻叔丁基中心</text></g></svg>"}};
-const ELECTRON_TABLE={"2019:三、单项选择题8":"carbonyl","2019:三、单项选择题9":"sn1","2022:二、选择题5":"hydride","2022:二、选择题6":"sn1","2015:三、按指定性质排序6":"sn1","2017:三、按指定性质排序3":"sn1","2014:三、按指定性质排序6":"carbonyl"};
+// E1 is elimination, not an SN1 substitution. Electron pair from Cβ–H
+// makes Cα=Cβ; no Nu→Cα addition should be depicted in this original 2015 q6.
+ELECTRON_DIAGRAMS.e1={
+  title:'E1 消除：先电离产生碳正离子，再由碱夺取 β-H 成双键',
+  pieces:[
+    '① Cα–Br 键电子对移向 Br，产生 Cα⁺ 与 Br⁻；普通 E1 的电离是慢步骤',
+    '② 溶剂／碱 B: 的孤对电子进攻邻位 Hβ；Cβ–H 键电子同时移向 Cα–Cβ 键之间',
+    '③ 建立 Cα=Cβ π 键形成烯烃，得到 B–H⁺；这不是 Nu: 进攻 Cα⁺ 生成 C–Nu 的 SN1 取代'
+  ],
+  svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 300" role="img" aria-label="E1消除：先C-Br异裂形成碳正离子；然后碱夺取beta氢，碳氢键电子生成碳碳双键">
+  <defs><marker id="e1ArrowHead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#167b59"/></marker></defs>
+  <rect x="10" y="13" width="375" height="260" rx="14" fill="#f7fbf7" stroke="#bdd3c1"/>
+  <text x="25" y="37" font-size="17" fill="#28533a">第一步 · 离去基电离（限速）</text>
+  <g font-size="27" fill="#243f31" text-anchor="middle"><text x="105" y="124">Cα</text><text x="212" y="124">Br</text><text x="305" y="124">Cα⁺</text></g>
+  <path d="M126 114 H184" stroke="#405b48" stroke-width="3"/>
+  <path d="M152 102 Q199 51 227 105" fill="none" stroke="#167b59" stroke-width="3.3" marker-end="url(#e1ArrowHead)"/>
+  <text x="200" y="70" font-size="12" fill="#345747">σ(C–Br) → Br</text>
+  <text x="157" y="205" font-size="17" fill="#345747">C–Br → C⁺ + Br⁻</text>
+  <rect x="404" y="13" width="535" height="260" rx="14" fill="#f7fbf7" stroke="#bdd3c1"/>
+  <text x="419" y="37" font-size="17" fill="#28533a">第二步 · 脱 β-H 形成烯烃</text>
+  <g font-size="26" fill="#243f31" text-anchor="middle">
+    <text x="480" y="172">B:</text><text x="615" y="109">Hβ</text>
+    <text x="620" y="174">Cβ</text><text x="754" y="174">Cα⁺</text>
+  </g>
+  <path d="M620 146 V121 M644 165 H723" stroke="#405b48" stroke-width="3"/>
+  <g fill="none" stroke="#167b59" stroke-width="3.4" marker-end="url(#e1ArrowHead)">
+    <path d="M499 161 Q540 85 592 107"/>
+    <path d="M636 135 Q695 82 696 158"/>
+  </g>
+  <text x="487" y="78" font-size="14" fill="#345747">B: → Hβ</text>
+  <text x="747" y="89" font-size="13" fill="#345747">σ(Cβ–H) → Cα=Cβ</text>
+  <text x="675" y="225" font-size="20" text-anchor="middle" fill="#345747">Cα=Cβ + BH⁺</text>
+</svg>`
+};
+
+const ELECTRON_TABLE={"2019:三、单项选择题8":"carbonyl","2019:三、单项选择题9":"sn1","2022:二、选择题5":"hydride","2022:二、选择题6":"sn1","2015:三、按指定性质排序6":"e1","2017:三、按指定性质排序3":"sn1","2014:三、按指定性质排序6":"carbonyl"};
 function electronSvg(q){
  const key=q?.examSource?.year+':'+q?.examSource?.originalQuestion,
    spec=ELECTRON_DIAGRAMS[ELECTRON_TABLE[key]];
