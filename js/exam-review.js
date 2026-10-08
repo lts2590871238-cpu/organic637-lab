@@ -84,7 +84,7 @@
     return '<svg class="paper-scheme" viewBox="0 0 850 185" role="img" aria-label="化学结构式与反应路径图"><defs><marker id="'+id+'" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><rect x="9" y="22" width="355" height="145" rx="12" class="scheme-box"/><rect x="489" y="22" width="352" height="145" rx="12" class="scheme-box"/><text x="25" y="42" class="scheme-title">起始结构 / 已知条件</text><text x="505" y="42" class="scheme-title">产物 / 判别结论</text><g class="scheme-chem">'+segment(ra,185)+segment(rb,665)+'</g><line x1="375" y1="97" x2="475" y2="97" stroke="currentColor" stroke-width="3" marker-end="url(#'+id+')"/></svg>';
   }
   function illustration(q,guide){
-    if(q.examSource)return '<div class="paper-chemical-visual">'+(NS.OriginalChem?.answerFor(q)||'<p class="paper-scheme-notice">本题正确答案的结构图仍待审校；暂仅展示经校对的文字推导。</p>')+(NS.OriginalChem?.reasoningFor(q)||'')+'</div>';
+    if(q.examSource)return '<div class="paper-chemical-visual">'+(NS.OriginalChem?.answerFor(q)||'<p class="paper-scheme-notice">本题正确答案的结构图仍待审校；暂仅展示经校对的文字推导。</p>')+(NS.OriginalChem?.reasoningFor(q)||'')+(NS.OriginalChem?.electronSvg(q)||'')+'</div>';
     const original=q.stemStructure?.svg||q.svg||q.baseSvg;
     return '<div class="paper-chemical-visual"><p class="paper-scheme-notice">这里先展示文本结构与反应方向示意，不是原卷键线结构式。涉及立体构型须以原题结构图为准。</p>'+scheme(q,guide)+(original?'<details class="paper-original-figure"><summary>查看题目原始结构／机理反应图</summary><div class="paper-trusted-svg">'+original+'</div></details>':'')+'</div>';
   }
