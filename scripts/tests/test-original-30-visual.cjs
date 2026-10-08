@@ -44,7 +44,10 @@ const dir='test-results/original-30';fs.mkdirSync(dir,{recursive:true});
      assert.equal(await page.locator('details.paper-details[open]').count(),5);
      assert.equal(await page.locator('.original-source-label').count(),5);
      assert.equal(await page.locator('.paper-comparison').count(),5);
-     assert.equal(await page.locator('.paper-correct-scheme, .paper-concept-scheme').count(),5,'must have own redrawn answer drawing');
+     const renderCount=await page.locator('.paper-correct-scheme, .paper-concept-scheme').count();
+     assert.ok(renderCount>=5,'not all answer structures drawn: '+renderCount);
+     const missing=await page.locator('.paper-question').evaluateAll(rows=>rows.filter((node)=>!node.querySelector('.paper-explanation .paper-correct-scheme, .paper-explanation .paper-concept-scheme')).map(n=>n.id));
+     assert.deepEqual(missing,[],'questions missing their own independent answer rendering');
      const errors=await page.evaluate(()=>{
        const problems=[];
        document.querySelectorAll('.paper-question svg').forEach((svg,i)=>{
