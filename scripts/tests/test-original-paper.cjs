@@ -32,6 +32,13 @@ let recognizedSvg=0, recognizedAnswers=0;
 for(const [name,[atoms,bonds]] of Object.entries(chem.graphTemplates)) {
  assert.ok(atoms.length>=1,'empty structure '+name);
  for(const [i,j,order] of bonds){assert.ok(atoms[i]&&atoms[j], 'broken atom bond index '+name);assert.ok([1,2,3].includes(order),'unsupported bond order '+name);}
+ // This static check rejects impossible total bond orders; actual structure identity
+ // still requires comparison against the original scanned drawing.
+ for(let atomId=0;atomId<atoms.length;atomId++){
+  const label=atoms[atomId][2],total=bonds.reduce((n,e)=>n+(e[0]===atomId||e[1]===atomId?e[2]:0),0);
+  const max=['O','O−'].includes(label)?2:['OH','Br','Cl','F'].includes(label)?1:['·','+'].includes(label)?3:4;
+  assert.ok(total<=max,'chemically impossible bond-order sum '+name+' atom '+atomId+': '+total+'/'+max);
+ }
 }
 for(const q of questions){
  const src=q.examSource;
