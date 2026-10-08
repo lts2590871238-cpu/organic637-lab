@@ -518,3 +518,5 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 .paper-answer-note{background:#eaf5ec;border-radius:12px;padding:15px;overflow-wrap:anywhere;}
 .paper-question[hidden]{display:none;}
 @media(max-width:640px){.paper-review{padding:0 10px;}.paper-review-head,.paper-question{padding:15px;border-radius:16px;}.paper-comparison{grid-template-columns:1fr;}.paper-option{align-items:flex-start;flex-wrap:wrap;}.paper-option em{margin-left:40px;}.paper-explanation{padding:12px;}}
+
+.paper-jump button{width:36px;height:36px;display:grid;place-items:center;border:0;border-radius:11px;background:#e6f5ea;color:#225b39;font-weight:700;cursor:pointer;}.paper-jump button.wrong{background:#fff0e9;color:#963e2b;}
