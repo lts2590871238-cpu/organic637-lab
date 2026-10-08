@@ -1,6 +1,6 @@
-/* Source-linked original mixed exam: 30 items / 15 per day. Editorial 3-pass review NOT complete. */
+/* Original scan-indexed mixed exams. Chemistry triple review still pending. */
 (()=>{'use strict';const ns=window.Organic637=window.Organic637||{};ns.OriginalExamDraft={
-  "version": "2026-10-08-mixed-chemistry-v2",
+  "version": "2026-10-08-mixed-synthesis-v3",
   "status": "partial_three_pass_pending",
   "questions": [
     {
@@ -1638,74 +1638,88 @@
       "hold": false
     },
     {
-      "id": "exam-2015-extra-08",
+      "id": "orig-2020-vii-2-aldol-synthesis",
       "day": 20,
-      "type": "ranking",
+      "type": "synthesis-steps",
       "role": "exam",
-      "primarySkill": "exam.original",
+      "primarySkill": "synthesis.cross_aldol",
       "skillIds": [
-        "exam.original"
+        "synthesis.cross_aldol"
       ],
-      "difficulty": 3,
+      "difficulty": 5,
       "points": 10,
-      "prompt": "亲电取代反应活性由强到弱排列。",
-      "items": [
+      "prompt": "（2020年原卷第七大题第2题）由苯乙酮 PhCOCH₃ 与环戊酮为指定起始原料，合成原卷图示的 1-(2-氧代-2-苯乙基)环戊醇（环戊烷的同一个碳上连接 –OH 与 –CH₂COPh）。请先写你的合成方案，再填写一条参考路线的关键三步，交卷后比较完整机理。注意原卷是开放式合成题，网页的三步分项评分只针对这一条参考路线。",
+      "formula": "苯乙酮 Ph–CO–CH₃ + 环戊酮  →  1-(2-氧代-2-苯乙基)环戊烷-1-醇（β-羟基酮）",
+      "parts": [
         {
-          "id": "a",
-          "label": "A：苯"
+          "id": "base",
+          "label": "第1步：用于预先形成苯乙酮烯醇盐的强碱"
         },
         {
-          "id": "b",
-          "label": "B：吡啶"
+          "id": "electrophile",
+          "label": "第2步：向已形成的烯醇盐中加入哪一个羰基底物"
         },
         {
-          "id": "c",
-          "label": "C：甲苯"
-        },
-        {
-          "id": "d",
-          "label": "D：苯酚"
+          "id": "workup",
+          "label": "第3步：温和质子化后处理"
         }
       ],
-      "answer": [
-        "d",
-        "c",
-        "a",
-        "b"
-      ],
-      "correctOrder": [
-        "d",
-        "c",
-        "a",
-        "b"
-      ],
-      "examSource": {
-        "school": "南京工业大学",
-        "year": 2015,
-        "printedSubjectCode": "816",
-        "scanFile": "扫描件_260725_205723(1).pdf",
-        "pdfPage": 54,
-        "originalQuestion": "三、按指定性质排序1",
-        "sourceType": "从历年扫描真题转录，待三轮审校",
-        "scanQuality": "人工可辨",
-        "originalPoints": 2,
-        "scoreNote": "当日混合卷每题等权折算10分；原卷该题2分"
-      },
-      "explanationLayers": {
-        "short": "独立解析见 examGuide。",
-        "why": "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。",
-        "full": "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。\n\n苯酚的 –OH 通过孤对共振供电子显著活化芳环；甲苯的 –CH₃ 通过超共轭弱致活化；苯处于中间。\n\n吡啶环氮吸电子，使芳环亲电取代明显困难，通常是四者中最慢。\n\n因此 D（苯酚） > C（甲苯） > A（苯） > B（吡啶）。"
-      },
-      "examGuide": {
-        "correctSummary": "D：苯酚 > C：甲苯 > A：苯 > B：吡啶",
-        "steps": [
-          "亲电芳香取代中，环电子密度越高，通常越易形成和稳定 σ 络合物。含有致活化取代基的芳环反应更快。",
-          "苯酚的 –OH 通过孤对共振供电子显著活化芳环；甲苯的 –CH₃ 通过超共轭弱致活化；苯处于中间。",
-          "吡啶环氮吸电子，使芳环亲电取代明显困难，通常是四者中最慢。",
-          "因此 D（苯酚） > C（甲苯） > A（苯） > B（吡啶）。"
+      "answer": {
+        "base": [
+          "LDA",
+          "二异丙基氨基锂",
+          "LDA/THF",
+          "LDA, THF",
+          "LDA -78°C",
+          "LiHMDS",
+          "KHMDS",
+          "NaHMDS"
+        ],
+        "electrophile": [
+          "环戊酮",
+          "cyclopentanone",
+          "cyclopentan-1-one"
+        ],
+        "workup": [
+          "饱和氯化铵水溶液",
+          "饱和NH4Cl水溶液",
+          "NH4Cl(aq)",
+          "NH4Cl",
+          "氯化铵水溶液",
+          "H3O+",
+          "稀酸水解",
+          "温和酸性水解"
         ]
       },
-      "hold": false
+      "examSource": {
+        "school": "南京工业大学",
+        "year": 2020,
+        "printedSubjectCode": "816",
+        "scanFile": "扫描件_260725_205723(1).pdf",
+        "pdfPage": 31,
+        "originalQuestion": "七、合成题2",
+        "originalPoints": 8,
+        "scoreNote": "原卷8分开放式合成题；网站仅将参考路线的三项关键操作折算为10分",
+        "sourceType": "原卷题意＋网页分步骤交互改编，非原题逐字作答界面",
+        "scanQuality": "起始原料与目标骨架已核对，条件可有合理替代路线"
+      },
+      "examGuide": {
+        "title": "交叉羟醛加成的化学选择性：为什么要先制备苯乙酮烯醇盐？",
+        "correctSummary": "LDA/THF（低温）预先形成 PhCOCH₂⁻ 烯醇盐 → 加入环戊酮让 α-C 进攻其羰基 C → 温和 NH₄Cl(aq) 后处理，得到 β-羟基酮 PhCOCH₂–C(OH)(环戊烷1位)",
+        "steps": [
+          "首先识别指定原料的两个羰基：苯乙酮在甲基侧含 α-H，强碱可以夺取形成共振稳定烯醇盐；环戊酮也可发生烯醇化，若起初把两种酮和碱混在一起，容易出现竞争性自身/交叉羟醛反应。因此先在干燥 THF、低温条件下用 LDA 预先生成苯乙酮烯醇盐，是一种控制交叉选择性的方案。",
+          "LDA 从苯乙酮的甲基夺取 α-H，C–H 电子参与形成 Cα=C(O⁻)–Ph 的烯醇盐共振结构。此时 α-碳具有亲核性。注意烯醇盐的负电荷可以画在 O 上，但它与具有亲核 α-碳的共振式代表同一离域体系，不能误以为只会从氧进攻。",
+          "在烯醇盐形成之后，再滴加环戊酮。苯乙酮 α-碳向环戊酮的羰基碳形成一根新的 C–C σ 键；环戊酮 C=O 的 π 电子转移到其氧上，得到环戊烷1位同时连 CH₂COPh 取代基和 O⁻ 的四面体烷氧中间体。",
+          "用饱和 NH₄Cl 水溶液等温和质子源处理，把环上的 O⁻ 质子化为 OH。苯乙酮原有的 Ph–C(=O)–片段保留，生成 β-羟基酮。避免强酸加热等脱水条件，否则可进一步生成共轭的 α,β-不饱和酮，与题目目标中的 OH 不符。",
+          "碳骨架核对：苯乙酮 C₈H₈O 与环戊酮 C₅H₈O 相加得到 C₁₃H₁₆O₂（羟醛加成没有脱水损失）。目标是环戊烷1位同连 OH 和 –CH₂–C(=O)–Ph，不是把酮误画成连在芳环上的醇，也不是单独产生烯烃。",
+          "此题原卷属于开放式合成，允许其它化学上可行的路线。网页内 base/electrophile/workup 三项自动判分只对应这里给出的参考路线；学生填写的自由路线另行保存用于自查，不自动宣布其它路线化学错误。"
+        ]
+      },
+      "explanationLayers": {
+        "short": "采用预生成的苯乙酮烯醇盐，C-亲核加成环戊酮后温和质子化，得到保留羟基的 β-羟基酮。",
+        "why": "预成烯醇盐控制交叉选择性，环戊酮羰基是新的C–C成键受体；温和处理避免进一步脱水。",
+        "full": "首先识别指定原料的两个羰基：苯乙酮在甲基侧含 α-H，强碱可以夺取形成共振稳定烯醇盐；环戊酮也可发生烯醇化，若起初把两种酮和碱混在一起，容易出现竞争性自身/交叉羟醛反应。因此先在干燥 THF、低温条件下用 LDA 预先生成苯乙酮烯醇盐，是一种控制交叉选择性的方案。\n\nLDA 从苯乙酮的甲基夺取 α-H，C–H 电子参与形成 Cα=C(O⁻)–Ph 的烯醇盐共振结构。此时 α-碳具有亲核性。注意烯醇盐的负电荷可以画在 O 上，但它与具有亲核 α-碳的共振式代表同一离域体系，不能误以为只会从氧进攻。\n\n在烯醇盐形成之后，再滴加环戊酮。苯乙酮 α-碳向环戊酮的羰基碳形成一根新的 C–C σ 键；环戊酮 C=O 的 π 电子转移到其氧上，得到环戊烷1位同时连 CH₂COPh 取代基和 O⁻ 的四面体烷氧中间体。\n\n用饱和 NH₄Cl 水溶液等温和质子源处理，把环上的 O⁻ 质子化为 OH。苯乙酮原有的 Ph–C(=O)–片段保留，生成 β-羟基酮。避免强酸加热等脱水条件，否则可进一步生成共轭的 α,β-不饱和酮，与题目目标中的 OH 不符。\n\n碳骨架核对：苯乙酮 C₈H₈O 与环戊酮 C₅H₈O 相加得到 C₁₃H₁₆O₂（羟醛加成没有脱水损失）。目标是环戊烷1位同连 OH 和 –CH₂–C(=O)–Ph，不是把酮误画成连在芳环上的醇，也不是单独产生烯烃。\n\n此题原卷属于开放式合成，允许其它化学上可行的路线。网页内 base/electrophile/workup 三项自动判分只对应这里给出的参考路线；学生填写的自由路线另行保存用于自查，不自动宣布其它路线化学错误。"
+      }
     },
     {
       "id": "orig-2020-ii-5-intramolecular-fc",
