@@ -601,6 +601,7 @@
   }
 
   function dayPage(day) {
+    if(day===19||day===20)return originalDayExamPage(day);
     const v16 = NS.Learning.ensureV16RootState(Store.state);
     const plan = NS.V16Director?.getDayPlan?.(day);
     if (v16.enabled && plan) {
@@ -1268,6 +1269,93 @@
         if(!state.responses.some(r=>r.questionId===question.id))state.responses.push({questionId:question.id,payload:submission.payload,correct:submission.correct,partialScore:Number(submission.partialScore||0)});
         Store.save();
       }
+    });
+  }
+
+  // The two final days use traceable original-exam questions. Existing legacy results
+  // stay in their original keys; never mutate old question IDs or past attempts.
+  function originalQuestions(day) {
+    return (NS.OriginalExamDraft?.questions||[]).filter(q=>q.day===day&&!q.hold);
+  }
+  function originalExamResultPage(day) {
+    const key='originalDay'+day,result=Store.state.examResults?.[key];
+    if(!result)return originalDayExamPage(day);
+    shell(`<main class="original-exam-result"><div class="kicker">Day ${day} · 历年真题混合卷</div><h1>本次折算成绩</h1><div class="original-exam-score"><strong>${Number(result.score150||0)} / 150</strong><span>${Number(result.percent||0)}% · ${Number(result.responseCount||0)} 道已交卷</span></div><p>每道题都来自扫描真题，原卷该题为2分；本混合卷每题等权折算为10分。这里是模拟成绩，并非某一年原卷的原始得分。</p><div class="btn-row"><button class="btn primary" id="originalPaper">← 返回试题卷 · 查看自己选项和逐题详解</button><button class="btn ghost" id="originalRetry">↻ 刷新重做</button><button class="btn soft" id="originalHome">回首页</button></div></main>`,'study');
+    $('#originalPaper').onclick=()=>{location.hash='#original-review/'+day;originalReviewPage(day);};
+    $('#originalRetry').onclick=()=>originalExamRetry(day);
+    $('#originalHome').onclick=()=>{location.hash='#welcome';};
+  }
+  function originalExamRetry(day) {
+    if(!confirm('确定重新作答第'+day+'天历年真题卷吗？原成绩将归档，原来的学习记录不会删除。'))return;
+    const key='originalDay'+day;
+    archiveExamReview('original-'+day,Store.state.examResults?.[key]);
+    delete Store.state.examResults[key];
+    Store.state.originalExamDrafts ||= {};
+    Store.state.originalExamDrafts[key]={index:0,responses:[],startedAt:Date.now()};
+    Store.save();
+    location.hash='#day/'+day;originalDayExamPage(day);
+  }
+  function originalReviewPage(day) {
+    const key='originalDay'+day,result=Store.state.examResults?.[key];
+    if(!result)return originalDayExamPage(day);
+    const byId=new Map((result.responses||[]).map(x=>[x.questionId,x]));
+    const rows=originalQuestions(day).map(question=>{
+      const r=byId.get(question.id);
+      return {question,hasEvidence:Boolean(r),correct:r?.correct===true,partialScore:r?.partialScore??null,payload:r?.payload??null};
+    });
+    shell('<div id="paperReviewRoot"></div>','study');
+    NS.ExamReview.render($('#paperReviewRoot'),{
+      title:'DAY '+day+' · 历年真题混合卷原答卷',
+      scoreLabel:Number(result.score150||0)+' / 150（混合模拟折算）',
+      rows,
+      onBack:()=>{location.hash='#original-result/'+day;originalExamResultPage(day);},
+      onRetry:()=>originalExamRetry(day)
+    });
+  }
+  function originalDayExamPage(day) {
+    const bank=originalQuestions(day),key='originalDay'+day;
+    if(!bank.length)return shell('<section class="panel"><h1>本日真题尚未核验完成</h1><p>为了保证答案准确，暂不开放无来源试题。</p></section>');
+    Store.state.examResults ||= {};
+    if(Store.state.examResults[key])return originalExamResultPage(day);
+    Store.state.originalExamDrafts ||= {};
+    let draft=Store.state.originalExamDrafts[key];
+    if(!draft||!Array.isArray(draft.responses))draft={index:0,responses:[],startedAt:Date.now()};
+    Store.state.originalExamDrafts[key]=draft;
+    draft.index=Math.max(Number(draft.index)||0,draft.responses.length);
+    if(draft.index>=bank.length) {
+      if(draft.responses.length!==bank.length){draft.index=draft.responses.length;Store.save();return originalDayExamPage(day);}
+      const total=bank.reduce((sum,q)=>sum+Number(q.points||0),0);
+      const raw=draft.responses.reduce((sum,r)=>sum+(Number(r.partialScore||0)*Number(bank.find(q=>q.id===r.questionId)?.points||0)),0);
+      const score=Math.round(raw/total*150*10)/10,percent=Math.round(raw/total*100);
+      Store.state.examResults[key]={score150:score,percent,responseCount:draft.responses.length,
+        completedAt:Date.now(),paperVersion:NS.OriginalExamDraft?.version,responses:JSON.parse(JSON.stringify(draft.responses))};
+      const progress=NS.Learning.ensureDayState(Store.state,day,REGISTRY);
+      progress.finished=true;progress.completedAt=Date.now();
+      Store.state.completedDays=[...new Set([...(Store.state.completedDays||[]),day])].sort((a,b)=>a-b);
+      Store.state.currentDay=Math.min(20,Math.max(Number(Store.state.currentDay)||1,day+1));
+      Store.save();location.hash='#original-result/'+day;
+      return originalExamResultPage(day);
+    }
+    const q=bank[draft.index];
+    const src=q.examSource;
+    shell(`<section class="panel question-shell original-exam-question"><div class="question-head"><div class="step-label">Day ${day} · 真题混合卷 · ${draft.index+1}/${bank.length}</div><span class="role-chip">10分（折算）</span></div><div class="paper-source-warning"><b>题源：</b>${src.year}年 · ${esc(src.originalQuestion)} · 第1份扫描PDF第${src.pdfPage}页 · 原题2分</div><div class="exam-warning">交卷前不显示答案；本题提交后锁定，不可回看修改。</div><div id="originalQuestionDiagram"></div><div id="interactionRoot"></div><div class="footer-actions"><button class="link-btn" id="originalExit">← 暂存退出</button><span class="tiny">结构图均为独立绘制的化学键线示意。</span></div></section>`,'study');
+    $('#originalQuestionDiagram').innerHTML=NS.OriginalChem?.figuresFor(q)||'';
+    $('#originalExit').onclick=()=>{Store.save();location.hash='#welcome';};
+    const started=performance.now();
+    NS.Interactions.mount($('#interactionRoot'),q,{
+      examMode:true,
+      onSubmit(submission){
+        if(draft.responses.some(row=>row.questionId===q.id))return;
+        draft.responses.push({questionId:q.id,payload:submission.payload,correct:submission.correct,
+          partialScore:Number(submission.partialScore||0),submittedAt:Date.now()});
+        const previous=(Store.state.attempts||[]).filter(r=>r.questionId===q.id&&r.mode==='original-exam').length;
+        NS.Learning.recordAttempt(Store.state,q,{day,mode:'original-exam',correct:submission.correct,
+          firstAttempt:previous===0,attemptNumber:previous+1,hintsUsed:0,confidence:submission.confidence,
+          responseTimeMs:Math.round(performance.now()-started),isTransfer:true,
+          answerPayload:submission.payload,partialScore:submission.partialScore,errorType:submission.errorType});
+        Store.save();
+      },
+      onNext(){draft.index=draft.responses.length;Store.save();originalDayExamPage(day);}
     });
   }
 
@@ -2288,7 +2376,9 @@
     if (detectiveMatch) return detectiveCasePage(decodeURIComponent(detectiveMatch[1]));
     const synthesisMatch = hash.match(/^#synthesis\/(.+)$/);
     if (synthesisMatch) return synthesisCasePage(decodeURIComponent(synthesisMatch[1]));
-    if (hash === '#full-exam/19') return full150ExamPage();
+    if (hash === '#full-exam/19') return originalDayExamPage(19);
+    const originalResultMatch=hash.match(/^#original-result\/(19|20)$/);if(originalResultMatch)return originalExamResultPage(Number(originalResultMatch[1]));
+    const originalReviewMatch=hash.match(/^#original-review\/(19|20)$/);if(originalReviewMatch)return originalReviewPage(Number(originalReviewMatch[1]));
     const reviewMatch=hash.match(/^#exam-review\/(core|full|legacy|day20)$/);if(reviewMatch)return examReviewPage(reviewMatch[1]);
     const dayMatch = hash.match(/^#day\/(\d+)$/);
     if (dayMatch) return dayPage(Number(dayMatch[1]));
