@@ -565,3 +565,11 @@ html,body{overflow-x:hidden}.cozy-app,.learning-page-wrap,.content-with-side,.pa
 .paper-mechanism-step p{color:#42574b;margin:3px 0;font-size:14px}
 .paper-mechanism-arrow{text-align:center;font-size:24px;color:#477456;line-height:1.6}
 .original-old-review{margin:15px 0 5px;border-top:1px solid #e2e9e1;padding-top:14px}
+
+
+.paper-electron-diagram{background:#f8fcf8;border:1px solid #abc7ae;border-radius:14px;padding:14px;margin:15px 0}
+.paper-electron-diagram h4{margin:4px 0 12px;line-height:1.6;font-size:16px}
+.paper-electron-diagram svg{display:block;width:100%;min-width:430px;height:auto;background:white;border-radius:12px}
+.paper-electron-diagram{overflow-x:auto}
+.paper-electron-diagram ol{margin:10px 0 8px;padding-left:22px;line-height:1.9}
+.paper-electron-diagram p{color:#46634d;font-size:13px;margin-bottom:2px}
