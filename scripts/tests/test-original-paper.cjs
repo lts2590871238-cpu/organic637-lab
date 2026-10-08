@@ -120,6 +120,11 @@ const methylNeighborC=lucasC.neighbors.some(i=>lucasC.adj[i].some(e=>!lucasC.rin
 assert.equal(methylNeighborC,true,'p59 Lucas C ring-adjacent carbon must bear methyl');
 const lucasQ=questions.find(q=>q.examSource.year===2014&&q.examSource.originalQuestion==='三、按指定性质排序8');
 assert.deepEqual([...lucasQ.correctOrder].join(','),'b,c,a','source-grounded tertiary > secondary > primary Lucas rate ordering');
+const lucasCurve=chem.electronSvg(lucasQ);
+assert.match(lucasCurve,/<h4>Lucas 反应/,'Lucas detailed electron flow diagram required');
+assert.match(lucasCurve,/C–O σ电子给O/,'Lucas carbon–oxygen bond electron pair departure missing');
+assert.match(lucasCurve,/Cl孤对进攻三级C/,'Lucas chloride capture must be drawn');
+assert.match(lucasCurve,/不能照搬/,'do not teach primary alcohols to react via free primary carbocations');
 const irQ=questions.find(q=>q.examSource.year===2018&&q.examSource.originalQuestion==='三、按指定性质排序3');
 assert.ok(irQ,'scanned p40 carbonyl IR original must be in current mixed paper');
 assert.deepEqual([...irQ.correctOrder].join(','),'b,a,c','p40 acyl fluoride > acyl chloride > conjugated methyl vinyl ketone');
