@@ -15,6 +15,7 @@ on:
       - 'scripts/tests/test-original-paper-review.cjs'
       - 'scripts/tests/test-original-paper-browser.cjs'
       - 'scripts/tests/test-original-full-journey.cjs'
+      - 'scripts/tests/test-original-30-visual.cjs'
       - 'styles.css'
       - 'app.js'
       - 'scripts/tests/test-original-paper.cjs'
@@ -23,7 +24,7 @@ on:
 jobs:
   original-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,10 +53,14 @@ jobs:
         run: node scripts/tests/test-original-paper-browser.cjs
       - name: Verify full 30-question exam flow and saving learner progress
         run: node scripts/tests/test-original-full-journey.cjs
+      - name: Full 30-question visual check on desktop and mobile
+        run: node scripts/tests/test-original-30-visual.cjs
       - name: Upload paper review screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: original-paper-review-screenshots
-          path: test-results/original-paper-*.png
+          path: |
+            test-results/original-paper-*.png
+            test-results/original-30/*.png
           if-no-files-found: ignore
