@@ -22,20 +22,37 @@ function draw(name){
  for(const [x,y,label] of coords)if(label){const t=label==='+'?'C⁺':label==='·'?(atoms.length===1?'CH₃·':'C·'):label;out+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="15" font-weight="600" fill="currentColor">'+escape(t)+'</text>';}
  return '<svg class="mol-graph-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(maxx-minx)+' '+(maxy-miny)+'" aria-label="'+escape(name)+'的重新绘制原子键线式" role="img"><g color="#253a31">'+out+'</g></svg>';
 }
+
+const SCHEMATIC={
+ '2020:一、选择题3':{title:'酸碱平衡的两步证据',nodes:['H₂O','R–C≡C–H','NH₃'],detail:['pKₐ≈15.7','pKₐ≈25','pKₐ≈38'],arrows:['酸性更强','酸性更强']},
+ '2019:三、单项选择题9':{title:'SN1 两步机理与可选的重排',nodes:['R–Br','R⁺ + Br⁻','R–Nu'],detail:['第一步：C–Br键电子给Br','碳正离子可1,2-迁移','第二步：Nu孤对进攻C⁺'],arrows:['离子化·慢','亲核进攻·快']},
+ '2019:三、单项选择题10':{title:'羰基伸缩振动来自键偶极变化',nodes:['R₂C=O','C ⇄ O 伸缩','1750–1680 cm⁻¹'],detail:['羰基极性大','振动引起偶极矩变化','对应原卷A项强吸收'],arrows:['键长变化','红外强峰']},
+ '2023:一、选择题7':{title:'环丁烷不是平面正方形',nodes:['纸上正方形','真实环丁烷微折叠','环内角≈88°'],detail:['平面模型90°','扭转以缓解重叠张力','小于90°·选C'],arrows:['真实构象','分子实测近似值']}
+};
+function conceptSvg(q){
+ const k=q?.examSource?.year+':'+q?.examSource?.originalQuestion,example=SCHEMATIC[k];
+ if(!example)return '';
+ const nodes=example.nodes.map((n,i)=>{const x=20+i*255;return '<rect x="'+x+'" y="26" width="224" height="107" rx="14" fill="#f8fbf8" stroke="#98bb9d"/><text x="'+(x+112)+'" y="64" text-anchor="middle" font-size="19" font-weight="650" fill="#294b37">'+escape(n)+'</text><text x="'+(x+112)+'" y="96" text-anchor="middle" font-size="11" fill="#486956">'+escape(example.detail[i])+'</text>'}).join('');
+ const arrows=example.arrows.map((t,i)=>'<text x="'+(247+i*255)+'" y="85" font-size="26" fill="#426a52">→</text><text x="'+(247+i*255)+'" y="111" text-anchor="middle" font-size="10" fill="#526959">'+escape(t)+'</text>').join('');
+ return '<div class="paper-concept-scheme"><strong>'+escape(example.title)+'</strong><svg viewBox="0 0 755 158" role="img" aria-label="'+escape(example.title)+'的独立机理和判断逻辑图">'+nodes+arrows+'</svg><small>示意图是机理／判断路径，用于解释原题；并非未给出结构的选项。</small></div>';
+}
+
 function optionsFor(q){
  const k=q?.examSource?.year+':'+q?.examSource?.originalQuestion;
  return MAP[k]||[];
 }
 function figuresFor(q){
+ const concept=conceptSvg(q);if(concept)return concept;
  const list=optionsFor(q);if(!list.some(Boolean))return '';
  return '<div class="original-molecule-grid">'+list.map((name,i)=>name?'<figure><figcaption>'+String.fromCharCode(65+i)+' · '+escape(name)+'</figcaption>'+draw(name)+'</figure>':'').join('')+'</div>';
 }
 function answerFor(q){
+ const concept=conceptSvg(q);if(concept)return '<div class="paper-correct-scheme"><b>正确答案的关键过程 · 重新绘制</b>'+concept+'</div>';
  const arr=optionsFor(q);
  const indices=q.type==='ranking'?(q.correctOrder||[]).map(id=>String(id).charCodeAt(0)-97):[String(q.answer||'').charCodeAt(0)-97];
  const chosen=indices.filter(i=>i>=0&&i<arr.length&&arr[i]&&G[arr[i]]);
  if(!chosen.length)return '';
  return '<div class="paper-correct-scheme"><b>正确答案 · 独立键线结构图</b><div class="original-molecule-grid">'+chosen.map((i,rank)=>'<figure class="is-correct-structure"><figcaption>'+(q.type==='ranking'?(rank+1)+'. ':'')+String.fromCharCode(65+i)+' · '+escape(arr[i])+'</figcaption>'+draw(arr[i])+'</figure>').join('')+'</div></div>';
 }
-NS.OriginalChem=Object.assign(NS.OriginalChem||{}, {draw, figuresFor,answerFor,graphTemplates:G,optionStructureNames:optionsFor});
+NS.OriginalChem=Object.assign(NS.OriginalChem||{}, {draw, figuresFor,answerFor,graphTemplates:G,optionStructureNames:optionsFor,conceptSvg});
 })();
