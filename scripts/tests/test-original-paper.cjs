@@ -26,6 +26,39 @@ assert.equal(w.Organic637.Interactions.evaluate(nmr,{fields:{...fourPart,methoxy
 const spectrumSVG=w.Organic637.OriginalChem.figuresFor(nmr);
 assert.match(spectrumSVG,/非原扫描实验曲线/);
 assert.match(spectrumSVG,/芳香环 4H/);
+// Topological scan audit, 2022 original p22 Q6:
+// A is allylic bromide (distance 1 bond to a C=C atom), B nonallylic
+// (2 bonds away), C bromocyclohexane (no C=C), D vinylic bromide (0).
+// This validates *atom connections*, not just SVG syntax or answer letters.
+function bromideDistanceToDoubleBond(name){
+ const [atoms,bonds]=w.Organic637.OriginalChem.graphTemplates[name];
+ const br=atoms.findIndex(a=>a[2]==='Br');
+ assert.ok(br>=0,'bromine atom missing '+name);
+ const brBond=bonds.find(([i,j])=>i===br||j===br);
+ assert.ok(brBond,'bromine bond absent '+name);
+ const attached=brBond[0]===br?brBond[1]:brBond[0];
+ const endpoints=new Set(bonds.filter(([, ,order])=>order===2).flatMap(([i,j])=>[i,j]));
+ if(!endpoints.size)return Infinity;
+ const graph=atoms.map(()=>[]);
+ for(const [i,j] of bonds){if(i!==br&&j!==br){graph[i].push(j);graph[j].push(i)}}
+ const queue=[[attached,0]],seen=new Set([attached]);
+ for(const [i,d] of queue){if(endpoints.has(i))return d;
+  for(const nb of graph[i])if(!seen.has(nb)){seen.add(nb);queue.push([nb,d+1])}
+ }
+ return Infinity;
+}
+for(const [name,expected] of [
+ ['烯丙位溴环己烯',1],
+ ['非烯丙位溴环己烯',2],
+ ['溴环己烷',Infinity],
+ ['乙烯基溴环己烯',0]
+ ])assert.equal(bromideDistanceToDoubleBond(name),expected,'scan p22 q6 bromine is attached to wrong ring carbon: '+name);
+const sn1=questions.find(q=>q.examSource.year===2022&&q.examSource.originalQuestion==='二、选择题6');
+assert.equal(sn1.answer,'d','2022 scanned source p22 q6 weakest SN1 is D vinylic bromide');
+const target=questions.find(q=>q.id==='orig-2020-vii-2-aldol-synthesis');
+assert.ok(w.Organic637.OriginalChem.figuresFor(target).includes('原卷指定目标'),'synthesis scan p31 product skeleton must be shown in the question alongside the starting reagents');
+assert.ok(w.Organic637.OriginalChem.figuresFor(target).includes('交叉羟醛加成目标'),'p31 drawn target skeleton missing');
+
 const water=questions.find(q=>q.id==='exam-2016-7-18');assert.equal(water.examSource.pdfPage,50,'incorrect water-solubility provenance');
 const check=w.Organic637.Interactions;
 const chem=w.Organic637.OriginalChem;
@@ -112,6 +145,7 @@ for(const q of questions){
 }
 console.log('PASS: 30 sourced questions, two 150-point normalized papers, correct and incorrect scoring');
 console.log('PASS: source metadata, page indexing, detailed explanation coverage, duplicate control');
-console.log('PASS: source/product formulas independently audited against all seven redrawn graphs');
+console.log('PASS: p22 SN1 bromide ring positions (allylic/homoallylic/vinylic), p31 target present before answer');
+console.log('PASS: source/product formulas audited, including the synthesis target and IR/NMR aromatic ether');
 console.log('PASS: '+recognizedSvg+' source figures and '+recognizedAnswers+' independently redrawn answer solutions; '+Object.keys(chem.graphTemplates).length+' molecular templates validated');
 console.log('Note: this is code-level verification, NOT final chemistry double-blind review or visual browser QA.');
