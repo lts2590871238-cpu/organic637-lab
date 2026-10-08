@@ -19,7 +19,7 @@ function draw(name){
    const segment=(off)=>'<line x1="'+(p[0]+nx*off).toFixed(1)+'" y1="'+(p[1]+ny*off).toFixed(1)+'" x2="'+(q[0]+nx*off).toFixed(1)+'" y2="'+(q[1]+ny*off).toFixed(1)+'" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>';
    out+=order===2?segment(-2.7)+segment(2.7):order===3?segment(-3.5)+segment(0)+segment(3.5):segment(0);
  }
- for(const [x,y,label] of coords)if(label){const t=label==='+'?'C⁺':label==='·'?(atoms.length===1?'CH₃·':'C·'):label;out+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="15" font-weight="600" fill="currentColor">'+escape(t)+'</text>';}
+ for(let index=0;index<coords.length;index++){const [x,y,label]=coords[index];if(!label)continue;const degree=bonds.filter(e=>e[0]===index||e[1]===index).length;const t=label==='+'?(degree===1?'CH₂⁺':degree===2?'CH⁺':'C⁺'):label==='·'?(degree===0?'CH₃·':degree===1?'CH₂·':degree===2?'CH·':'C·'):label;out+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="15" font-weight="600" fill="currentColor">'+escape(t)+'</text>';}
  return '<svg class="mol-graph-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(maxx-minx)+' '+(maxy-miny)+'" aria-label="'+escape(name)+'的重新绘制原子键线式" role="img"><g color="#253a31">'+out+'</g></svg>';
 }
 
